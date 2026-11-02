@@ -7,8 +7,8 @@
     },
     {
       "file": "02_配置模板.html",
-      "bytes": 106547,
-      "sha256": "b0d7b0caf7c709c4bdf3381e4f6ba7aae31d9a92e791ed73307cae86509609ce"
+      "bytes": 106619,
+      "sha256": "f626da199e113a3d351620a1cbe165812400944e550474133620e5bfefd60edf"
     },
     {
       "file": "04_多属性战斗诊断.html",
@@ -196,6 +196,6 @@
       "sha256": "d57dba77bdc89ff59504f05703bb3e8a6719463547126d8f3e2c39b10a7a59e9"
     }
   ],
-  "totalBytes": 144638384,
+  "totalBytes": 144638456,
   "browserValidation": "pending"
 }

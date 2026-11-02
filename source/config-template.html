@@ -4,13 +4,13 @@
 <header class="workspace-header"><div><h1>关卡数值表</h1><p>设定基础数值，把方案交给成长模拟验证。</p></div><nav><a href="06_成长模拟与卡点诊断.html">成长节奏</a><a href="04_多属性战斗诊断.html">战斗属性</a></nav></header><section>
 
 <p><a href="06_成长模拟与卡点诊断.html">进入完整成长模拟工作台</a> · <button id="sendGrowth" class="primary">把当前配置送入成长模拟</button></p>
-<p class="intro">先写想要的游玩节奏，再填数值。此模板沿用现有推荐方案，帮助生成参数和基础表；它不会自动找到满足目标的平衡方案，也不会修改正在玩的小游戏。</p>
+<p class="intro">这里载入的是原研究模板，与“成长节奏”页的推荐组合不同。你可以改参数、生成基础表，再送入成长模拟验证；想直接试推荐组合，请打开“成长节奏”。这里不会自动调平衡，也不会修改正在玩的小游戏。</p>
 <h2>先记录体验目标</h2><p class="note">下列数字是策划假设，单独修改目标不会自动调整参数。导出后仍需仿真或试玩检验。</p><div id="goals" class="grid"></div>
 <h2>先看这三项参数</h2><p class="note">这三项是现有千关研究主要调整的变量。倍率与百分比在这里分别标明。</p><div id="main-fields" class="grid"></div>
-<label style="max-width:330px;margin-top:14px">成长发放方式<select id="family"><option value="fixed">每关平滑兑现（当前推荐）</option><option value="chapter">每章结束集中兑现（案例修改前）</option></select></label>
+<label style="max-width:330px;margin-top:14px">过关后什么时候变强<select id="family"><option value="fixed">每过一关，就变强一点</option><option value="chapter">过完一整章，才一起变强</option></select></label>
 <details><summary>展开其余战斗与经济规则</summary><p class="note">先保留基准。只有项目规则确实不同才修改；这些数值不是通用行业标准。</p><div id="other-fields" class="grid"></div></details>
 <div class="buttons"><button id="json" class="primary">导出参数JSON</button><button id="stages">导出基础关卡表CSV</button><button id="prices">导出升级价格表CSV</button><button id="dictionary">导出参数字段说明CSV</button></div>
-<div class="buttons"><button id="import">导入本模板参数</button><button id="reset">恢复推荐基准</button><input type="file" id="file" accept=".json,application/json" class="file"></div>
+<div class="buttons"><button id="import">导入本模板参数</button><button id="reset">恢复模板初始值</button><input type="file" id="file" accept=".json,application/json" class="file"></div>
 <div id="status" role="status" aria-live="polite"></div>
 <p class="note">关卡表只包含基础生命、0级收益奖励和过关增益。升级表列出0—300级的价格与累计倍率，这是导出范围，不是游戏等级上限。两张表都不代表玩家届时一定拥有这些属性。</p>
 <h2>当前输入生成了什么</h2><div id="readout" class="readout"></div><div class="tables"><table><thead><tr><th>关卡</th><th>Boss</th><th>生命</th><th>首次奖励<br>收益0级</th><th>通关前成长倍率</th></tr></thead><tbody id="preview"></tbody></table></div>
@@ -21,7 +21,7 @@
 const BASE=__CONFIG__;
 const M=ConfigModel,$=id=>document.getElementById(id);
 let current=structuredClone(BASE);
-const goalLabels={visits_per_day:'每天回访次数',session_minutes:'每次游玩分钟',first_completion_min_days:'期望首通天数下限',first_completion_max_days:'期望首通天数上限',max_no_progress_hours:'最长无新关目标（小时）'};
+const goalLabels={visits_per_day:'每天上线几次',session_minutes:'每次玩几分钟',first_completion_min_days:'希望最早几天打完',first_completion_max_days:'希望最晚几天打完',max_no_progress_hours:'最多能接受几小时没过新关'};
 const pct=new Set(['hp_growth','attack_gain','attack_cost_growth','income_gain','income_cost_growth','reward_growth','chapter_power']);
 const probability=new Set(['crit_chance','push_success_threshold']);
 const mains=['cost_scale','reward_growth','chapter_power'];
