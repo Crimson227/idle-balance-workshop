@@ -1,0 +1,76 @@
+{
+  "status": "passed",
+  "modelVersion": "growth-event-2.0.0",
+  "node": "v22.21.1",
+  "platform": "win32",
+  "uniqueConfigurations": 26,
+  "uniqueRuns": 780,
+  "comparisonReferences": 1020,
+  "matchedControls": true,
+  "allStatusesRetained": true,
+  "ledgerConserved": true,
+  "maxLedgerError": 6.821842527556193e-13,
+  "protectedHashes": {
+    "支持资料/成长模拟引擎.js": "6ae05d423ebd64cfee895d825d605a03f18bef59b3ed1833df6f4ac8f6ce0c1c",
+    "支持资料/配置公式.js": "6d4e0b5736225ec664eebeb6ee3cdb02c910138d0d401a7cfd73c7d15cd14f82",
+    "06_成长模拟与卡点诊断.html": "610fe693f0bb85ceda79a17391392b0d4dc37b2c3a4ffce0482cf65ccb3abfa8",
+    "04_多属性战斗诊断.html": "e403ef1688bccf424780cdbe5513696e8143744714a9f258d0a95765a58c051d"
+  },
+  "productUnchanged": true,
+  "exactReplays": [
+    {
+      "pair": "cheap_balanced",
+      "id": "C01",
+      "seed": 4001001,
+      "exact": true
+    },
+    {
+      "pair": "cheap_balanced",
+      "id": "C02",
+      "seed": 4001001,
+      "exact": true
+    },
+    {
+      "pair": "optional_income_balanced",
+      "id": "C01",
+      "seed": 4001001,
+      "exact": true
+    },
+    {
+      "pair": "optional_income_balanced",
+      "id": "C04",
+      "seed": 4001001,
+      "exact": true
+    },
+    {
+      "pair": "optional_income_attack_only",
+      "id": "C05",
+      "seed": 4001001,
+      "exact": true
+    },
+    {
+      "pair": "optional_income_attack_only",
+      "id": "C08",
+      "seed": 4001001,
+      "exact": true
+    },
+    {
+      "pair": "frequency_attack_only_7.5",
+      "id": "C23",
+      "seed": 4001001,
+      "exact": true
+    },
+    {
+      "pair": "frequency_attack_only_7.5",
+      "id": "C24",
+      "seed": 4001001,
+      "exact": true
+    }
+  ],
+  "limits": [
+    "unchanged model, four fixed purchase strategies, scheduled visits, one crit rule",
+    "seed IDs are synthetic randomness, not human participants",
+    "no causal decomposition of combination",
+    "new sample size is a descriptive precision choice, not a power calculation"
+  ]
+}

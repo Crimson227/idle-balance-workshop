@@ -1,0 +1,75 @@
+{
+  "status": "passed",
+  "modelVersion": "growth-event-2.0.0",
+  "sourceEngineUnchanged": true,
+  "existingWorkbenchUnchanged": true,
+  "costExperimentOnlyChangesOneParameter": true,
+  "comparisonFiles": 17,
+  "runReferences": 408,
+  "uniqueRuns": 312,
+  "exactReplays": [
+    {
+      "file": "结果_cheap_balanced.json",
+      "role": 0,
+      "seed": 20261201,
+      "status": "exact_match"
+    },
+    {
+      "file": "结果_cheap_balanced.json",
+      "role": 1,
+      "seed": 20261201,
+      "status": "exact_match"
+    },
+    {
+      "file": "结果_optional_income_balanced.json",
+      "role": 0,
+      "seed": 20261201,
+      "status": "exact_match"
+    },
+    {
+      "file": "结果_optional_income_balanced.json",
+      "role": 1,
+      "seed": 20261201,
+      "status": "exact_match"
+    },
+    {
+      "file": "结果_optional_income_attack_only.json",
+      "role": 0,
+      "seed": 20261201,
+      "status": "exact_match"
+    },
+    {
+      "file": "结果_optional_income_attack_only.json",
+      "role": 1,
+      "seed": 20261201,
+      "status": "exact_match"
+    },
+    {
+      "file": "结果_optional_income_three_attack_one_income.json",
+      "role": 0,
+      "seed": 20261201,
+      "status": "exact_match"
+    },
+    {
+      "file": "结果_optional_income_three_attack_one_income.json",
+      "role": 1,
+      "seed": 20261201,
+      "status": "exact_match"
+    },
+    {
+      "file": "结果_frequency_attack_only_7.5.json",
+      "role": 0,
+      "seed": 20261201,
+      "status": "exact_match"
+    },
+    {
+      "file": "结果_frequency_attack_only_7.5.json",
+      "role": 1,
+      "seed": 20261201,
+      "status": "exact_match"
+    }
+  ],
+  "controlsMatched": true,
+  "ledgerConserved": true,
+  "unfinishedRetained": true
+}

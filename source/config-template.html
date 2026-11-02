@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>关卡数值表 · 挂机数值工坊</title>
+<style>__CSS__</style></head><body class="config-page"><a class="skip-link" href="#workspace">跳到主要内容</a><div class="app-shell"><aside class="sidebar" aria-label="工作台导航"><a class="brand" href="数值工坊.html"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M3 28h30M6 22l8-8 7 4 9-13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M5 22h3m20-17h4v4" fill="none" stroke="currentColor" stroke-width="2.5"/></svg><span class="brand-copy"><strong>数值工坊</strong><span>让每次改动有据可查</span></span></a><div class="tool-switch" aria-label="选择工具"><a href="06_成长模拟与卡点诊断.html">成长节奏</a><a href="04_多属性战斗诊断.html">战斗属性</a><a href="02_配置模板.html" aria-current="page">关卡数值表</a></div><nav class="section-nav" aria-label="本页导航"><a href="#goals"><span class="nav-index">01</span>游玩目标</a><a href="#main-fields"><span class="nav-index">02</span>基础数值</a><a href="#json"><span class="nav-index">03</span>保存与导出</a><a href="#readout"><span class="nav-index">04</span>生成的关卡表</a></nav><div class="sidebar-bottom"><span class="local-mark" aria-hidden="true"></span>离线可用 · 数据留在本机</div></aside><main class="workspace" id="workspace" tabindex="-1">
+<header class="workspace-header"><div><h1>关卡数值表</h1><p>设定基础数值，把方案交给成长模拟验证。</p></div><nav><a href="06_成长模拟与卡点诊断.html">成长节奏</a><a href="04_多属性战斗诊断.html">战斗属性</a></nav></header><section>
+
+<p><a href="06_成长模拟与卡点诊断.html">进入完整成长模拟工作台</a> · <button id="sendGrowth" class="primary">把当前配置送入成长模拟</button></p>
+<p class="intro">先写想要的游玩节奏，再填数值。此模板沿用现有推荐方案，帮助生成参数和基础表；它不会自动找到满足目标的平衡方案，也不会修改正在玩的小游戏。</p>
+<h2>先记录体验目标</h2><p class="note">下列数字是策划假设，单独修改目标不会自动调整参数。导出后仍需仿真或试玩检验。</p><div id="goals" class="grid"></div>
+<h2>先看这三项参数</h2><p class="note">这三项是现有千关研究主要调整的变量。倍率与百分比在这里分别标明。</p><div id="main-fields" class="grid"></div>
+<label style="max-width:330px;margin-top:14px">成长发放方式<select id="family"><option value="fixed">每关平滑兑现（当前推荐）</option><option value="chapter">每章结束集中兑现（案例修改前）</option></select></label>
+<details><summary>展开其余战斗与经济规则</summary><p class="note">先保留基准。只有项目规则确实不同才修改；这些数值不是通用行业标准。</p><div id="other-fields" class="grid"></div></details>
+<div class="buttons"><button id="json" class="primary">导出参数JSON</button><button id="stages">导出基础关卡表CSV</button><button id="prices">导出升级价格表CSV</button><button id="dictionary">导出参数字段说明CSV</button></div>
+<div class="buttons"><button id="import">导入本模板参数</button><button id="reset">恢复推荐基准</button><input type="file" id="file" accept=".json,application/json" class="file"></div>
+<div id="status" role="status" aria-live="polite"></div>
+<p class="note">关卡表只包含基础生命、0级收益奖励和过关增益。升级表列出0—300级的价格与累计倍率，这是导出范围，不是游戏等级上限。两张表都不代表玩家届时一定拥有这些属性。</p>
+<h2>当前输入生成了什么</h2><div id="readout" class="readout"></div><div class="tables"><table><thead><tr><th>关卡</th><th>Boss</th><th>生命</th><th>首次奖励<br>收益0级</th><th>通关前成长倍率</th></tr></thead><tbody id="preview"></tbody></table></div>
+<details><summary>交给开发时怎样接入</summary><p>JSON中的 <code>rules</code> 是计算输入，<code>goals</code> 只记录体验目标。按附带字段说明读取参数，使用关卡表与升级表；也可按同目录配套公式重新计算。</p><p>本模板可重新导入自己导出的JSON。原千关试玩和原Python研究脚本使用冻结配置，不会自动读取此文件；接入修改后的参数需要开发明确替换对应字段，再做检查。</p><p>交接时同时说明首次奖励与重复奖励、攻击间隔、暴击、取整和离线规则。当前口径为连续资源、不取整；离线固定关卡与属性，最多按上限结算，不自动购买或推进。</p><p>至少核对第1关、首个Boss和末关；然后比较不同购买选择与回访预算。先记录不达标结果，再决定改参数或改目标。</p></details>
+</section><footer>范围：已有输出与挂机经济模型。没有新增装备、开箱、怪物机制或留存预测。参数格式正确 ≠ 推进达标 ≠ 玩家喜欢。</footer>
+</main></div><script>__MODEL__</script>
+<script>
+const BASE=__CONFIG__;
+const M=ConfigModel,$=id=>document.getElementById(id);
+let current=structuredClone(BASE);
+const goalLabels={visits_per_day:'每天回访次数',session_minutes:'每次游玩分钟',first_completion_min_days:'期望首通天数下限',first_completion_max_days:'期望首通天数上限',max_no_progress_hours:'最长无新关目标（小时）'};
+const pct=new Set(['hp_growth','attack_gain','attack_cost_growth','income_gain','income_cost_growth','reward_growth','chapter_power']);
+const probability=new Set(['crit_chance','push_success_threshold']);
+const mains=['cost_scale','reward_growth','chapter_power'];
+const labels={hp_growth:'每关生命增幅（%）',attack_gain:'攻击升级增幅（%）',attack_cost_growth:'攻击价格递增（%）',income_gain:'收益升级增幅（%）',income_cost_growth:'收益价格递增（%）',reward_growth:'每关奖励增幅（%）',chapter_power:'每章累计成长增幅（%）',cost_scale:'所有升级起价倍率',crit_chance:'暴击率（%）',push_success_threshold:'自动挑战准入概率（%）'};
+const display=(key,value)=>pct.has(key)?Number(((value-1)*100).toPrecision(12)):probability.has(key)?value*100:value;
+const native=(key,value)=>pct.has(key)?1+value/100:probability.has(key)?value/100:value;
+function field(key,label,value,goal=false){const input=document.createElement('input');input.type='number';input.step='any';input.value=display(key,value);input.dataset.key=key;input.dataset.goal=String(goal);input.id='field-'+key;const wrap=document.createElement('label');wrap.htmlFor=input.id;wrap.append(document.createTextNode(label),input);return wrap;}
+function setup(){
+ $('goals').replaceChildren(...Object.entries(goalLabels).map(([k,l])=>field(k,l,current.goals[k],true)));
+ for(const target of ['main-fields','other-fields'])$(target).replaceChildren();
+ for(const [key,label,unit] of M.fields){const l=labels[key]||label+'（'+unit+'）';$(mains.includes(key)?'main-fields':'other-fields').append(field(key,l,current.rules[key]));}
+ $('family').value=current.rules.family;refresh();
+}
+function read(){const c=structuredClone(current);for(const input of document.querySelectorAll('input[data-key]')){const raw=input.value.trim(),value=raw===''?NaN:Number(raw);(input.dataset.goal==='true'?c.goals:c.rules)[input.dataset.key]=native(input.dataset.key,value);}c.rules.family=$('family').value;return M.validate(c);}
+function refresh(){try{current=read();$('status').className='';$('status').textContent='参数格式检查通过。体验目标仍需验证；已生成当前基础表。';for(const id of ['json','stages','prices','dictionary','sendGrowth'])$(id).disabled=false;
+ const r=current.rules,d=M.damage(current,0,0),dps=d/r.attack_interval_seconds*(1+r.crit_chance*(r.crit_multiplier-1));
+ $('readout').textContent=`共${r.stage_cap}关；首次攻击升级${(r.cost_scale*r.attack_cost_base).toPrecision(5)}资源，首次收益升级${(r.cost_scale*r.income_cost_base).toPrecision(5)}资源。首关0级参考：普通一击${d.toPrecision(5)}，期望每秒伤害${dps.toPrecision(5)}。`;
+ const nums=[...new Set([1,2,3,r.chapter_size-1,r.chapter_size,r.chapter_size+1,r.stage_cap])].filter(n=>n>=1&&n<=r.stage_cap).sort((a,b)=>a-b);
+ $('preview').innerHTML=nums.map(n=>{const row=M.stage(current,n);return `<tr><td>${n}</td><td>${row.is_boss?'是':'否'}</td><td>${row.enemy_hp.toPrecision(6)}</td><td>${row.first_reward.toPrecision(6)}</td><td>${row.clear_power_before.toFixed(6)}</td></tr>`;}).join('');
+ }catch(e){$('status').className='error';$('status').textContent=e.message;for(const id of ['json','stages','prices','dictionary','sendGrowth'])$(id).disabled=true;$('preview').replaceChildren();$('readout').textContent='请先修正输入。';}}
+function download(name,text,type){const blob=new Blob([text],{type}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);}
+document.addEventListener('input',e=>{if(e.target.matches('input[data-key]'))refresh();});$('family').onchange=refresh;
+$('json').onclick=()=>download('项目数值配置.json',JSON.stringify(read(),null,2),'application/json');
+$('stages').onclick=()=>{const c=read(),rows=Array.from({length:c.rules.stage_cap},(_,i)=>M.stage(c,i+1));download('基础关卡表.csv',M.csv(Object.keys(rows[0]),rows),'text/csv;charset=utf-8');};
+$('prices').onclick=()=>{const c=read(),rows=Array.from({length:301},(_,i)=>M.upgrade(c,i));download('升级价格表.csv',M.csv(Object.keys(rows[0]),rows),'text/csv;charset=utf-8');};
+$('dictionary').onclick=()=>{const c=read(),rows=M.fields.map(([key,label,unit,min,max])=>({field:'rules.'+key,name:label,value:c.rules[key],unit,min,max}));download('参数字段说明.csv','\uFEFF字段,含义,当前值,单位,模板最低值,模板最高值\r\n'+rows.map(r=>Object.values(r).join(',')).join('\r\n')+'\r\n','text/csv;charset=utf-8');};
+$('import').onclick=()=>$('file').click();$('file').onchange=async()=>{try{const file=$('file').files[0];if(!file)return;if(file.size>1000000)throw Error('参数文件请小于1MB。');current=M.validate(JSON.parse(await file.text()));setup();$('status').textContent='已导入参数。体验目标尚未自动验证。';}catch(e){$('status').className='error';$('status').textContent='导入失败：'+e.message;}finally{$('file').value='';}};
+$('reset').onclick=()=>{current=structuredClone(BASE);setup();};
+$('sendGrowth').onclick=()=>{try{const c=M.validate(read());location.href='06_成长模拟与卡点诊断.html#config='+encodeURIComponent(JSON.stringify(c));}catch(e){$('status').textContent=e.message;}};
+setup();window.templateAudit={read,base:BASE,model:M};
+</script><script>__SHELL__</script></body></html>

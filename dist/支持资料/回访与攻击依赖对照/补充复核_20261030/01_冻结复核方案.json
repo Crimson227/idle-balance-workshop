@@ -1,0 +1,394 @@
+{
+  "date": "2026-10-30",
+  "mode": "fixed-design replication",
+  "modelVersion": "growth-event-2.0.0",
+  "seeds": [
+    4001001,
+    4001002,
+    4001003,
+    4001004,
+    4001005,
+    4001006,
+    4001007,
+    4001008,
+    4001009,
+    4001010,
+    4001011,
+    4001012,
+    4001013,
+    4001014,
+    4001015,
+    4001016,
+    4001017,
+    4001018,
+    4001019,
+    4001020,
+    4001021,
+    4001022,
+    4001023,
+    4001024,
+    4001025,
+    4001026,
+    4001027,
+    4001028,
+    4001029,
+    4001030
+  ],
+  "batchSize": 10,
+  "priorSeeds": [
+    20261201,
+    20261202,
+    20261203,
+    20261204,
+    20261205,
+    20261206,
+    20261207,
+    20261208,
+    20261209,
+    20261210,
+    20261211,
+    20261212
+  ],
+  "selectionSeeds": [
+    20261029,
+    20261030,
+    20261031
+  ],
+  "priorBoundarySeeds": [
+    20261101,
+    20261102,
+    20261103,
+    20261104,
+    20261105,
+    20261106,
+    20261107,
+    20261108,
+    20261109,
+    20261110,
+    20261111,
+    20261112
+  ],
+  "budgetDays": 28,
+  "goals": {
+    "visits_per_day": 3,
+    "session_minutes": 5,
+    "first_completion_min_days": 14,
+    "first_completion_max_days": 21,
+    "max_no_progress_hours": 36,
+    "expected_stages_per_visit": 5
+  },
+  "pairs": [
+    {
+      "key": "cheap_balanced",
+      "design": {
+        "key": "cheap",
+        "name": "只把价格减半",
+        "patch": {
+          "cost_scale": 2.8125
+        }
+      },
+      "behavior": {
+        "strategy": "balanced"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "boss_balanced",
+      "design": {
+        "key": "boss",
+        "name": "只降低Boss生命尖峰",
+        "patch": {
+          "boss_hp_multiplier": 1.2
+        }
+      },
+      "behavior": {
+        "strategy": "balanced"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "optional_income_balanced",
+      "design": {
+        "key": "optional_income",
+        "name": "可选收益升级：双价格斜率修正",
+        "patch": {
+          "attack_cost_growth": 1.105,
+          "income_gain": 1.005,
+          "income_cost_growth": 1.3,
+          "boss_hp_multiplier": 1.2,
+          "cost_scale": 300
+        }
+      },
+      "behavior": {
+        "strategy": "balanced"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "cheap_attack_only",
+      "design": {
+        "key": "cheap",
+        "name": "只把价格减半",
+        "patch": {
+          "cost_scale": 2.8125
+        }
+      },
+      "behavior": {
+        "strategy": "attack_only"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "boss_attack_only",
+      "design": {
+        "key": "boss",
+        "name": "只降低Boss生命尖峰",
+        "patch": {
+          "boss_hp_multiplier": 1.2
+        }
+      },
+      "behavior": {
+        "strategy": "attack_only"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "optional_income_attack_only",
+      "design": {
+        "key": "optional_income",
+        "name": "可选收益升级：双价格斜率修正",
+        "patch": {
+          "attack_cost_growth": 1.105,
+          "income_gain": 1.005,
+          "income_cost_growth": 1.3,
+          "boss_hp_multiplier": 1.2,
+          "cost_scale": 300
+        }
+      },
+      "behavior": {
+        "strategy": "attack_only"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "cheap_income_first",
+      "design": {
+        "key": "cheap",
+        "name": "只把价格减半",
+        "patch": {
+          "cost_scale": 2.8125
+        }
+      },
+      "behavior": {
+        "strategy": "income_first"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "boss_income_first",
+      "design": {
+        "key": "boss",
+        "name": "只降低Boss生命尖峰",
+        "patch": {
+          "boss_hp_multiplier": 1.2
+        }
+      },
+      "behavior": {
+        "strategy": "income_first"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "optional_income_income_first",
+      "design": {
+        "key": "optional_income",
+        "name": "可选收益升级：双价格斜率修正",
+        "patch": {
+          "attack_cost_growth": 1.105,
+          "income_gain": 1.005,
+          "income_cost_growth": 1.3,
+          "boss_hp_multiplier": 1.2,
+          "cost_scale": 300
+        }
+      },
+      "behavior": {
+        "strategy": "income_first"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "cheap_three_attack_one_income",
+      "design": {
+        "key": "cheap",
+        "name": "只把价格减半",
+        "patch": {
+          "cost_scale": 2.8125
+        }
+      },
+      "behavior": {
+        "strategy": "three_attack_one_income"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "boss_three_attack_one_income",
+      "design": {
+        "key": "boss",
+        "name": "只降低Boss生命尖峰",
+        "patch": {
+          "boss_hp_multiplier": 1.2
+        }
+      },
+      "behavior": {
+        "strategy": "three_attack_one_income"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "optional_income_three_attack_one_income",
+      "design": {
+        "key": "optional_income",
+        "name": "可选收益升级：双价格斜率修正",
+        "patch": {
+          "attack_cost_growth": 1.105,
+          "income_gain": 1.005,
+          "income_cost_growth": 1.3,
+          "boss_hp_multiplier": 1.2,
+          "cost_scale": 300
+        }
+      },
+      "behavior": {
+        "strategy": "three_attack_one_income"
+      },
+      "reference": "标准：每日3×5分钟"
+    },
+    {
+      "key": "frequency_balanced_5",
+      "design": {
+        "key": "optional_income",
+        "name": "可选收益升级：双价格斜率修正",
+        "patch": {
+          "attack_cost_growth": 1.105,
+          "income_gain": 1.005,
+          "income_cost_growth": 1.3,
+          "boss_hp_multiplier": 1.2,
+          "cost_scale": 300
+        }
+      },
+      "behavior": {
+        "strategy": "balanced",
+        "visitsPerDay": 2,
+        "sessionMinutes": 5,
+        "visitHours": [
+          0,
+          12
+        ]
+      },
+      "reference": "每日2×5分钟，计划在线总时长减少"
+    },
+    {
+      "key": "frequency_balanced_7.5",
+      "design": {
+        "key": "optional_income",
+        "name": "可选收益升级：双价格斜率修正",
+        "patch": {
+          "attack_cost_growth": 1.105,
+          "income_gain": 1.005,
+          "income_cost_growth": 1.3,
+          "boss_hp_multiplier": 1.2,
+          "cost_scale": 300
+        }
+      },
+      "behavior": {
+        "strategy": "balanced",
+        "visitsPerDay": 2,
+        "sessionMinutes": 7.5,
+        "visitHours": [
+          0,
+          12
+        ]
+      },
+      "reference": "每日2×7.5分钟，计划在线总时长相同"
+    },
+    {
+      "key": "frequency_attack_only_5",
+      "design": {
+        "key": "optional_income",
+        "name": "可选收益升级：双价格斜率修正",
+        "patch": {
+          "attack_cost_growth": 1.105,
+          "income_gain": 1.005,
+          "income_cost_growth": 1.3,
+          "boss_hp_multiplier": 1.2,
+          "cost_scale": 300
+        }
+      },
+      "behavior": {
+        "strategy": "attack_only",
+        "visitsPerDay": 2,
+        "sessionMinutes": 5,
+        "visitHours": [
+          0,
+          12
+        ]
+      },
+      "reference": "每日2×5分钟，计划在线总时长减少"
+    },
+    {
+      "key": "frequency_attack_only_7.5",
+      "design": {
+        "key": "optional_income",
+        "name": "可选收益升级：双价格斜率修正",
+        "patch": {
+          "attack_cost_growth": 1.105,
+          "income_gain": 1.005,
+          "income_cost_growth": 1.3,
+          "boss_hp_multiplier": 1.2,
+          "cost_scale": 300
+        }
+      },
+      "behavior": {
+        "strategy": "attack_only",
+        "visitsPerDay": 2,
+        "sessionMinutes": 7.5,
+        "visitHours": [
+          0,
+          12
+        ]
+      },
+      "reference": "每日2×7.5分钟，计划在线总时长相同"
+    },
+    {
+      "key": "missed_balanced",
+      "design": {
+        "key": "optional_income",
+        "name": "可选收益升级：双价格斜率修正",
+        "patch": {
+          "attack_cost_growth": 1.105,
+          "income_gain": 1.005,
+          "income_cost_growth": 1.3,
+          "boss_hp_multiplier": 1.2,
+          "cost_scale": 300
+        }
+      },
+      "behavior": {
+        "strategy": "balanced",
+        "missedVisits": [
+          42
+        ]
+      },
+      "reference": "额外跳过序号42的回访，计划在线减少5分钟"
+    }
+  ],
+  "protectedHashes": {
+    "支持资料/成长模拟引擎.js": "6ae05d423ebd64cfee895d825d605a03f18bef59b3ed1833df6f4ac8f6ce0c1c",
+    "支持资料/配置公式.js": "6d4e0b5736225ec664eebeb6ee3cdb02c910138d0d401a7cfd73c7d15cd14f82",
+    "06_成长模拟与卡点诊断.html": "610fe693f0bb85ceda79a17391392b0d4dc37b2c3a4ffce0482cf65ccb3abfa8",
+    "04_多属性战斗诊断.html": "e403ef1688bccf424780cdbe5513696e8143744714a9f258d0a95765a58c051d"
+  },
+  "freeze": "Existing 17 comparisons and parameter values frozen before new runs. No tuning, new attributes or new UI. IDs are PRNG seeds, not dates.",
+  "unit": "30 seed IDs per configuration; behavior and design share seeds. Do not count comparisons, visits or reused controls as independent players.",
+  "offline": "farm only; no purchases or NEW push starts offline; an online-started battle may settle after logout; cap 24h; safe failure policy",
+  "analysis": "Descriptive medians/ranges and paired counts, all outcomes retained. No population inference, p-values or retention estimates. Each saved batch has 10 seeds to fit the unchanged 12-seed UI limit.",
+  "clarification": "Offline wording clarified after source audit; no configuration, seeds or results changed."
+}

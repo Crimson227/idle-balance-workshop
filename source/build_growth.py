@@ -1,0 +1,16 @@
+from pathlib import Path
+import json
+root=Path(__file__).resolve().parent.parent
+build=root/'_构建'
+text=(build/'growth-template.html').read_text(encoding='utf-8')
+recommended=json.loads((root/'支持资料/回访与攻击依赖对照/补充复核_20261030/完整结果/结果_optional_income_balanced_批1.json').read_text(encoding='utf-8'))['project']
+text=text.replace('__RECOMMENDED__',json.dumps(recommended,ensure_ascii=False))
+study=json.loads((root/'支持资料/回访与攻击依赖对照/补充复核_20261030/02_三十种子汇总.json').read_text(encoding='utf-8'))
+evidence={x['id']:{k:x[k] for k in ['samples','finishMedian','longestHours','empty','visits','allGoals']} for x in study['configurations'] if x['id'] in ['C01','C04']}
+text=text.replace('__EVIDENCE__',json.dumps(evidence,ensure_ascii=False))
+for key,value in {'CSS':(build/'workbench-fonts.css').read_text(encoding='utf-8')+(build/'workbench.css').read_text(encoding='utf-8')+(build/'growth.css').read_text(encoding='utf-8'),'MODEL':(root/'支持资料/配置公式.js').read_text(encoding='utf-8'),'ENGINE':(root/'支持资料/成长模拟引擎.js').read_text(encoding='utf-8'),'DECISION':(build/'growth-decision.js').read_text(encoding='utf-8'),'GUIDE':(build/'growth-guide.js').read_text(encoding='utf-8'),'APP':(build/'growth-app.js').read_text(encoding='utf-8'),'DEFAULT':(root/'支持资料/推荐基准参数.json').read_text(encoding='utf-8'),'VERSION':'growth-event-2.0.0'}.items():text=text.replace('__'+key+'__',value)
+text=text.replace('__SHELL__',(build/'workbench-shell.js').read_text(encoding='utf-8'))
+text=text.replace('__ATTRIBUTE_DATA__',(build/'attribute-catalog.json').read_text(encoding='utf-8')).replace('__ATTRIBUTE_PAGE__','growth').replace('__ATTRIBUTE_HELP__',(build/'attribute-help.js').read_text(encoding='utf-8'))
+(root/'06_成长模拟与卡点诊断.html').write_text(text,encoding='utf-8')
+(root/'数值工坊.html').write_text(text,encoding='utf-8')
+print('Built growth workbench')

@@ -1,0 +1,361 @@
+{
+  "diffs": [
+    {
+      "key": "cost_scale",
+      "before": 5.625,
+      "after": 2.8125
+    }
+  ],
+  "stages": [
+    {
+      "stage": 500,
+      "seed": 20261201,
+      "before": {
+        "stage": 500,
+        "historical": true,
+        "snapshot": {
+          "time": 191097.89999995864,
+          "highest": 499,
+          "attackLevel": 132,
+          "incomeLevel": 30,
+          "coins": 1640395702.223749,
+          "mode": "arrival"
+        },
+        "damage": 7590901561.260275,
+        "requiredDamage": 5575818691.962682,
+        "damageGap": 0,
+        "probability": 1,
+        "policy": "attack",
+        "policyCost": 11568244235.47863,
+        "attackCost": 11568244235.47863,
+        "resourceGap": 9927848533.25488,
+        "farmRatePerSecond": 11391681.81793389,
+        "estimatedActiveWaitSeconds": 871.4998094158054,
+        "attacksNeeded": 0,
+        "totalAttackCost": 0,
+        "totalAttackGap": 0,
+        "totalEstimatedActiveWaitSeconds": 0,
+        "afterOneProbability": 1,
+        "afterOneCanPass": true,
+        "afterOneContinuousStages": 36,
+        "forecastCapped": false,
+        "earlyPower": null,
+        "evidence": [
+          "资源门槛：下一次攻击升级缺9.928e+9资源；固定当前刷取能力、持续刷取约0.24小时。成本和奖励共同决定这个比值，不能仅凭此唯一归因。",
+          "成长发放时点：该快照处于离线/暂停，默认离线只刷取，上线才能购买与新推关。"
+        ]
+      },
+      "after": {
+        "stage": 500,
+        "historical": true,
+        "snapshot": {
+          "time": 172886.69999998476,
+          "highest": 499,
+          "attackLevel": 144,
+          "incomeLevel": 33,
+          "coins": 27881986151.083817,
+          "mode": "arrival"
+        },
+        "damage": 29573970244.457424,
+        "requiredDamage": 5575818691.962682,
+        "damageGap": 0,
+        "probability": 1,
+        "policy": "attack",
+        "policyCost": 30946499970.50757,
+        "attackCost": 30946499970.50757,
+        "resourceGap": 3064513819.423752,
+        "farmRatePerSecond": 45197744.85024277,
+        "estimatedActiveWaitSeconds": 67.80236114827511,
+        "attacksNeeded": 0,
+        "totalAttackCost": 0,
+        "totalAttackGap": 0,
+        "totalEstimatedActiveWaitSeconds": 0,
+        "afterOneProbability": 1,
+        "afterOneCanPass": true,
+        "afterOneContinuousStages": 79,
+        "forecastCapped": false,
+        "earlyPower": null,
+        "evidence": [
+          "资源门槛：下一次攻击升级缺3.065e+9资源；固定当前刷取能力、持续刷取约0.02小时。成本和奖励共同决定这个比值，不能仅凭此唯一归因。",
+          "成长发放时点：该快照处于离线/暂停，默认离线只刷取，上线才能购买与新推关。"
+        ]
+      },
+      "actualBeforeGapHours": 0.0063333333333301,
+      "actualAfterGapHours": 0.0018888888888856552,
+      "matchedSnapshotCounterfactual": {
+        "ordinaryDamage": 7590901561.260275,
+        "attackCost": 5784122117.739315,
+        "coins": 1640395702.223749,
+        "resourceGap": 4143726415.515566,
+        "canAffordNextAttack": false,
+        "warning": "只把价格变化应用于原快照，非真实修改后轨迹；真实轨迹在after及完整结果里"
+      }
+    },
+    {
+      "stage": 900,
+      "seed": 20261201,
+      "before": {
+        "stage": 900,
+        "historical": true,
+        "snapshot": {
+          "time": 777855.4000002882,
+          "highest": 899,
+          "attackLevel": 235,
+          "incomeLevel": 55,
+          "coins": 3847365288809794.5,
+          "mode": "online",
+          "visit": 27
+        },
+        "damage": 19956568038077016,
+        "requiredDamage": 36278085745092950,
+        "damageGap": 16321517707015936,
+        "probability": 0,
+        "policy": "attack",
+        "policyCost": 20660698757902824,
+        "attackCost": 20660698757902824,
+        "resourceGap": 16813333469093030,
+        "farmRatePerSecond": 2779037542104.866,
+        "estimatedActiveWaitSeconds": 6050.0562566558465,
+        "attacksNeeded": 6,
+        "totalAttackCost": 180858352862662430,
+        "totalAttackGap": 177010987573852640,
+        "totalEstimatedActiveWaitSeconds": 63695.06884739061,
+        "afterOneProbability": 4.668792895962913e-27,
+        "afterOneCanPass": false,
+        "afterOneContinuousStages": 0,
+        "forecastCapped": false,
+        "earlyPower": null,
+        "evidence": [
+          "战斗能力：成功概率0.0%，低于准入目标90%；普通单击需提高81.8%。",
+          "资源门槛：下一次攻击升级缺1.681e+16资源；固定当前刷取能力、持续刷取约1.68小时。成本和奖励共同决定这个比值，不能仅凭此唯一归因。",
+          "一次攻击升级仍不足：至少需连续6次攻击升级；这是只买攻击的反事实，不是当前策略承诺。"
+        ]
+      },
+      "after": {
+        "stage": 900,
+        "historical": true,
+        "snapshot": {
+          "time": 518652.3999996918,
+          "highest": 899,
+          "attackLevel": 239,
+          "incomeLevel": 55,
+          "coins": 6211691994181942,
+          "mode": "online",
+          "visit": 18
+        },
+        "damage": 31402046167071410,
+        "requiredDamage": 36278085745092950,
+        "damageGap": 4876039578021544,
+        "probability": 0.022068450770535618,
+        "policy": "attack",
+        "policyCost": 18067845628469630,
+        "attackCost": 18067845628469630,
+        "resourceGap": 11856153634287690,
+        "farmRatePerSecond": 4304203663665.8423,
+        "estimatedActiveWaitSeconds": 2754.5521914708693,
+        "attacksNeeded": 2,
+        "totalAttackCost": 38845868101209710,
+        "totalAttackGap": 32634176107027770,
+        "totalEstimatedActiveWaitSeconds": 7581.931213550802,
+        "afterOneProbability": 0.6765967248105142,
+        "afterOneCanPass": false,
+        "afterOneContinuousStages": 0,
+        "forecastCapped": false,
+        "earlyPower": null,
+        "evidence": [
+          "战斗能力：成功概率2.2%，低于准入目标90%；普通单击需提高15.5%。",
+          "资源门槛：下一次攻击升级缺1.186e+16资源；固定当前刷取能力、持续刷取约0.77小时。成本和奖励共同决定这个比值，不能仅凭此唯一归因。",
+          "一次攻击升级仍不足：至少需连续2次攻击升级；这是只买攻击的反事实，不是当前策略承诺。"
+        ]
+      },
+      "actualBeforeGapHours": 23.938611111172747,
+      "actualAfterGapHours": 4.941583333341663,
+      "matchedSnapshotCounterfactual": {
+        "ordinaryDamage": 19956568038077016,
+        "attackCost": 10330349378951412,
+        "coins": 3847365288809794.5,
+        "resourceGap": 6482984090141618,
+        "canAffordNextAttack": false,
+        "warning": "只把价格变化应用于原快照，非真实修改后轨迹；真实轨迹在after及完整结果里"
+      }
+    },
+    {
+      "stage": 950,
+      "seed": 20261201,
+      "before": {
+        "stage": 950,
+        "historical": true,
+        "snapshot": {
+          "time": 950591.100000669,
+          "highest": 949,
+          "attackLevel": 249,
+          "incomeLevel": 58,
+          "coins": 60350701074056040,
+          "mode": "online",
+          "visit": 33
+        },
+        "damage": 143856733518852940,
+        "requiredDamage": 257816867799508930,
+        "damageGap": 113960134280655980,
+        "probability": 0,
+        "policy": "attack",
+        "policyCost": 146189025299663230,
+        "attackCost": 146189025299663230,
+        "resourceGap": 85838324225607200,
+        "farmRatePerSecond": 14595397017988.076,
+        "estimatedActiveWaitSeconds": 5881.1914550742185,
+        "attacksNeeded": 6,
+        "totalAttackCost": 1279700489906321700,
+        "totalAttackGap": 1219349788832265700,
+        "totalEstimatedActiveWaitSeconds": 83543.44779586878,
+        "afterOneProbability": 1.7530106989066e-24,
+        "afterOneCanPass": false,
+        "afterOneContinuousStages": 0,
+        "forecastCapped": false,
+        "earlyPower": null,
+        "evidence": [
+          "战斗能力：成功概率0.0%，低于准入目标90%；普通单击需提高79.2%。",
+          "资源门槛：下一次攻击升级缺8.584e+16资源；固定当前刷取能力、持续刷取约1.63小时。成本和奖励共同决定这个比值，不能仅凭此唯一归因。",
+          "一次攻击升级仍不足：至少需连续6次攻击升级；这是只买攻击的反事实，不是当前策略承诺。"
+        ]
+      },
+      "after": {
+        "stage": 950,
+        "historical": true,
+        "snapshot": {
+          "time": 605085.8999998758,
+          "highest": 949,
+          "attackLevel": 251,
+          "incomeLevel": 58,
+          "coins": 60259867079414220,
+          "mode": "online",
+          "visit": 21
+        },
+        "damage": 180453886526049150,
+        "requiredDamage": 257816867799508930,
+        "damageGap": 77362981273459780,
+        "probability": 3.336125471816878e-13,
+        "policy": "attack",
+        "policyCost": 96667492979402300,
+        "attackCost": 96667492979402300,
+        "resourceGap": 36407625899988080,
+        "farmRatePerSecond": 18163469085403.25,
+        "estimatedActiveWaitSeconds": 2004.4423082838523,
+        "attacksNeeded": 4,
+        "totalAttackCost": 482697042756022900,
+        "totalAttackGap": 422437175676608700,
+        "totalEstimatedActiveWaitSeconds": 23257.51615455953,
+        "afterOneProbability": 0.00001050714000091492,
+        "afterOneCanPass": false,
+        "afterOneContinuousStages": 0,
+        "forecastCapped": false,
+        "earlyPower": null,
+        "evidence": [
+          "战斗能力：成功概率0.0%，低于准入目标90%；普通单击需提高42.9%。",
+          "资源门槛：下一次攻击升级缺3.641e+16资源；固定当前刷取能力、持续刷取约0.56小时。成本和奖励共同决定这个比值，不能仅凭此唯一归因。",
+          "一次攻击升级仍不足：至少需连续4次攻击升级；这是只买攻击的反事实，不是当前策略承诺。"
+        ]
+      },
+      "actualBeforeGapHours": 23.957527777833164,
+      "actualAfterGapHours": 11.931555555586238,
+      "matchedSnapshotCounterfactual": {
+        "ordinaryDamage": 143856733518852940,
+        "attackCost": 73094512649831620,
+        "coins": 60350701074056040,
+        "resourceGap": 12743811575775576,
+        "canAffordNextAttack": false,
+        "warning": "只把价格变化应用于原快照，非真实修改后轨迹；真实轨迹在after及完整结果里"
+      }
+    },
+    {
+      "stage": 1000,
+      "seed": 20261201,
+      "before": {
+        "stage": 1000,
+        "historical": true,
+        "snapshot": {
+          "time": 1166482.9000010907,
+          "highest": 999,
+          "attackLevel": 263,
+          "incomeLevel": 61,
+          "coins": 484388714947457100,
+          "mode": "online",
+          "visit": 41
+        },
+        "damage": 1036989914259244800,
+        "requiredDamage": 1832222840780408800,
+        "damageGap": 795232926521164000,
+        "probability": 0,
+        "policy": "attack",
+        "policyCost": 1034390529017851800,
+        "attackCost": 1034390529017851800,
+        "resourceGap": 550001814070394700,
+        "farmRatePerSecond": 76675004715431.6,
+        "estimatedActiveWaitSeconds": 7173.1565731446435,
+        "attacksNeeded": 6,
+        "totalAttackCost": 9054784133249526000,
+        "totalAttackGap": 8570395418302069000,
+        "totalEstimatedActiveWaitSeconds": 111775.60992803164,
+        "afterOneProbability": 2.882054731644883e-23,
+        "afterOneCanPass": false,
+        "afterOneContinuousStages": 0,
+        "forecastCapped": false,
+        "earlyPower": null,
+        "evidence": [
+          "战斗能力：成功概率0.0%，低于准入目标90%；普通单击需提高76.7%。",
+          "资源门槛：下一次攻击升级缺5.500e+17资源；固定当前刷取能力、持续刷取约1.99小时。成本和奖励共同决定这个比值，不能仅凭此唯一归因。",
+          "一次攻击升级仍不足：至少需连续6次攻击升级；这是只买攻击的反事实，不是当前策略承诺。"
+        ]
+      },
+      "after": {
+        "stage": 1000,
+        "historical": true,
+        "snapshot": {
+          "time": 734419.1000001747,
+          "highest": 999,
+          "attackLevel": 265,
+          "incomeLevel": 62,
+          "coins": 636221556980962200,
+          "mode": "online",
+          "visit": 26
+        },
+        "damage": 1300800148446797000,
+        "requiredDamage": 1832222840780408800,
+        "damageGap": 531422692333611800,
+        "probability": 1.3930524752340095e-11,
+        "policy": "attack",
+        "policyCost": 683990737313054500,
+        "attackCost": 683990737313054500,
+        "resourceGap": 47769180332092290,
+        "farmRatePerSecond": 103243107327204.03,
+        "estimatedActiveWaitSeconds": 462.68638719580025,
+        "attacksNeeded": 4,
+        "totalAttackCost": 3415422247930573000,
+        "totalAttackGap": 2779200690949610500,
+        "totalEstimatedActiveWaitSeconds": 26918.995009919712,
+        "afterOneProbability": 0.0000342881701538944,
+        "afterOneCanPass": false,
+        "afterOneContinuousStages": 0,
+        "forecastCapped": false,
+        "earlyPower": null,
+        "evidence": [
+          "战斗能力：成功概率0.0%，低于准入目标90%；普通单击需提高40.9%。",
+          "资源门槛：下一次攻击升级缺4.777e+16资源；固定当前刷取能力、持续刷取约0.13小时。成本和奖励共同决定这个比值，不能仅凭此唯一归因。",
+          "一次攻击升级仍不足：至少需连续4次攻击升级；这是只买攻击的反事实，不是当前策略承诺。"
+        ]
+      },
+      "actualBeforeGapHours": 35.98627777786744,
+      "actualAfterGapHours": 18.92286111115129,
+      "matchedSnapshotCounterfactual": {
+        "ordinaryDamage": 1036989914259244800,
+        "attackCost": 517195264508925900,
+        "coins": 484388714947457100,
+        "resourceGap": 32806549561468800,
+        "canAffordNextAttack": false,
+        "warning": "只把价格变化应用于原快照，非真实修改后轨迹；真实轨迹在after及完整结果里"
+      }
+    }
+  ],
+  "firstCompletionBefore": 15.000378472238582,
+  "firstCompletionAfter": 9.00037615741057
+}

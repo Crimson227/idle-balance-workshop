@@ -1,0 +1,11 @@
+{
+  "status": "passed",
+  "uniqueRuns": 780,
+  "references": 1020,
+  "offlineSegments": 42307,
+  "carriedSettlements": 22290,
+  "offlinePurchases": 0,
+  "offlineCarryRule": "No new offline push starts; at most one online-started push settles per offline interval, within battle timeout after logout.",
+  "handCheck": "Six attack purchase costs summed independently; half-price snapshot and damage invariance verified.",
+  "productHashesUnchanged": true
+}

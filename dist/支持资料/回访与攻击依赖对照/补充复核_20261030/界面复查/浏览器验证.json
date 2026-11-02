@@ -1,0 +1,19 @@
+{
+  "status": "passed",
+  "localLinks": 18,
+  "importedComparisonBatches": 7,
+  "runsPerBatch": 20,
+  "browserReplayedRuns": 20,
+  "discreteStatesExact": true,
+  "maxNormalizedNumericError": 1.0551538643350968e-12,
+  "numericDifferences": 15419,
+  "numericTolerance": 1e-10,
+  "browserVersion": "156.0.4314.50",
+  "comparison": "Full fieldwise comparison; numbers scaled by max(1,abs(actual),abs(expected)); all discrete state fields exact",
+  "operation": "import → copy baseline → modify cost → rerun → inspect stage900 → export1000-stageCSV; import late completion and inspect failed goal",
+  "mobileWidths": [
+    390,
+    320
+  ],
+  "pageErrors": []
+}
