@@ -4,3 +4,37 @@
 .workflow-path{margin-bottom:20px}.workflow-path a{padding:10px 12px}.start-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(270px,1fr);gap:36px}.start-copy{min-width:0}#start{padding:28px 30px}#start h2{font-size:28px;max-width:24ch;margin-bottom:12px}#start .start-intro{font-size:15px;line-height:1.9;color:var(--ink)}#comparisonContext{border:0;padding:0;margin-top:22px;font-size:13px}#activePlan{font-size:13px;font-weight:500;margin-top:8px}#start .start-copy .actions{margin-top:24px}#start .start-limit{color:var(--muted);font-size:13px;margin-top:18px}.start-facts{padding-left:30px;border-left:1px solid #cbd7c0}.start-facts h3{font-size:16px;margin:0 0 12px}.start-facts dl{margin:0 0 18px}.start-facts dl>div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:8px 0;border-bottom:1px solid #dbe3d3;font-size:13px}.start-facts dt{color:var(--muted);flex-shrink:0}.start-facts dd{margin:0;text-align:right;font-weight:600}.start-facts details{border:0;padding-top:0;margin-top:12px}.start-facts summary{font-weight:400;font-size:13px}.start-facts #setupSummary{font-size:12px}.start-facts>button{background:transparent;border-color:#9dad93}#start>details{margin-top:24px}.result-actions{margin:20px 0 24px}.result-actions button:first-child{color:var(--accent);border-color:var(--accent)}#editStatus:empty{display:none}#run:disabled{cursor:wait}
 @media(max-width:800px){.start-layout{grid-template-columns:1fr;gap:24px}.start-facts{padding:22px 0 0;border-left:0;border-top:1px solid #cbd7c0}.start-facts dl{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}.start-facts dl>div{display:block}.start-facts dd{text-align:left;margin-top:3px}.start-facts>button{width:100%}}
 @media(max-width:480px){#start{padding:22px 18px}#start h2{font-size:24px}.workflow-path a{padding:10px 5px}#comparisonContext{margin-top:16px}}
+/* First use presents a task, one change, then a decision. Full tools retain their IDs. */
+.growth-page:not(.full-mode) .sidebar{grid-template-columns:1fr auto;padding-bottom:18px}
+.growth-page:not(.full-mode) .sidebar .tool-switch,.growth-page:not(.full-mode) .sidebar .section-nav{display:none}
+.growth-page:not(.full-mode) .sidebar-bottom{grid-column:2}
+.growth-page:not(.full-mode) .workspace-header{margin:6px 0 28px}
+.growth-page:not(.full-mode) .workspace-header h1{font-size:30px;letter-spacing:-.02em}
+#easy{padding:30px 32px;margin-top:0}
+.easy-progress{display:flex;list-style:none;padding:0 0 22px;margin:0 0 26px;gap:32px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.easy-progress li{margin:0;min-height:24px}
+.easy-progress [aria-current=step]{color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:9px;text-decoration-thickness:2px}
+#easy h2{font-size:25px;margin:0 0 10px;line-height:1.5}
+#easy h2:focus{outline:none}
+.problem-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:28px 0}
+.problem-choices button{display:flex;align-items:start;flex-direction:column;justify-content:start;text-align:left;padding:22px 20px;border-color:#b4c2b3;border-radius:9px;gap:12px;min-width:0}
+.problem-choices strong{font-size:18px;font-weight:650;line-height:1.5}
+.problem-choices span{font-size:14px;line-height:1.8;color:var(--muted)}
+.problem-choices .choice-action{margin-top:auto;padding-top:10px;color:var(--accent);font-size:13px;font-weight:600}
+.problem-choices button:hover{background:#edf3e8;border-color:var(--accent)}
+.easy-source{font-size:13px;color:var(--muted);max-width:90ch}
+.easy-secondary{display:flex;align-items:center;gap:18px;margin:22px 0}.easy-secondary p{font-size:13px;color:var(--muted);margin:0}
+.easy-change{max-width:680px;background:#f3f6ef;border-radius:8px;padding:20px 22px;margin:24px 0}
+.easy-change input{max-width:260px;background:#fff;font-size:21px;min-height:54px}
+.easy-change label{font-size:15px;margin-top:18px;font-weight:600}
+#easyConditions .fields{grid-template-columns:repeat(4,minmax(0,1fr))}
+#easyStatus:not(:empty){margin-top:20px;font-size:14px;color:var(--mint)}
+#easyMisses{color:var(--amber);font-size:14px}
+#easyMetrics td:first-child{white-space:normal;min-width:180px}
+#easy caption{text-align:left;font-size:13px;color:var(--muted);padding-bottom:10px}
+#easyBenefits,#easyCosts{font-size:16px;line-height:1.9;max-width:80ch}
+#easyResult .actions{margin-top:26px}
+#advancedWorkbench{margin-top:24px}#advancedWorkbench>summary{font-size:14px}
+#fullReturn{margin-bottom:20px}
+@media(max-width:720px){#easy{padding:24px 22px}.problem-choices{grid-template-columns:1fr;gap:12px;margin:22px 0}.problem-choices button{padding:17px 18px;gap:6px}.problem-choices .choice-action{padding-top:5px}.easy-secondary{display:block}.easy-secondary p{margin-top:9px}#easyConditions .fields{grid-template-columns:repeat(2,minmax(0,1fr))}.growth-page:not(.full-mode) .workspace-header h1{font-size:26px}}
+@media(max-width:480px){#easy{padding:22px 18px}#easy h2{font-size:22px}.easy-progress{gap:20px;font-size:12px;margin-bottom:22px}.easy-change{padding:18px}.easy-secondary button{width:100%}#easyResult .actions button{flex-basis:100%}}

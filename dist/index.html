@@ -26,9 +26,74 @@ canvas{display:block;width:100%;height:290px;margin:24px 0 12px;border:1px solid
 .workflow-path{margin-bottom:20px}.workflow-path a{padding:10px 12px}.start-layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(270px,1fr);gap:36px}.start-copy{min-width:0}#start{padding:28px 30px}#start h2{font-size:28px;max-width:24ch;margin-bottom:12px}#start .start-intro{font-size:15px;line-height:1.9;color:var(--ink)}#comparisonContext{border:0;padding:0;margin-top:22px;font-size:13px}#activePlan{font-size:13px;font-weight:500;margin-top:8px}#start .start-copy .actions{margin-top:24px}#start .start-limit{color:var(--muted);font-size:13px;margin-top:18px}.start-facts{padding-left:30px;border-left:1px solid #cbd7c0}.start-facts h3{font-size:16px;margin:0 0 12px}.start-facts dl{margin:0 0 18px}.start-facts dl>div{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:8px 0;border-bottom:1px solid #dbe3d3;font-size:13px}.start-facts dt{color:var(--muted);flex-shrink:0}.start-facts dd{margin:0;text-align:right;font-weight:600}.start-facts details{border:0;padding-top:0;margin-top:12px}.start-facts summary{font-weight:400;font-size:13px}.start-facts #setupSummary{font-size:12px}.start-facts>button{background:transparent;border-color:#9dad93}#start>details{margin-top:24px}.result-actions{margin:20px 0 24px}.result-actions button:first-child{color:var(--accent);border-color:var(--accent)}#editStatus:empty{display:none}#run:disabled{cursor:wait}
 @media(max-width:800px){.start-layout{grid-template-columns:1fr;gap:24px}.start-facts{padding:22px 0 0;border-left:0;border-top:1px solid #cbd7c0}.start-facts dl{display:grid;grid-template-columns:1fr 1fr;gap:0 22px}.start-facts dl>div{display:block}.start-facts dd{text-align:left;margin-top:3px}.start-facts>button{width:100%}}
 @media(max-width:480px){#start{padding:22px 18px}#start h2{font-size:24px}.workflow-path a{padding:10px 5px}#comparisonContext{margin-top:16px}}
+/* First use presents a task, one change, then a decision. Full tools retain their IDs. */
+.growth-page:not(.full-mode) .sidebar{grid-template-columns:1fr auto;padding-bottom:18px}
+.growth-page:not(.full-mode) .sidebar .tool-switch,.growth-page:not(.full-mode) .sidebar .section-nav{display:none}
+.growth-page:not(.full-mode) .sidebar-bottom{grid-column:2}
+.growth-page:not(.full-mode) .workspace-header{margin:6px 0 28px}
+.growth-page:not(.full-mode) .workspace-header h1{font-size:30px;letter-spacing:-.02em}
+#easy{padding:30px 32px;margin-top:0}
+.easy-progress{display:flex;list-style:none;padding:0 0 22px;margin:0 0 26px;gap:32px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.easy-progress li{margin:0;min-height:24px}
+.easy-progress [aria-current=step]{color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:9px;text-decoration-thickness:2px}
+#easy h2{font-size:25px;margin:0 0 10px;line-height:1.5}
+#easy h2:focus{outline:none}
+.problem-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:28px 0}
+.problem-choices button{display:flex;align-items:start;flex-direction:column;justify-content:start;text-align:left;padding:22px 20px;border-color:#b4c2b3;border-radius:9px;gap:12px;min-width:0}
+.problem-choices strong{font-size:18px;font-weight:650;line-height:1.5}
+.problem-choices span{font-size:14px;line-height:1.8;color:var(--muted)}
+.problem-choices .choice-action{margin-top:auto;padding-top:10px;color:var(--accent);font-size:13px;font-weight:600}
+.problem-choices button:hover{background:#edf3e8;border-color:var(--accent)}
+.easy-source{font-size:13px;color:var(--muted);max-width:90ch}
+.easy-secondary{display:flex;align-items:center;gap:18px;margin:22px 0}.easy-secondary p{font-size:13px;color:var(--muted);margin:0}
+.easy-change{max-width:680px;background:#f3f6ef;border-radius:8px;padding:20px 22px;margin:24px 0}
+.easy-change input{max-width:260px;background:#fff;font-size:21px;min-height:54px}
+.easy-change label{font-size:15px;margin-top:18px;font-weight:600}
+#easyConditions .fields{grid-template-columns:repeat(4,minmax(0,1fr))}
+#easyStatus:not(:empty){margin-top:20px;font-size:14px;color:var(--mint)}
+#easyMisses{color:var(--amber);font-size:14px}
+#easyMetrics td:first-child{white-space:normal;min-width:180px}
+#easy caption{text-align:left;font-size:13px;color:var(--muted);padding-bottom:10px}
+#easyBenefits,#easyCosts{font-size:16px;line-height:1.9;max-width:80ch}
+#easyResult .actions{margin-top:26px}
+#advancedWorkbench{margin-top:24px}#advancedWorkbench>summary{font-size:14px}
+#fullReturn{margin-bottom:20px}
+@media(max-width:720px){#easy{padding:24px 22px}.problem-choices{grid-template-columns:1fr;gap:12px;margin:22px 0}.problem-choices button{padding:17px 18px;gap:6px}.problem-choices .choice-action{padding-top:5px}.easy-secondary{display:block}.easy-secondary p{margin-top:9px}#easyConditions .fields{grid-template-columns:repeat(2,minmax(0,1fr))}.growth-page:not(.full-mode) .workspace-header h1{font-size:26px}}
+@media(max-width:480px){#easy{padding:22px 18px}#easy h2{font-size:22px}.easy-progress{gap:20px;font-size:12px;margin-bottom:22px}.easy-change{padding:18px}.easy-secondary button{width:100%}#easyResult .actions button{flex-basis:100%}}
 </style></head><body class="growth-page"><a class="skip-link" href="#workspace">跳到主要内容</a><div class="app-shell"><aside class="sidebar" aria-label="工作台导航"><a class="brand" href="数值工坊.html"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M3 28h30M6 22l8-8 7 4 9-13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/><path d="M5 22h3m20-17h4v4" fill="none" stroke="currentColor" stroke-width="2.5"/></svg><span class="brand-copy"><strong>数值工坊</strong><span>让每次改动有据可查</span></span></a><div class="tool-switch" aria-label="选择工具"><a href="06_成长模拟与卡点诊断.html" aria-current="page">成长节奏</a><a href="04_多属性战斗诊断.html">战斗属性</a><a href="02_配置模板.html">关卡数值表</a></div><nav class="section-nav" aria-label="本页导航"><a href="#start"><span class="nav-index">01</span>推荐与对照</a><a href="#adjustments"><span class="nav-index">02</span>修改设置</a><a href="#results"><span class="nav-index">04</span>本次结果</a><a href="#diagnosis"><span class="nav-index">05</span>卡点与记录</a><a href="#storage"><span class="nav-index">06</span>保存与反馈</a><a href="#attributeFinder"><span class="nav-index">03</span>属性填哪里</a></nav><div class="sidebar-bottom"><span class="local-mark" aria-hidden="true"></span>计算在浏览器完成 · 设置可导出</div></aside><main class="workspace" id="workspace" tabindex="-1">
-<header class="workspace-header"><div><h1>成长节奏</h1><p>看清哪里在等，验证每一次改动。</p></div><nav aria-label="快捷操作"><button id="showGuide">跟着练一次</button><a href="04_多属性战斗诊断.html">打开战斗属性</a></nav></header>
-<ol class="workflow-path" aria-label="操作顺序"><li><a href="#adjustments"><b>1</b><span>改一个参数<small>保留推荐设置作对照</small></span></a></li><li><a href="#results"><b>2</b><span>比较前后<small>先读改善和代价</small></span></a></li><li><a href="#diagnosis"><b>3</b><span>查清卡点<small>看依据，再决定保不保留</small></span></a></li></ol>
+<header class="workspace-header"><div><h1>把等待和过关的节奏调顺。</h1><p>改一个设置，看清改善和代价，再决定留不留。</p></div></header>
+<section id="easy" aria-label="一步步检查成长节奏">
+<ol class="easy-progress" aria-label="三步操作"><li aria-current="step">1. 选问题</li><li>2. 试改一项</li><li>3. 看结果</li></ol>
+<div id="easyChoose">
+<h2 tabindex="-1" id="easyChooseTitle">你想先检查哪个问题？</h2>
+<p>选一个，工具会带你改一个相关设置，再比较改前和改后。</p>
+<div class="problem-choices">
+<button id="easyReturn"><strong>回来没进展</strong><span>试着多给一点打怪奖励，看回来能不能买升级、过新关。</span><span class="choice-action">检查回访进展 →</span></button>
+<button id="easyPrice"><strong>升级攒钱太久</strong><span>试着降低攻击升级的涨价速度，看等待能少多少。</span><span class="choice-action">检查升级等待 →</span></button>
+<button id="easyBoss"><strong>总在Boss前卡住</strong><span>试着降低Boss血量，看是否缓解突然变难。</span><span class="choice-action">检查Boss门槛 →</span></button>
+</div>
+<p class="easy-source" id="easySource"></p>
+</div>
+<div id="easyEdit" hidden>
+<h2 id="easyEditTitle" tabindex="-1"></h2><p id="easyWhy"></p>
+<div class="easy-change"><p id="easyBefore"></p><label><span id="easyFieldLabel"></span><input id="easyValue" type="number" step="any" aria-describedby="easyHint easyError"></label><p id="easyHint" class="muted"></p></div>
+<details id="easyConditions"><summary>先确认这次按什么目标比较</summary><p id="easyBehavior"></p><p class="muted">这些是当前方案的试算目标，可以修改；不是所有挂机游戏都应该采用的标准。两份方案会使用相同目标。</p><div class="fields"><label>最早几天打完<input id="easyMin" type="number" step="any"></label><label>最晚几天打完<input id="easyMax" type="number" step="any"></label><label>最多几小时没过新关<input id="easyWait" type="number" step="any"></label><label>每次回来至少过几关<input id="easyVisit" type="number" step="1"></label></div></details>
+<p id="easyTargetSummary" class="muted"></p>
+<div class="actions"><button id="easyRun" class="primary">比较改前和改后</button><button id="easyCancel" hidden>停止计算</button><button id="easyBack">返回选问题</button></div>
+</div>
+<div id="easyResult" hidden>
+<h2 id="easyVerdict" tabindex="-1"></h2><p id="easyBenefits"></p><p id="easyCosts"></p>
+<div class="scroll"><table><caption>这次实际模拟的结果</caption><thead><tr><th>看什么</th><th>修改前</th><th>修改后</th></tr></thead><tbody id="easyMetrics"></tbody></table></div>
+<p id="easyProblemAnswer"></p><p id="easyMisses"></p>
+<details><summary>为什么这样判断？看具体卡点和依据</summary><p id="easyEvidence"></p><p id="easyEvidenceLimit" class="muted"></p><p id="easyComparisonNote" class="muted"></p></details>
+<div class="actions"><button id="easyKeep" class="primary">保留这次设置</button><button id="easyUndo">撤回这次改动</button><button id="easyAgain">再改一下</button><button id="easyDetails">查看曲线和逐关记录</button></div>
+<p class="scope">这是模拟判断。是否更好玩，还需要试玩。</p>
+</div>
+<p id="easyError" class="form-error" role="alert" hidden></p><p id="easyStatus" role="status" aria-live="polite"></p>
+</section>
+<div class="easy-secondary"><button id="openFull">我有自己的设置，打开完整工具</button><p>完整设置、属性查找、保存和以前的研究都在这里。</p></div>
+<div id="fullReturn" hidden><button id="returnSimple">回到三步操作</button></div>
+<details id="advancedWorkbench"><summary>更多设置与研究资料</summary><div class="actions"><button id="showGuide">旧版完整练习</button><a href="04_多属性战斗诊断.html">打开战斗属性</a><a href="02_配置模板.html">打开关卡数值表</a></div><ol class="workflow-path" aria-label="操作顺序"><li><a href="#adjustments"><b>1</b><span>改一个参数<small>保留推荐设置作对照</small></span></a></li><li><a href="#results"><b>2</b><span>比较前后<small>先读改善和代价</small></span></a></li><li><a href="#diagnosis"><b>3</b><span>查清卡点<small>看依据，再决定保不保留</small></span></a></li></ol>
 
 
 
@@ -45,7 +110,7 @@ canvas{display:block;width:100%;height:290px;margin:24px 0 12px;border:1px solid
 <p class="muted">两份方案使用相同的上线安排和模拟天数。这里只算一种伤害、暴击和升级经济，不包含角色受伤或技能，也不能直接证明玩家会留下来。</p>
 </details></section>
 
-<section id="guide" aria-label="新手操作引导">
+<section id="guide" aria-label="新手操作引导" hidden>
 <h2 id="guideTitle">第一次用？跟着做一次</h2><p id="guideInstruction" role="status" aria-live="polite">用一个练习学会修改、比较、撤回和保存。练习会暂存你的当前设置，退出时恢复，不覆盖本机存档。</p>
 <div class="actions"><button id="guideNext" class="primary">开始新手练习</button><button id="guideLocate" hidden>定位当前操作</button><button id="guideExit">跳过引导，直接使用</button></div><p id="guideNote" class="muted"></p>
 </section>
@@ -71,7 +136,7 @@ canvas{display:block;width:100%;height:290px;margin:24px 0 12px;border:1px solid
 <label>试玩后有什么感受，或者为什么想改目标<textarea id="feedback" rows="3" placeholder="例如：虽然每次回来都能过关，但升级没什么感觉。"></textarea></label><button id="addFeedback">记下感受和现在的目标</button><div id="feedbackRows"></div>
 <p class="scope">算得对、符合你定的要求、玩家觉得好玩，是三件不同的事。这里能帮你检查前两件，第三件还要实际试玩。</p></section>
 <section id="attributeFinder" aria-label="属性放哪里"><h2>有个属性，不知道填哪里？</h2><div class="actions attribute-controls"><label>输入你游戏里的叫法<input id="attributeQuery" type="search" placeholder="例如：电抗性20%、暴击率、攻击速度"></label><div class="attribute-owner"><span id="attributeOwnerLabel">这个属性属于谁</span><input id="attributeSide" type="hidden" value=""><div id="attributeOwnerChoices" role="group" aria-labelledby="attributeOwnerLabel"><button type="button" id="attributeOwnerPlayer" data-attribute-side="player" aria-pressed="false">角色／自己</button><button type="button" id="attributeOwnerEnemy" data-attribute-side="enemy" aria-pressed="false">敌人／怪物</button><button type="button" id="attributeOwnerUnknown" data-attribute-side="" aria-pressed="true">还不确定</button></div></div><button id="attributeSearch">查找位置</button></div><div id="attributeResults" role="status" aria-live="polite"></div></section>
-<footer><details><summary>计算版本与文件说明</summary>界面流程 studio-3.1 · 计算规则 growth-event-2.0.0 · 可离线使用。设置和完整结果用JSON文件保存，表格用CSV文件保存。资源按小数计算，未接入真实游戏的整数货币结算。</details></footer>
+</details><footer><details><summary>计算版本与文件说明</summary>界面流程 studio-4.0 · 计算规则 growth-event-2.0.0 · 可离线使用。设置和完整结果用JSON文件保存，表格用CSV文件保存。资源按小数计算，未接入真实游戏的整数货币结算。</details></footer>
 </main></div><script>(function(root,factory){const v=factory();if(typeof module==='object'&&module.exports)module.exports=v;else root.ConfigModel=v;})(globalThis,function(){
   'use strict';
   const fields=[
@@ -328,7 +393,7 @@ const goalsText=g=>`希望在${time(g.first_completion_min_days*86400)}到${time
 const field=(id,label,value,opts,hint='')=>`<label>${esc(label)}${opts?`<select id="${id}" ${hint?`aria-describedby="help-${id}"`:''}>${options(opts,value)}</select>`:`<input id="${id}" type="number" step="any" value="${value}" ${hint?`aria-describedby="help-${id}"`:''}>`}${hint?`<small class="field-help" id="help-${id}">${esc(hint)}</small>`:''}</label>`;
 function fail(e){let msg=e.message||String(e);if(e instanceof SyntaxError)msg='这个文件没有读懂，可能不完整。请打开本工具保存的设置或完整结果文件。';for(const [k,old] of M.fields)msg=msg.replaceAll(old,labels[k]);msg=msg.replaceAll('预算','模拟天数').replaceAll('准入概率','挑战新关需要的赢面').replaceAll('资源守恒','收入和支出').replaceAll('随机种子','重复试算编号').replaceAll('首通','打完全部关卡').replaceAll('参数JSON','设置文件').replaceAll('有限数字','数字');$('error').textContent=msg;$('error').hidden=false;$('editError').textContent=msg;$('editError').hidden=!$('editor').open;}
 function clearError(){$('error').hidden=true;$('editError').hidden=true;}
-function invalidate(){resultSelection='1:0';generation++;groups=[];executed=null;window.growthAudit=null;renderResults();$('status').textContent='设置改了，下面的旧结果已清除。请再点一次“开始模拟，比较前后”。';$('editStatus').textContent=$('status').textContent;}
+function invalidate(changed=false){resultSelection='1:0';generation++;groups=[];executed=null;window.growthAudit=null;renderResults();$('status').textContent=changed?'设置改了，请重新比较；下面已清除旧结果。':'设置已准备好。修改后运行比较，就能看到改善和代价。';$('editStatus').textContent=$('status').textContent;}
 function renderEditor(){
  focusedSetting=null;$('editPrompt').textContent='';
  $('name').value=current.name;$('baselineInfo').textContent='已保留修改前的设置。下方改动只作用于修改后，比较时不会偷偷更换对照。';
@@ -402,8 +467,8 @@ function installProject(p){if(p.modelVersion!==G.VERSION&&p.modelVersion)throw E
 function validateResults(gs){if(!Array.isArray(gs)||gs.length<2||gs.length>10)throw Error('完整结果里应有2到10组方案，请打开本工具保存的完整结果文件。');for(const g of gs){if(!Array.isArray(g.results)||!g.results.length||g.results.length>12)throw Error('每组应有1到12次模拟记录，请检查文件是否完整。');for(const r of g.results){G.prepare(r.config);if(r.version!==G.VERSION||!Array.isArray(r.stages)||r.stages.length!==r.config.rules.stage_cap||!['completed','budget_exhausted','event_limit'].includes(r.status)||!Number.isFinite(r.time)||!Number.isFinite(r.coins)||r.coins<0||r.metrics?.ledgerRelativeError>1e-10||Math.abs(r.earned-r.spent-r.coins)>Math.max(1,r.earned,r.spent)*1e-10)throw Error('记录的计算版本、关卡过程或收支对不上，请打开完整的原文件。');}}}
 function renderFeedback(){$('feedbackRows').innerHTML=feedback.map(x=>`<p class="feedback">${esc(x.date)} · ${esc(x.note)}<br><small>当时${esc(goalsText(x.goals))}。</small></p>`).join('');}
 
-document.addEventListener('input',e=>{if(!e.target.closest('#ruleGroups,#commonFields')&&e.target.id!=='name')return;if(e.target.id==='visits'){const n=Number(e.target.value);if(Number.isInteger(n)&&n>0&&n<=24)$('hours').value=n===3?'0,5,12':Array.from({length:n},(_,i)=>24*i/n).join(',');}invalidate();clearError();try{current=read();renderDiff();}catch(err){fail(err);}});
-document.addEventListener('change',e=>{if(e.target.matches('#commonFields select,#ruleGroups select')){invalidate();clearError();try{current=read();renderDiff();}catch(err){fail(err);}}});
+document.addEventListener('input',e=>{if(!e.target.closest('#ruleGroups,#commonFields')&&e.target.id!=='name')return;if(e.target.id==='visits'){const n=Number(e.target.value);if(Number.isInteger(n)&&n>0&&n<=24)$('hours').value=n===3?'0,5,12':Array.from({length:n},(_,i)=>24*i/n).join(',');}invalidate(true);clearError();try{current=read();renderDiff();}catch(err){fail(err);}});
+document.addEventListener('change',e=>{if(e.target.matches('#commonFields select,#ruleGroups select')){invalidate(true);clearError();try{current=read();renderDiff();}catch(err){fail(err);}}});
 $('run').onclick=()=>execute(false);$('runEdited').onclick=()=>execute(false);$('cancelTop').onclick=()=>{$('cancel').onclick();};$('robust').onclick=()=>execute(true);$('cancel').onclick=()=>{generation++;$('status').textContent='正在停止计算。';};
 $('freeze').onclick=()=>{try{current=read();baseline=copy(current);invalidate();renderEditor();$('status').textContent='现在的设置已留作原方案。接下来改下方数值，再运行比较。';}catch(e){fail(e);}};
 $('copy').onclick=()=>{try{current=copy(baseline);invalidate();renderEditor();clearError();$('status').textContent='已撤回改动，恢复修改前的全部设置。';}catch(e){fail(e);}};
@@ -525,6 +590,64 @@ if(location.hash.startsWith('#config=')){try{const c=G.prepare(JSON.parse(decode
  // A refresh during practice must not replace a previously edited project with the practice project.
  try{if(typeof sessionStorage!=='undefined'){const raw=sessionStorage.getItem(returnKey);if(raw){installProject(JSON.parse(raw));forget();note='上次练习中断，已恢复练习前的设置。';}}}catch{note='上次练习的恢复记录未能读取，请使用你保存的设置文件。';}
  draw();
+})();
+</script><script>(function(){
+ 'use strict';
+ const tasks={
+  easyReturn:{title:'试着多给一点打怪奖励',key:'reward_base',label:'打怪奖励增加多少（%）',trial:10,min:0,max:200,why:'回来有钱，却不一定打得过新关。这次只增加打怪奖励，检查升级和过关是否一起改善。',hint:'先试增加10%。会影响所有关卡的首通和重复奖励，可能让整个游戏结束得更早。',value:(c,v)=>c.rules.reward_base*(1+v/100)},
+  easyPrice:{title:'试着让攻击升级涨价慢一点',key:'attack_cost_growth',label:'每升一级，下次涨价多少（%）',min:0,max:200,why:'升级越往后越贵，可能越来越难攒。这次只改涨价速度，第一次升级的价格不变。',hint:'例如原来10.5%，先试10%。这是试算值；更快过关，也可能让原定游玩周期变短。',value:(_,v)=>1+v/100},
+  easyBoss:{title:'试着降低Boss的血量',key:'boss_hp_multiplier',label:'Boss血量减少多少（%）',trial:10,min:0,max:99,why:'Boss血量突然升高，可能挡住原本顺畅的推进。这次只降Boss血量，普通怪和奖励不变。',hint:'先试减少10%。Boss可能更容易过，但也可能变得没挑战；这里不会自动判断好不好玩。',value:(c,v)=>c.rules.boss_hp_multiplier*(1-v/100)}
+ };
+ let task=null,snapshot=null,anchor=null,running=false;
+ function message(s,error=false){$('easyError').hidden=!error;$('easyError').textContent=error?s:'';$('easyStatus').textContent=error?'':s;}
+ function show(n){$('easyChoose').hidden=n!==0;$('easyEdit').hidden=n!==1;$('easyResult').hidden=n!==2;document.querySelectorAll('.easy-progress li').forEach((e,i)=>{if(i===n)e.setAttribute('aria-current','step');else e.removeAttribute('aria-current');});}
+ function focus(id){$(id).focus({preventScroll:true});$('easy').scrollIntoView({block:'start'});}
+ function source(){const c=read();$('easySource').textContent=`当前从「${c.name}」开始：${c.rules.stage_cap}关，每天上线${c.behavior.visitsPerDay}次、每次${c.behavior.sessionMinutes}分钟。没填自己的游戏时，可以先用这套推荐设置试一次。`;}
+ function capture(){return {current:copy(read()),baseline:copy(baseline),groups,executed,feedback:copy(feedback),resultSelection};}
+ function restore(){if(!snapshot)return;current=copy(snapshot.current);baseline=copy(snapshot.baseline);feedback=copy(snapshot.feedback);generation++;groups=snapshot.groups;executed=snapshot.executed;resultSelection=snapshot.resultSelection;renderEditor();renderResults();renderFeedback();clearError();snapshot=null;}
+ function conditions(){const c=anchor;$('easyBehavior').textContent=`${c.rules.stage_cap}关；每天上线${c.behavior.visitsPerDay}次、每次${c.behavior.sessionMinutes}分钟；${strategyNames[c.behavior.strategy]}。最多模拟${c.simulation.days}天，重复${c.simulation.seeds.length}次。上线安排和购买顺序在完整设置中修改。`;
+  for(const [id,key] of [['easyMin','first_completion_min_days'],['easyMax','first_completion_max_days'],['easyWait','max_no_progress_hours'],['easyVisit','expected_stages_per_visit']])$(id).value=c.goals[key];targetSummary();}
+ function targetSummary(){ $('easyTargetSummary').textContent=`本次按这些目标判断：${$('easyMin').value}—${$('easyMax').value}天打完，最长${$('easyWait').value}小时没过新关，每次回来至少过${$('easyVisit').value}关。可展开上面一行修改。`; }
+ function choose(id){if(busy)return;try{if(snapshot)restore();snapshot=capture();anchor=copy(snapshot.current);task=tasks[id];
+  $('easyEditTitle').textContent=task.title;$('easyWhy').textContent=task.why;$('easyFieldLabel').textContent=task.label;$('easyHint').textContent=task.hint;
+  const before=task.key==='attack_cost_growth'?f(ruleDisplay(task.key,anchor.rules[task.key]))+'%':f(anchor.rules[task.key])+(task.key==='reward_base'?'资源（第1关基础奖励）':'倍普通怪血量');
+  $('easyBefore').textContent='修改前：'+before+'。其他战斗、升级和奖励设置保持不变。';
+  $('easyValue').value=task.trial??Math.max(0,Number((ruleDisplay(task.key,anchor.rules[task.key])-.5).toFixed(4)));$('easyValue').min=task.min;$('easyValue').max=task.max;
+  conditions();show(1);message('下一步：确认试改值和目标，再点“比较改前和改后”。这时还没有改动你的设置。');focus('easyEditTitle');
+ }catch(e){message(e.message,true);}}
+ function edited(){const raw=$('easyValue').value,v=Number(raw);if(!raw.trim()||!Number.isFinite(v)||v<task.min||v>task.max)throw Error(`请在“${task.label}”填${task.min}到${task.max}之间的数字。`);
+  const a=copy(anchor);for(const [id,key] of [['easyMin','first_completion_min_days'],['easyMax','first_completion_max_days'],['easyWait','max_no_progress_hours'],['easyVisit','expected_stages_per_visit']]){if(!$(id).value.trim())throw Error('比较目标不能留空，请展开目标填写数字。');a.goals[key]=Number($(id).value);}
+  if(!(a.goals.first_completion_min_days>0&&a.goals.first_completion_max_days>=a.goals.first_completion_min_days&&a.goals.max_no_progress_hours>0&&a.goals.expected_stages_per_visit>0&&a.goals.expected_stages_per_visit<=2000)){$('easyConditions').open=true;throw Error('请检查比较目标：最早天数要大于0，最晚天数不能更早；可接受等待要大于0，每次回来目标填1到2000关。');}
+  const before=G.prepare(a),after=copy(before);after.rules[task.key]=task.value(anchor,v);after.name=anchor.name+' · 本次试改';
+  const prepared=G.prepare(after);if(!G.diffs(before,prepared).length)throw Error('这个值与修改前相同。请改一个值再比较，或返回选另一个问题。');return [before,prepared];
+ }
+ function lock(v){running=v;$('easyRun').disabled=v;$('easyBack').disabled=v;$('openFull').disabled=v;$('easyCancel').hidden=!v;$('easyValue').disabled=v;for(const id of ['easyMin','easyMax','easyWait','easyVisit'])$(id).disabled=v;$('easyRun').textContent=v?'正在比较，请稍候…':'比较改前和改后';}
+ async function run(){if(running)return;let ticker;try{const [a,b]=edited();baseline=a;current=b;invalidate(true);renderEditor();clearError();lock(true);message('正在用同样的上线安排和目标，分别模拟改前与改后。');ticker=setInterval(()=>{$('easyStatus').textContent=$('status').textContent;},200);await execute(false);
+  if(!groups.length){message($('error').textContent||'这次没有算完，请重新比较。',true);return;}result();show(2);message('先读结论，再决定保留、撤回，或者继续试。');focus('easyVerdict');
+ }catch(e){message(e.message,true);}finally{clearInterval(ticker);lock(false);}}
+ function result(){const d=assessComparison(groups),summary=G.compare(groups),[a,b]=groups.map(x=>x.results),n=a.length;
+  $('easyVerdict').textContent=d.verdict;$('easyBenefits').textContent='改善了什么：'+(d.benefits.join(' ')||'本次未观察到明确改善。');$('easyCosts').textContent='牺牲了什么：'+(d.costs.join(' ')||'已检查指标未见退步，仍需试玩。');
+  const empty=rs=>rs.reduce((total,r)=>total+r.visits.filter(v=>v.remaining>0&&v.newStages===0).length,0),visits=rs=>rs.reduce((total,r)=>total+r.visits.filter(v=>v.remaining>0).length,0);
+  $('easyMetrics').innerHTML=[['打完所需时间（已完成者中间值）',...summary.map(s=>s.completionMedianAmongCompleted===null?'还没打完':time(s.completionMedianAmongCompleted*86400))],['最久没过新关',...summary.map(s=>time(s.maxGapHours*3600))],['回来却没过新关的次数',`${empty(a)} / ${visits(a)}次`,`${empty(b)} / ${visits(b)}次`],['全部目标都符合',...summary.map(s=>s.goalPasses+' / '+s.samples+'次')],['在模拟期限内没打完',...summary.map(s=>(s.samples-s.completed)+' / '+s.samples+'次')]].map(row).join('');
+  $('easyProblemAnswer').textContent=task===tasks.easyReturn?(empty(a)===0?'原方案这批模拟没有“回来零进展”的回访，不能认定它存在这个问题；请结合每次回访的过关数量和试玩感受再判断。':`原方案共${visits(a)}次有效回访，其中${empty(a)}次没过新关；修改后是${empty(b)}/${visits(b)}次。`):'是否值得保留，按上面确认的目标和实际结果判断；不会因为改动方向看起来合理就自动推荐。';
+  const misses=rs=>[['completion','打完周期'],['wait','最长等待'],['visits','每次回访进展']].map(([k,label])=>`${label}${rs.filter(r=>!r.metrics.goal[k]).length}/${rs.length}次未达标`).join('；');$('easyMisses').textContent='修改后仍没达到的要求：'+misses(b)+'。';
+  const worst=a.reduce((x,y)=>x.metrics.longestGap.seconds>=y.metrics.longestGap.seconds?x:y),gap=worst.metrics.longestGap,diag=G.diagnose(worst,gap.stage);
+  $('easyEvidence').textContent=`修改前这批模拟中，最久没过新关的一段发生在第${gap.stage}关前，持续${time(gap.seconds)}。`+(diag.unreached?'尚未到达，不能给出该关的真实伤害快照。':`按当时情况，普通一下伤害${f(diag.damage)}，达到挑战要求约需${f(diag.requiredDamage)}；下一次攻击升级价格${f(diag.attackCost)}，还差${f(diag.resourceGap)}资源。升一次${diag.afterOneCanPass?'达到':'仍未达到'}当前关挑战要求。`);
+  $('easyEvidenceLimit').textContent=diag.unreached?'不能据此唯一判断原因。':diag.evidence.join(' ')+' 这是其中一次的历史快照；等待估计按当前速度持续刷取，不等于实际几小时后一定升级。';
+  $('easyComparisonNote').textContent=`只修改了“${labels[task.key]}”；同一时间预算、上线安排、购买顺序、目标和${n}个重复编号。目标达标不等于玩家喜欢。`;
+  $('easyKeep').disabled=false;$('easyKeep').textContent='保留这次设置';
+ }
+ function full(keep=false,section='start'){if(running)return;if(!keep)restore();else snapshot=null;$('easy').hidden=true;document.querySelector('.easy-secondary').hidden=true;$('fullReturn').hidden=false;$('advancedWorkbench').open=true;document.body.classList.add('full-mode');$(section).scrollIntoView({block:'start'});if(section==='start')$('editRecommended').focus({preventScroll:true});}
+ for(const id of Object.keys(tasks))$(id).onclick=()=>choose(id);
+ $('easyRun').onclick=run;$('easyCancel').onclick=()=>{$('cancel').onclick();message('正在停止；算到一半的结果不会用于比较。');};
+ $('easyBack').onclick=()=>{restore();task=null;anchor=null;show(0);source();message('已返回，你进入本次试改前的设置和结果仍在。');focus('easyChooseTitle');};
+ $('easyAgain').onclick=()=>{show(1);message('改一个值，再用同样条件比较。');focus('easyEditTitle');};
+ $('easyUndo').onclick=()=>{current=copy(baseline);invalidate();renderEditor();snapshot=null;show(0);source();message('已撤回本次参数改动。当前保留修改前的设置和这次确认的目标；未覆盖本机存档。');focus('easyChooseTitle');};
+ $('easyKeep').onclick=()=>{snapshot=null;$('save').onclick();if(!$('error').hidden){message($('error').textContent,true);return;}$('easyKeep').disabled=true;$('easyKeep').textContent='设置已保存到这台电脑';message('已保留并保存设置。这次完整模拟过程可在“查看曲线和逐关记录”里的保存区另行导出。');};
+ $('easyDetails').onclick=()=>full(true,'results');$('openFull').onclick=()=>full(false);$('returnSimple').onclick=()=>{if(busy)return;$('advancedWorkbench').open=false;$('easy').hidden=false;document.querySelector('.easy-secondary').hidden=false;$('fullReturn').hidden=true;document.body.classList.remove('full-mode');snapshot=null;task=null;show(0);source();message('从当前设置开始。选一个问题，继续检查。');focus('easyChooseTitle');};
+ for(const id of ['easyMin','easyMax','easyWait','easyVisit'])$(id).oninput=targetSummary;
+ $('advancedWorkbench').addEventListener('toggle',()=>{if($('advancedWorkbench').open&&!$('easy').hidden)full(false);});
+ source();show(0);if(location.hash.startsWith('#config='))full(true,'adjustments');
 })();
 </script><script>globalThis.ATTRIBUTE_CATALOG={
   "version": "attribute-locator-1.0",

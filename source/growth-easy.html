@@ -1,0 +1,31 @@
+<section id="easy" aria-label="一步步检查成长节奏">
+<ol class="easy-progress" aria-label="三步操作"><li aria-current="step">1. 选问题</li><li>2. 试改一项</li><li>3. 看结果</li></ol>
+<div id="easyChoose">
+<h2 tabindex="-1" id="easyChooseTitle">你想先检查哪个问题？</h2>
+<p>选一个，工具会带你改一个相关设置，再比较改前和改后。</p>
+<div class="problem-choices">
+<button id="easyReturn"><strong>回来没进展</strong><span>试着多给一点打怪奖励，看回来能不能买升级、过新关。</span><span class="choice-action">检查回访进展 →</span></button>
+<button id="easyPrice"><strong>升级攒钱太久</strong><span>试着降低攻击升级的涨价速度，看等待能少多少。</span><span class="choice-action">检查升级等待 →</span></button>
+<button id="easyBoss"><strong>总在Boss前卡住</strong><span>试着降低Boss血量，看是否缓解突然变难。</span><span class="choice-action">检查Boss门槛 →</span></button>
+</div>
+<p class="easy-source" id="easySource"></p>
+</div>
+<div id="easyEdit" hidden>
+<h2 id="easyEditTitle" tabindex="-1"></h2><p id="easyWhy"></p>
+<div class="easy-change"><p id="easyBefore"></p><label><span id="easyFieldLabel"></span><input id="easyValue" type="number" step="any" aria-describedby="easyHint easyError"></label><p id="easyHint" class="muted"></p></div>
+<details id="easyConditions"><summary>先确认这次按什么目标比较</summary><p id="easyBehavior"></p><p class="muted">这些是当前方案的试算目标，可以修改；不是所有挂机游戏都应该采用的标准。两份方案会使用相同目标。</p><div class="fields"><label>最早几天打完<input id="easyMin" type="number" step="any"></label><label>最晚几天打完<input id="easyMax" type="number" step="any"></label><label>最多几小时没过新关<input id="easyWait" type="number" step="any"></label><label>每次回来至少过几关<input id="easyVisit" type="number" step="1"></label></div></details>
+<p id="easyTargetSummary" class="muted"></p>
+<div class="actions"><button id="easyRun" class="primary">比较改前和改后</button><button id="easyCancel" hidden>停止计算</button><button id="easyBack">返回选问题</button></div>
+</div>
+<div id="easyResult" hidden>
+<h2 id="easyVerdict" tabindex="-1"></h2><p id="easyBenefits"></p><p id="easyCosts"></p>
+<div class="scroll"><table><caption>这次实际模拟的结果</caption><thead><tr><th>看什么</th><th>修改前</th><th>修改后</th></tr></thead><tbody id="easyMetrics"></tbody></table></div>
+<p id="easyProblemAnswer"></p><p id="easyMisses"></p>
+<details><summary>为什么这样判断？看具体卡点和依据</summary><p id="easyEvidence"></p><p id="easyEvidenceLimit" class="muted"></p><p id="easyComparisonNote" class="muted"></p></details>
+<div class="actions"><button id="easyKeep" class="primary">保留这次设置</button><button id="easyUndo">撤回这次改动</button><button id="easyAgain">再改一下</button><button id="easyDetails">查看曲线和逐关记录</button></div>
+<p class="scope">这是模拟判断。是否更好玩，还需要试玩。</p>
+</div>
+<p id="easyError" class="form-error" role="alert" hidden></p><p id="easyStatus" role="status" aria-live="polite"></p>
+</section>
+<div class="easy-secondary"><button id="openFull">我有自己的设置，打开完整工具</button><p>完整设置、属性查找、保存和以前的研究都在这里。</p></div>
+<div id="fullReturn" hidden><button id="returnSimple">回到三步操作</button></div>
