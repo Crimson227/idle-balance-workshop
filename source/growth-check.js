@@ -22,7 +22,7 @@ function checkGrowthProblem(runs,kind){
  const evidence=[],directions=[];
  if(diag&&!diag.unreached){
   evidence.push(`以第${witness.gap.stage}关第一次卡住或刚到达时的记录为例：普通一下打${f(diag.damage)}，挑战要求约${f(diag.requiredDamage)}。${blocked?'伤害还不够。':'伤害已经够，不能把等待直接归因于升级太贵。'}`);
-  if(money){evidence.push(`下一次攻击升级花${f(diag.attackCost)}资源，还差${f(diag.resourceGap)}；${diag.afterOneCanPass?'升一次达到当前关挑战要求。':`升一次仍不够${diag.attacksNeeded!==null?'，按只买攻击估计至少还要升'+diag.attacksNeeded+'次':''}。`}`);directions.push(diag.snapshot.attackLevel===0?'priceBase':'easyPrice','easyReturn');}
+  if(money){evidence.push(`下一次攻击升级花${f(diag.attackCost)}资源，还差${f(diag.resourceGap)}；${diag.afterOneCanPass?'升一次达到当前关挑战要求。':`升一次仍不够${diag.attacksNeeded!==null?'，按只买攻击估计至少还要升'+diag.attacksNeeded+'次':''}。`}`);directions.push(diag.snapshot.attackLevel===0||config.rules.attack_cost_growth===1?'priceBase':'easyPrice','easyReturn');}
   if(blocked&&kind==='easyBoss'&&config.rules.boss_hp_multiplier>1)directions.unshift('easyBoss');
   if(blocked&&config.rules.family==='chapter'&&diag.earlyPower>diag.probability+.01){directions.unshift('timing');evidence.push('同一时刻，只把章末成长改为逐关给，打赢机会会提高。这只是局部试算，仍需重跑整条路线。');}
   if(diag.snapshot.mode!=='online'&&config.behavior.offlineMode==='farm')evidence.push('这条记录发生在不在线时；当前规则只刷资源，回来后才买升级、开始新关。即使钱或伤害够了，也可能在等下一次上线。');
@@ -39,11 +39,11 @@ function checkGrowthProblem(runs,kind){
 function explainGrowthComparison(groups){
  const [a,b]=G.compare(groups),before=groups[0].results,after=groups[1].results,wait=(a.maxGapHours-b.maxGapHours)*3600;
  if(a.completed<a.samples||b.completed<b.samples)return `修改前有${a.samples-a.completed}次没打完，修改后有${b.samples-b.completed}次没打完。先别只看完成者的快慢，当前还不能定稿。`;
- const days=x=>f(Number(x.toFixed(1)))+'天',early=after.filter(r=>r.metrics.completionDays<r.config.goals.first_completion_min_days).length,late=after.filter(r=>r.metrics.completionDays>r.config.goals.first_completion_max_days).length;
- let text=wait>0?(wait<60?`最长等待几乎没变，只少了${time(wait)}。`:`最长等待少了${time(wait)}。`):wait<0?`最长等待反而多了${time(-wait)}。`:'最长等待没变。';
+ const days=x=>x<1?time(x*86400).replace(/^约/,''):f(Number(x.toFixed(1)))+'天',early=after.filter(r=>r.metrics.completionDays<r.config.goals.first_completion_min_days).length,late=after.filter(r=>r.metrics.completionDays>r.config.goals.first_completion_max_days).length;
+ let text=wait>0?(wait<60&&wait/Math.max(1,a.maxGapHours*3600)<.05?`最长等待几乎没变，只少了${time(wait)}。`:`最长等待少了${time(wait)}。`):wait<0?`最长等待反而多了${time(-wait)}。`:'最长等待没变。';
  text+=`打完所需时间从约${days(a.completionMedianAmongCompleted)}变为约${days(b.completionMedianAmongCompleted)}。`;
  if(early)text+=`${early===after.length?'修改后每次都':`其中${early}次`}早于你设定的至少${after[0].config.goals.first_completion_min_days}天；更快在这里是代价。`;
  if(late)text+=`${late}次超过你设定的最晚${after[0].config.goals.first_completion_max_days}天。`;
- if(!early&&!late)text+='两份方案完成时都在你设定的游玩周期内。';
+ if(!early&&!late)text+=before.every(r=>r.metrics.completionDays>=r.config.goals.first_completion_min_days&&r.metrics.completionDays<=r.config.goals.first_completion_max_days)?'两份方案完成时都在你设定的游玩周期内。':'修改后每次完成都在周期目标内；修改前有不在范围内的情况。';
  return text;
 }

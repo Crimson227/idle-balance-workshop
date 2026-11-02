@@ -3,12 +3,12 @@
 <div id="easyChoose">
 <h2 tabindex="-1" id="easyChooseTitle">你想先检查哪个问题？</h2>
 <p>先检查问题有没有发生、可能卡在哪里，再决定要不要改。</p>
+<div class="easy-origin"><p class="easy-source" id="easySource"></p><button id="startOwn">换成我的游戏：按提示填规则</button></div>
 <div class="problem-choices">
 <button id="easyReturn"><strong>回来没进展</strong><span>检查每次回来过了几关，再区分伤害、资源和上线安排。</span><span class="choice-action">检查回访进展 →</span></button>
 <button id="easyPrice"><strong>升级攒钱太久</strong><span>先看伤害是否不够、还缺多少钱，避免改错地方。</span><span class="choice-action">检查升级等待 →</span></button>
 <button id="easyBoss"><strong>总在Boss前卡住</strong><span>查看Boss处的实际等待和伤害，再决定是否降低门槛。</span><span class="choice-action">检查Boss门槛 →</span></button>
 </div>
-<p class="easy-source" id="easySource"></p>
 </div>
 <div id="easyCheck" hidden>
 <h2 id="easyCheckTitle" tabindex="-1">先检查当前方案</h2><p id="easyCheckIntro"></p>
@@ -17,10 +17,10 @@
 <div class="actions"><button id="easyCheckRun" class="primary">先检查当前方案</button><button id="easyCheckCancel" hidden>停止检查</button><button id="easyCheckBack">返回选问题</button></div>
 <div id="easyFindings" hidden><h3 id="easyFoundTitle" tabindex="-1"></h3><p id="easyFoundSummary"></p><div id="easyFoundEvidence" class="check-evidence"></div><p id="easyFoundNext"></p><div class="actions"><button id="easyAccept">保持原方案，检查其他问题</button><button id="easyShowTrials">我仍想试一个改法</button><button id="easyRules">核对我的游戏规则</button></div><div id="easyDirections" hidden><p class="muted">一次只试一种。下面是候选方向，不是已经证明的解决方法。</p><div id="easyDirectionChoices" class="actions"></div></div></div>
 </div>
-<div id="easyOwn" hidden><p id="ownProgress" class="muted"></p><h2 id="ownTitle" tabindex="-1"></h2><p id="ownNote"></p><p class="scope">这是单种伤害、限时战斗的试算规则。技能、元素抗性、玩家受伤等仍不接入；预填值不代表已经识别了你的游戏。</p><div id="ownFields" class="fields own-fields"></div><p id="ownMath"></p><div class="actions own-actions"><button id="ownNext" class="primary">继续</button><button id="ownPrev" hidden>上一步</button><button id="ownCancel">取消填写，回到原设置</button></div></div>
+<div id="easyOwn" hidden><p id="ownProgress" class="muted"></p><h2 id="ownTitle" tabindex="-1"></h2><p id="ownNote"></p><p id="ownScope" class="scope">这是单种伤害、限时战斗的试算规则。技能、元素抗性、玩家受伤等仍不接入；预填值不代表已经识别了你的游戏。</p><div id="ownFields" class="fields own-fields"></div><p id="ownMath"></p><div class="actions own-actions"><button id="ownNext" class="primary">继续</button><button id="ownPrev" hidden>上一步</button><button id="ownCancel">取消填写，回到原设置</button></div></div>
 <div id="easyEdit" hidden>
 <h2 id="easyEditTitle" tabindex="-1"></h2><p id="easyWhy"></p>
-<div class="easy-change"><p id="easyBefore"></p><label><span id="easyFieldLabel"></span><input id="easyValue" type="number" step="any" aria-describedby="easyHint easyError"><select id="easySelect" aria-describedby="easyHint" hidden><option value="fixed">每过一关就给一点成长</option></select></label><p id="easyHint" class="muted"></p></div>
+<div class="easy-change"><p id="easyBefore"></p><label><span id="easyFieldLabel"></span><input id="easyValue" type="number" step="any" aria-labelledby="easyFieldLabel" aria-describedby="easyHint easyError"><select id="easySelect" aria-labelledby="easyFieldLabel" aria-describedby="easyHint" hidden><option value="fixed">每过一关就给一点成长</option></select></label><p id="easyHint" class="muted"></p></div>
 <p id="easyEditTarget" class="muted"></p>
 <div class="actions"><button id="easyRun" class="primary">比较改前和改后</button><button id="easyCancel" hidden>停止计算</button><button id="easyBack">回到检查结果</button></div>
 </div>
@@ -34,5 +34,5 @@
 </div>
 <p id="easyError" class="form-error" role="alert" hidden></p><p id="easyStatus" role="status" aria-live="polite"></p>
 </section>
-<div class="easy-secondary"><button id="startOwn">换成我的游戏：按提示填规则</button><button id="openFull">打开完整工具与资料</button></div>
+<div class="easy-secondary"><button id="openFull">打开完整工具与资料</button></div>
 <div id="fullReturn" hidden><button id="returnSimple">回到引导检查</button></div>
