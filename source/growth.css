@@ -30,6 +30,7 @@
 #easyConditions .fields{grid-template-columns:repeat(4,minmax(0,1fr))}
 #easyStatus:not(:empty){margin-top:20px;font-size:14px;color:var(--mint)}
 #easyMisses{color:var(--amber);font-size:14px}
+#easyMisses[data-pass=true]{color:var(--mint)}
 #easyMetrics td:first-child{white-space:normal;min-width:180px}
 #easy caption{text-align:left;font-size:13px;color:var(--muted);padding-bottom:10px}
 #easyBenefits,#easyCosts{font-size:16px;line-height:1.9;max-width:80ch}

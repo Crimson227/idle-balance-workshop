@@ -52,6 +52,7 @@ canvas{display:block;width:100%;height:290px;margin:24px 0 12px;border:1px solid
 #easyConditions .fields{grid-template-columns:repeat(4,minmax(0,1fr))}
 #easyStatus:not(:empty){margin-top:20px;font-size:14px;color:var(--mint)}
 #easyMisses{color:var(--amber);font-size:14px}
+#easyMisses[data-pass=true]{color:var(--mint)}
 #easyMetrics td:first-child{white-space:normal;min-width:180px}
 #easy caption{text-align:left;font-size:13px;color:var(--muted);padding-bottom:10px}
 #easyBenefits,#easyCosts{font-size:16px;line-height:1.9;max-width:80ch}
@@ -86,7 +87,7 @@ canvas{display:block;width:100%;height:290px;margin:24px 0 12px;border:1px solid
 <div class="scroll"><table><caption>这次实际模拟的结果</caption><thead><tr><th>看什么</th><th>修改前</th><th>修改后</th></tr></thead><tbody id="easyMetrics"></tbody></table></div>
 <p id="easyProblemAnswer"></p><p id="easyMisses"></p>
 <details><summary>为什么这样判断？看具体卡点和依据</summary><p id="easyEvidence"></p><p id="easyEvidenceLimit" class="muted"></p><p id="easyComparisonNote" class="muted"></p></details>
-<div class="actions"><button id="easyKeep" class="primary">保留这次设置</button><button id="easyUndo">撤回这次改动</button><button id="easyAgain">再改一下</button><button id="easyDetails">查看曲线和逐关记录</button></div>
+<div class="actions"><button id="easyUndo">撤回这次改动</button><button id="easyKeep">保留并保存设置</button><button id="easyAgain">再改一下</button><button id="easyDetails">查看曲线和逐关记录</button></div>
 <p class="scope">这是模拟判断。是否更好玩，还需要试玩。</p>
 </div>
 <p id="easyError" class="form-error" role="alert" hidden></p><p id="easyStatus" role="status" aria-live="polite"></p>
@@ -366,7 +367,7 @@ function assessComparison(gs){
  const worsened=['completion','wait','visits'].some(k=>count(after,k)<count(before,k));
  if(worsened)out.verdict='建议撤回这次改动：牺牲了原本达标的目标';
  else if(b.goalPasses<n)out.verdict='仍有目标没达到，暂不建议定稿';
- else if(out.costs.length)out.verdict='有改善也有代价，需要你取舍';
+ else if(out.costs.length)out.verdict=out.benefits.length?'有改善也有代价，需要你取舍':'未见明确改善，并有代价，建议继续调整';
  else if(out.benefits.length)out.verdict='建议保留，作为下一轮试玩候选';
  else out.verdict='未见明确收益，暂不建议替换修改前的方案';
  if(!out.benefits.length)out.benefits.push('本次没有观察到等待、操作量或目标通过数的改善。');
@@ -602,7 +603,7 @@ if(location.hash.startsWith('#config=')){try{const c=G.prepare(JSON.parse(decode
  function message(s,error=false){$('easyError').hidden=!error;$('easyError').textContent=error?s:'';$('easyStatus').textContent=error?'':s;}
  function show(n){$('easyChoose').hidden=n!==0;$('easyEdit').hidden=n!==1;$('easyResult').hidden=n!==2;document.querySelectorAll('.easy-progress li').forEach((e,i)=>{if(i===n)e.setAttribute('aria-current','step');else e.removeAttribute('aria-current');});}
  function focus(id){$(id).focus({preventScroll:true});$('easy').scrollIntoView({block:'start'});}
- function source(){const c=read();$('easySource').textContent=`当前从「${c.name}」开始：${c.rules.stage_cap}关，每天上线${c.behavior.visitsPerDay}次、每次${c.behavior.sessionMinutes}分钟。没填自己的游戏时，可以先用这套推荐设置试一次。`;}
+ function source(){const c=read(),name=c.name===RECOMMENDED_PROJECT.candidate.name?'推荐方案':c.name;$('easySource').textContent=`当前使用「${name}」：${c.rules.stage_cap}关，每天上线${c.behavior.visitsPerDay}次、每次${c.behavior.sessionMinutes}分钟。没填自己的游戏时，可以先用这套推荐设置试一次。`;}
  function capture(){return {current:copy(read()),baseline:copy(baseline),groups,executed,feedback:copy(feedback),resultSelection};}
  function restore(){if(!snapshot)return;current=copy(snapshot.current);baseline=copy(snapshot.baseline);feedback=copy(snapshot.feedback);generation++;groups=snapshot.groups;executed=snapshot.executed;resultSelection=snapshot.resultSelection;renderEditor();renderResults();renderFeedback();clearError();snapshot=null;}
  function conditions(){const c=anchor;$('easyBehavior').textContent=`${c.rules.stage_cap}关；每天上线${c.behavior.visitsPerDay}次、每次${c.behavior.sessionMinutes}分钟；${strategyNames[c.behavior.strategy]}。最多模拟${c.simulation.days}天，重复${c.simulation.seeds.length}次。上线安排和购买顺序在完整设置中修改。`;
@@ -618,7 +619,7 @@ if(location.hash.startsWith('#config=')){try{const c=G.prepare(JSON.parse(decode
  function edited(){const raw=$('easyValue').value,v=Number(raw);if(!raw.trim()||!Number.isFinite(v)||v<task.min||v>task.max)throw Error(`请在“${task.label}”填${task.min}到${task.max}之间的数字。`);
   const a=copy(anchor);for(const [id,key] of [['easyMin','first_completion_min_days'],['easyMax','first_completion_max_days'],['easyWait','max_no_progress_hours'],['easyVisit','expected_stages_per_visit']]){if(!$(id).value.trim())throw Error('比较目标不能留空，请展开目标填写数字。');a.goals[key]=Number($(id).value);}
   if(!(a.goals.first_completion_min_days>0&&a.goals.first_completion_max_days>=a.goals.first_completion_min_days&&a.goals.max_no_progress_hours>0&&a.goals.expected_stages_per_visit>0&&a.goals.expected_stages_per_visit<=2000)){$('easyConditions').open=true;throw Error('请检查比较目标：最早天数要大于0，最晚天数不能更早；可接受等待要大于0，每次回来目标填1到2000关。');}
-  const before=G.prepare(a),after=copy(before);after.rules[task.key]=task.value(anchor,v);after.name=anchor.name+' · 本次试改';
+  const before=G.prepare(a),after=copy(before);after.rules[task.key]=task.value(anchor,v);after.name='试改：'+task.title;
   const prepared=G.prepare(after);if(!G.diffs(before,prepared).length)throw Error('这个值与修改前相同。请改一个值再比较，或返回选另一个问题。');return [before,prepared];
  }
  function lock(v){running=v;$('easyRun').disabled=v;$('easyBack').disabled=v;$('openFull').disabled=v;$('easyCancel').hidden=!v;$('easyValue').disabled=v;for(const id of ['easyMin','easyMax','easyWait','easyVisit'])$(id).disabled=v;$('easyRun').textContent=v?'正在比较，请稍候…':'比较改前和改后';}
@@ -630,21 +631,22 @@ if(location.hash.startsWith('#config=')){try{const c=G.prepare(JSON.parse(decode
   const empty=rs=>rs.reduce((total,r)=>total+r.visits.filter(v=>v.remaining>0&&v.newStages===0).length,0),visits=rs=>rs.reduce((total,r)=>total+r.visits.filter(v=>v.remaining>0).length,0);
   $('easyMetrics').innerHTML=[['打完所需时间（已完成者中间值）',...summary.map(s=>s.completionMedianAmongCompleted===null?'还没打完':time(s.completionMedianAmongCompleted*86400))],['最久没过新关',...summary.map(s=>time(s.maxGapHours*3600))],['回来却没过新关的次数',`${empty(a)} / ${visits(a)}次`,`${empty(b)} / ${visits(b)}次`],['全部目标都符合',...summary.map(s=>s.goalPasses+' / '+s.samples+'次')],['在模拟期限内没打完',...summary.map(s=>(s.samples-s.completed)+' / '+s.samples+'次')]].map(row).join('');
   $('easyProblemAnswer').textContent=task===tasks.easyReturn?(empty(a)===0?'原方案这批模拟没有“回来零进展”的回访，不能认定它存在这个问题；请结合每次回访的过关数量和试玩感受再判断。':`原方案共${visits(a)}次有效回访，其中${empty(a)}次没过新关；修改后是${empty(b)}/${visits(b)}次。`):'是否值得保留，按上面确认的目标和实际结果判断；不会因为改动方向看起来合理就自动推荐。';
-  const misses=rs=>[['completion','打完周期'],['wait','最长等待'],['visits','每次回访进展']].map(([k,label])=>`${label}${rs.filter(r=>!r.metrics.goal[k]).length}/${rs.length}次未达标`).join('；');$('easyMisses').textContent='修改后仍没达到的要求：'+misses(b)+'。';
+  const misses=[['completion','打完周期'],['wait','最长等待'],['visits','每次回访进展']].map(([k,label])=>({label,count:b.filter(r=>!r.metrics.goal[k]).length})).filter(x=>x.count);$('easyMisses').textContent=misses.length?'修改后仍没达到的要求：'+misses.map(x=>`${x.label}${x.count}/${b.length}次未达标`).join('；')+'。':'修改后这批模拟全部达到了上面的目标，接下来仍需试玩。';$('easyMisses').dataset.pass=String(!misses.length);
   const worst=a.reduce((x,y)=>x.metrics.longestGap.seconds>=y.metrics.longestGap.seconds?x:y),gap=worst.metrics.longestGap,diag=G.diagnose(worst,gap.stage);
   $('easyEvidence').textContent=`修改前这批模拟中，最久没过新关的一段发生在第${gap.stage}关前，持续${time(gap.seconds)}。`+(diag.unreached?'尚未到达，不能给出该关的真实伤害快照。':`按当时情况，普通一下伤害${f(diag.damage)}，达到挑战要求约需${f(diag.requiredDamage)}；下一次攻击升级价格${f(diag.attackCost)}，还差${f(diag.resourceGap)}资源。升一次${diag.afterOneCanPass?'达到':'仍未达到'}当前关挑战要求。`);
-  $('easyEvidenceLimit').textContent=diag.unreached?'不能据此唯一判断原因。':diag.evidence.join(' ')+' 这是其中一次的历史快照；等待估计按当前速度持续刷取，不等于实际几小时后一定升级。';
+  const evidence=[];if(!diag.unreached){evidence.push(diag.probability+1e-12>=worst.config.rules.push_success_threshold?'当时伤害已经达到挑战要求，不能把这段等待直接归因于伤害不够或升级太贵。':'当时打赢的机会还没达到挑战要求，需要结合升级、奖励和购买顺序检查。');if(diag.resourceGap>0)evidence.push(`如果继续买一次攻击升级，还差${f(diag.resourceGap)}资源；按当时速度不停刷旧关，约需${time(diag.estimatedActiveWaitSeconds)}。这不是实际多久后一定买到的承诺。`);if(diag.snapshot.mode!=='online'&&worst.config.behavior.offlineMode==='farm')evidence.push('这时玩家不在线，游戏只替玩家刷资源；再次上线才会买升级、开始挑战新关。');if(diag.policy==='income')evidence.push('当时的购买顺序先存钱升级赚钱能力，短期不会增加伤害。');}
+  $('easyEvidenceLimit').textContent=diag.unreached?'不能据此唯一判断原因。':evidence.join(' ')+' 以上只说明其中一次当时的情况，不能据此认定唯一原因。';
   $('easyComparisonNote').textContent=`只修改了“${labels[task.key]}”；同一时间预算、上线安排、购买顺序、目标和${n}个重复编号。目标达标不等于玩家喜欢。`;
-  $('easyKeep').disabled=false;$('easyKeep').textContent='保留这次设置';
+  const recommended=d.verdict.startsWith('建议保留')?'easyKeep':d.verdict.startsWith('建议撤回')?'easyUndo':'easyAgain';for(const id of ['easyKeep','easyUndo','easyAgain'])$(id).setAttribute('class',id===recommended?'primary':'');$('easyUndo').textContent=recommended==='easyUndo'?'按建议撤回这次改动':'撤回这次改动';$('easyKeep').disabled=false;$('easyKeep').textContent='保留并保存设置';
  }
- function full(keep=false,section='start'){if(running)return;if(!keep)restore();else snapshot=null;$('easy').hidden=true;document.querySelector('.easy-secondary').hidden=true;$('fullReturn').hidden=false;$('advancedWorkbench').open=true;document.body.classList.add('full-mode');$(section).scrollIntoView({block:'start'});if(section==='start')$('editRecommended').focus({preventScroll:true});}
+ function full(keep=false,section='start'){if(running)return;if(!keep)restore();else snapshot=null;$('easy').hidden=true;document.querySelector('.easy-secondary').hidden=true;$('fullReturn').hidden=false;$('advancedWorkbench').open=true;document.body.classList.add('full-mode');if(groups.length)drawCurve();$(section).scrollIntoView({block:'start'});if(section==='start')$('editRecommended').focus({preventScroll:true});}
  for(const id of Object.keys(tasks))$(id).onclick=()=>choose(id);
  $('easyRun').onclick=run;$('easyCancel').onclick=()=>{$('cancel').onclick();message('正在停止；算到一半的结果不会用于比较。');};
  $('easyBack').onclick=()=>{restore();task=null;anchor=null;show(0);source();message('已返回，你进入本次试改前的设置和结果仍在。');focus('easyChooseTitle');};
  $('easyAgain').onclick=()=>{show(1);message('改一个值，再用同样条件比较。');focus('easyEditTitle');};
  $('easyUndo').onclick=()=>{current=copy(baseline);invalidate();renderEditor();snapshot=null;show(0);source();message('已撤回本次参数改动。当前保留修改前的设置和这次确认的目标；未覆盖本机存档。');focus('easyChooseTitle');};
  $('easyKeep').onclick=()=>{snapshot=null;$('save').onclick();if(!$('error').hidden){message($('error').textContent,true);return;}$('easyKeep').disabled=true;$('easyKeep').textContent='设置已保存到这台电脑';message('已保留并保存设置。这次完整模拟过程可在“查看曲线和逐关记录”里的保存区另行导出。');};
- $('easyDetails').onclick=()=>full(true,'results');$('openFull').onclick=()=>full(false);$('returnSimple').onclick=()=>{if(busy)return;$('advancedWorkbench').open=false;$('easy').hidden=false;document.querySelector('.easy-secondary').hidden=false;$('fullReturn').hidden=true;document.body.classList.remove('full-mode');snapshot=null;task=null;show(0);source();message('从当前设置开始。选一个问题，继续检查。');focus('easyChooseTitle');};
+ $('easyDetails').onclick=()=>full(true,'results');$('openFull').onclick=()=>full(false);$('returnSimple').onclick=()=>{if(busy)return;if($('guide').dataset.active==='true')$('guideExit').onclick();$('advancedWorkbench').open=false;$('easy').hidden=false;document.querySelector('.easy-secondary').hidden=false;$('fullReturn').hidden=true;document.body.classList.remove('full-mode');snapshot=null;task=null;show(0);source();message('从当前设置开始。选一个问题，继续检查。');focus('easyChooseTitle');};
  for(const id of ['easyMin','easyMax','easyWait','easyVisit'])$(id).oninput=targetSummary;
  $('advancedWorkbench').addEventListener('toggle',()=>{if($('advancedWorkbench').open&&!$('easy').hidden)full(false);});
  source();show(0);if(location.hash.startsWith('#config='))full(true,'adjustments');

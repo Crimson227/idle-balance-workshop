@@ -31,7 +31,7 @@ function assessComparison(gs){
  const worsened=['completion','wait','visits'].some(k=>count(after,k)<count(before,k));
  if(worsened)out.verdict='建议撤回这次改动：牺牲了原本达标的目标';
  else if(b.goalPasses<n)out.verdict='仍有目标没达到，暂不建议定稿';
- else if(out.costs.length)out.verdict='有改善也有代价，需要你取舍';
+ else if(out.costs.length)out.verdict=out.benefits.length?'有改善也有代价，需要你取舍':'未见明确改善，并有代价，建议继续调整';
  else if(out.benefits.length)out.verdict='建议保留，作为下一轮试玩候选';
  else out.verdict='未见明确收益，暂不建议替换修改前的方案';
  if(!out.benefits.length)out.benefits.push('本次没有观察到等待、操作量或目标通过数的改善。');
