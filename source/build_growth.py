@@ -3,7 +3,7 @@ import json
 root=Path(__file__).resolve().parent.parent
 build=root/'_构建'
 text=(build/'growth-template.html').read_text(encoding='utf-8')
-text=text.replace('__EASY_HTML__',(build/'growth-easy.html').read_text(encoding='utf-8')).replace('__EASY_APP__',(build/'growth-easy.js').read_text(encoding='utf-8'))
+text=text.replace('__EASY_HTML__',(build/'growth-easy.html').read_text(encoding='utf-8')).replace('__EASY_APP__',(build/'growth-check.js').read_text(encoding='utf-8')+(build/'growth-own.js').read_text(encoding='utf-8')+(build/'growth-easy.js').read_text(encoding='utf-8'))
 recommended=json.loads((root/'支持资料/回访与攻击依赖对照/补充复核_20261030/完整结果/结果_optional_income_balanced_批1.json').read_text(encoding='utf-8'))['project']
 text=text.replace('__RECOMMENDED__',json.dumps(recommended,ensure_ascii=False))
 study=json.loads((root/'支持资料/回访与攻击依赖对照/补充复核_20261030/02_三十种子汇总.json').read_text(encoding='utf-8'))

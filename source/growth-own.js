@@ -1,0 +1,26 @@
+function createOwnGrowthSetup(onFinish,onCancel,report){
+ let draft=null,page=0;
+ const pages=[...growthRuleSections.map(([title,keys])=>({title,keys})),{title:'玩家怎么回来、怎么买升级',behavior:true},{title:'你希望推进多快',goals:true}];
+ const notes=['先填关数和怪物血量。倍率1.04表示后面每关血量多4%；Boss在章末出现。','填写扣除敌人防御前的攻击。若已经填扣过防御的伤害，可把固定防御设为0。每次升级的倍率1.12表示多12%。','直接填玩家第一次实际支付的价格；以后每次涨价填百分比。普通关首通和重刷同奖，Boss首通可额外加奖。','此处按攻击间隔、暴击与战斗限时算输赢；不计算玩家被打死、技能或元素抗性。不能代表这些机制对完整游戏的影响。','同样的数值，回来时间和购买顺序不同，也可能完全不同。离线规则要与你准备做的游戏一致。','这些目标用来判断改动值不值得保留，不会改变伤害和价格。预填的是当前值，可以改成自己的目标。'];
+ function common(){const b=draft.behavior,g=draft.goals;return page===4?[
+  field('own-visits','每天回来几次',b.visitsPerDay),field('own-session','每次玩几分钟',b.sessionMinutes),`<label>每天第几小时回来，用逗号隔开<input id="own-hours" value="${esc(b.visitHours.join(','))}"><small class="field-help">例如0,5,12，表示开始时、5小时后、12小时后；之后每天重复。改次数后请核对时间。</small></label>`,
+  field('own-strategy','有钱时先买什么',b.strategy,Object.entries(strategyNames)),field('own-failure','新关打不过时',b.failureAction,[['safe','先刷打赢过的关'],['retry','一直重试新关'],['farm_one_retry','输一场，刷一场旧关再试']]),field('own-offline','下线后游戏替玩家做什么',b.offlineMode,[['farm','只刷旧关赚资源，不升级、不推新关'],['farm_buy','刷旧关、买升级，不推新关'],['auto','刷旧关、买升级，也推新关']])
+ ]:[field('own-days','最多检查多少天',draft.simulation.days,null,'到了期限仍没打完，也会保留记录。'),field('own-min','最早几天打完',g.first_completion_min_days),field('own-max','最晚几天打完',g.first_completion_max_days),field('own-wait','最多几小时没过新关',g.max_no_progress_hours),field('own-visit','每次回来至少过几关',g.expected_stages_per_visit)];}
+ function draw(){const p=pages[page];$('ownTitle').textContent=p.title;$('ownProgress').textContent=`第${page+1}组，共${pages.length}组`;$('ownNote').textContent=notes[page];$('ownFields').innerHTML=(p.keys?[...(page===1?[field('own-family','过关后怎么变强',draft.rules.family,[['fixed','每过一关给一点成长'],['chapter','过完整章才一起给成长']])]:[]),...p.keys.filter(k=>k!=='cost_scale').map(k=>{const first=['attack_cost_base','income_cost_base'].includes(k);return field('own-'+k,(first?(k==='attack_cost_base'?'第一次升级攻击，实际花多少钱':'第一次升级赚钱能力，实际花多少钱'):labels[k])+'（'+plainFields[k][1]+'）',first?draft.rules[k]*draft.rules.cost_scale:ruleDisplay(k,draft.rules[k]),null,first?'填玩家实际支付的资源，不用自己换算基础价或价格倍数。':hints[k]||'预填当前值；不知道时可暂时保留，结果只对这套假设有效。');})]:common()).join('');
+  if(page===2)$('ownMath').textContent=`按这些设置，第一次攻击升级实际花${f(draft.rules.attack_cost_base*draft.rules.cost_scale)}资源，第一次赚钱升级花${f(draft.rules.income_cost_base*draft.rules.cost_scale)}资源。`;else $('ownMath').textContent='';
+  $('ownPrev').hidden=page===0;$('ownNext').textContent=page===pages.length-1?'使用这些设置，开始检查':'继续：'+pages[page+1].title;$('ownTitle').focus({preventScroll:true});$('easy').scrollIntoView({block:'start'});report('当前值已预填。每次只核对这一组；保留示例值时，结论也只适用于这些假设。');
+  if(page===4)$('own-visits').oninput=()=>{const n=Number($('own-visits').value);if(Number.isInteger(n)&&n>=1&&n<=24)$('own-hours').value=n===3?'0,5,12':Array.from({length:n},(_,i)=>24*i/n).join(',');};
+  if(page===2)for(const k of ['attack_cost_base','income_cost_base'])$('own-'+k).oninput=()=>{$('ownMath').textContent=`第一次攻击升级实际花${f(Number($('own-attack_cost_base').value))}资源；第一次赚钱升级花${f(Number($('own-income_cost_base').value))}资源。`;};
+ }
+ function number(id,label){const raw=$(id).value,v=Number(raw);if(!raw.trim()||!Number.isFinite(v)){ $(id).focus();throw Error(`“${label}”请填数字。`);}return v;}
+ function commit(){const c=copy(draft),p=pages[page];
+  if(p.keys){for(const k of p.keys.filter(k=>k!=='cost_scale')){let v=number('own-'+k,labels[k]);if(pricePercent.has(k))v=$('own-'+k).value===String(ruleDisplay(k,draft.rules[k]))?draft.rules[k]:(100+v)/100;const spec=M.fields.find(x=>x[0]===k);if(v<spec[3]||v>spec[4]){$('own-'+k).focus();throw Error(`${labels[k]}请填${pricePercent.has(k)?0:spec[3]}到${pricePercent.has(k)?200:spec[4]}${pricePercent.has(k)?'%':plainFields[k][1]}。`);}c.rules[k]=v;}if(page===2)c.rules.cost_scale=1;if(page===1)c.rules.family=$('own-family').value;}
+  else if(p.behavior){const b=c.behavior;b.visitsPerDay=number('own-visits','每天回来几次');b.sessionMinutes=number('own-session','每次玩几分钟');b.visitHours=$('own-hours').value.split(',').map(v=>Number(v.trim()));b.strategy=$('own-strategy').value;b.failureAction=$('own-failure').value;b.offlineMode=$('own-offline').value;c.goals.visits_per_day=b.visitsPerDay;c.goals.session_minutes=b.sessionMinutes;}
+  else{c.simulation.days=number('own-days','最多检查多少天');for(const [id,key] of [['min','first_completion_min_days'],['max','first_completion_max_days'],['wait','max_no_progress_hours'],['visit','expected_stages_per_visit']])c.goals[key]=number('own-'+id,'比较目标');}
+  draft=G.prepare(c);
+ }
+ $('ownNext').onclick=()=>{try{commit();if(page===pages.length-1){draft.name='我的游戏试算草稿';onFinish(copy(draft));}else{page++;draw();}}catch(e){fail(e);report($('error').textContent,true);}};
+ $('ownPrev').onclick=()=>{try{commit();page--;draw();}catch(e){fail(e);report($('error').textContent,true);}};
+ $('ownCancel').onclick=onCancel;
+ return {open(){draft=copy(read());page=0;draw();}};
+}
