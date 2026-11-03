@@ -1,0 +1,1 @@
+self.onmessage=e=>{const {id,type,game,seed,result,stage,attempt}=e.data;try{const core=load('./一体化核心.cjs');const data=type==='replay'?core.replay(result,stage,attempt):core.run(game,seed);self.postMessage({id,ok:true,data});}catch(error){self.postMessage({id,ok:false,error:error.message});}};

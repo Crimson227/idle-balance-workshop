@@ -1,0 +1,28 @@
+<section id="connected" aria-label="我的游戏数值工作台">
+<nav class="connected-nav" aria-label="游戏工作区"><button id="cgDataTab" aria-current="page">我的游戏 / 数据</button><button id="cgRunTab">整体模拟</button><button id="cgResultsTab">结果与调整</button></nav>
+<p id="cgProjectLine" class="connected-project">还没有载入游戏。先用示例完整走一遍，或填写自己的规则。</p>
+<div id="cgEmpty"><h2>从角色到过关，放在同一个游戏里算。</h2><p>角色和敌人的战斗、升级花费、金币奖励与回访时间一起参与模拟。</p><div class="actions"><button id="cgExample" class="primary">载入《遗迹守卫》示例</button><button id="cgCreate">填写我的游戏</button><label class="file-button">打开配置或结果文件<input id="cgImport" type="file" accept=".json,application/json"></label></div></div>
+<div id="cgData" hidden>
+<h2>我的游戏数据</h2><p id="cgDataIntro"></p>
+<form id="cgForm" novalidate><label>游戏名称<input id="cgName" maxlength="120" required></label><div id="cgFieldGroups"></div>
+<details id="cgGoals"><summary>我希望玩多久，回来时有多少进展</summary>
+<label>这次按什么判断<select id="cgGoalMode"><option value="pending">暂不设目标，先看实际情况</option><option value="set">填写我的目标</option></select></label>
+<div id="cgGoalFields" class="fields" hidden>
+<label>最早多久打完（可空）<input id="cgGoalMin" type="number" min="0" step="any"></label>
+<label>最晚多久打完（可空）<input id="cgGoalMax" type="number" min="0" step="any"></label>
+<label>完成时间单位<select id="cgGoalUnit"><option value="minutes">分钟</option><option value="hours" selected>小时</option><option value="days">天</option></select></label>
+<label>最多多久没过新关（可空）<input id="cgGoalGap" type="number" min="0" step="any"></label>
+<label>等待时间单位<select id="cgWaitUnit"><option value="minutes">分钟</option><option value="hours" selected>小时</option><option value="days">天</option></select></label>
+<label>每次回来至少过几关（可空）<input id="cgGoalVisit" type="number" min="1" step="1"></label>
+</div></details>
+<div class="actions connected-sticky"><button type="submit" class="primary">保存这份游戏数据</button><button id="cgDataRun" type="button">保存并整体检查</button><button id="cgDiscard" type="button">撤回未保存修改</button></div></form></div>
+<div id="cgSimulation" hidden><h2>整体模拟</h2><p id="cgRunSummary"></p><p>每场实际计算物理与火焰、暴击、生命、护甲、吸血和回复。升级只在有钱且在线时购买。</p><div class="actions"><button id="cgRun" class="primary">帮我整体检查</button><button id="cgCompare" disabled>与修改前比较整条路线</button><button id="cgStop" hidden>停止计算</button><button id="cgEditData">修改游戏数据</button></div><p id="cgProgress" role="status" aria-live="polite"></p></div>
+<div id="cgResults" hidden><h2 id="cgResultTitle">还没有模拟结果</h2><p id="cgWhat" class="conclusion"></p><p id="cgWhy"></p><p id="cgTradeoff"></p><div id="cgComparison" hidden><div class="scroll"><table><caption>相同观察时间、目标和试算编号</caption><thead><tr><th>看什么</th><th>修改前</th><th>修改后</th></tr></thead><tbody id="cgComparisonRows"></tbody></table></div><details><summary>这次具体改了什么</summary><div id="cgDiffs"></div></details></div>
+<div class="actions"><label>查看哪一次记录<select id="cgRunSelect"></select></label><button id="cgLongest">定位最长等待</button><button id="cgFirstFailure">查看第一次没打赢</button></div>
+<section class="connected-diagnosis" aria-label="这关发生什么"><h3 id="cgBlockTitle"></h3><p id="cgBlockWhat"></p><p id="cgBlockWhy"></p><details id="cgTimeEvidence"><summary>展开这一段的时间与金币依据</summary><div id="cgTimeRows"></div></details><div class="actions"><button id="cgOpenBattle">展开当时的实际战斗</button></div><div id="cgBattle" hidden><h4 id="cgBattleTitle"></h4><p id="cgBattleSummary"></p><div id="cgActors" class="connected-actors"></div><label>查看哪一个时刻<select id="cgBattleStep"></select></label><div class="actions"><button id="cgBattlePrev">上一个时刻</button><button id="cgBattleNext">下一个时刻</button><button id="cgCloseBattle">收起战斗</button></div><div id="cgBattleMoment"></div></div></section>
+<section aria-label="下一步怎么改"><h3>怎么改，再跑一次</h3><p id="cgNext"></p><div id="cgSuggestions" class="actions"></div><div class="actions"><button id="cgChangeMyData">自己改游戏数据</button><button id="cgKeep" hidden>保留修改后的方案</button><button id="cgUndo" hidden>撤回到修改前</button></div><details id="cgRejected" hidden><summary>查看没有改善的方案</summary><div id="cgRejectedRows"></div></details></section>
+<details><summary>逐关、购买与每次回访记录</summary><div class="scroll connected-records"><table><caption>点击关卡，在这里展开对应战斗</caption><thead><tr><th>关卡</th><th>到达 / 通过</th><th>战斗 / 等待</th><th>失败</th><th>到达时 / 通过后金币</th></tr></thead><tbody id="cgStageRows"></tbody></table></div><details><summary>升级购买记录</summary><div class="scroll"><table><thead><tr><th>时间 / 关卡</th><th>买了什么</th><th>实际价格</th><th>钱包余额</th></tr></thead><tbody id="cgPurchaseRows"></tbody></table></div></details><details><summary>每次回来过了几关</summary><div id="cgVisitRows"></div></details></details>
+</div>
+<p id="cgError" class="form-error" role="alert" hidden></p><p id="cgNotice" role="status" aria-live="polite"></p>
+<footer class="connected-footer"><div class="actions"><button id="cgSave" disabled>保存到这台电脑</button><button id="cgRestore">找回上次保存</button><button id="cgExportConfig" disabled>导出游戏配置</button><button id="cgExportResults" disabled>导出本次完整结果</button></div><details><summary>本版规则与旧工具</summary><p>一体化版本 connected-growth-1.0.0，逐击战斗 ddr-3.0.0。每场双方满血开始；伤害同刻结算，存活者按实际扣血吸血，再做整秒回复。只支持物理和一个火焰通道、固定三类加法升级。每次过关只领一次奖励，失败不给奖；这里没有重复刷旧关收入。固定金币收入在在线和离线时计时，离线达到上限暂停；下线不买升级、不主动开新战斗，已经开打的一场可以打完。</p><p>游戏、配置和结果版本一起导出。金币和战斗用精确分数计算，不自动取整。体验目标空着就不判断达标，模拟也不判断真人是否喜欢。</p><button id="cgLegacy">打开原单伤害研究工具</button></details></footer>
+</section>
