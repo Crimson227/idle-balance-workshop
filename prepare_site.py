@@ -39,8 +39,10 @@ while queue:
     records.append({'file':rel.as_posix(),'bytes':target.stat().st_size,'sha256':hashlib.sha256(target.read_bytes()).hexdigest()})
 shutil.copyfile(dist/'数值工坊.html',dist/'index.html')
 (site/'source').mkdir(exist_ok=True)
-for file in ['connected-html.html','connected-app.js','connected.css','connected-editorial.css','connected-worker-tail.js','connected-bundle.js','build_connected.py','growth-own-simple.js','growth-search.js','growth-check.js','growth-own.js','growth-easy.html','growth-easy.js','growth-template.html','growth-app.js','growth-guide.js','growth-decision.js','growth.css','battle-template.html','battle-app.js','battle.css','config-template.html','config.css','workbench.css','workbench-shell.js','build_growth.py','build_battle.py','build_config.py','attribute-help.js']:
+for file in ['connected-html.html','connected-app.js','connected.css','connected-editorial.css','connected-expanded.css','connected-v2-editor.js','connected-charts.js','connected-worker-tail.js','connected-bundle.js','build_connected.py','growth-own-simple.js','growth-search.js','growth-check.js','growth-own.js','growth-easy.html','growth-easy.js','growth-template.html','growth-app.js','growth-guide.js','growth-decision.js','growth.css','battle-template.html','battle-app.js','battle.css','config-template.html','config.css','workbench.css','workbench-shell.js','build_growth.py','build_battle.py','build_config.py','attribute-help.js']:
     shutil.copyfile(source/'_构建'/file,site/'source'/file)
 shutil.copytree(source/'支持资料/一体化成长',site/'source/connected-core',dirs_exist_ok=True)
+for file in ['connected-lookup.js','attribute-catalog.json']:
+    shutil.copyfile(source/'_构建'/file,site/'source'/file)
 (site/'release-files.json').write_text(json.dumps({'files':records,'totalBytes':sum(x['bytes']for x in records),'browserValidation':'pending'},ensure_ascii=False,indent=2),encoding='utf8')
 print(json.dumps({'files':len(records)+1,'totalMB':round(sum(x['bytes']for x in records)/1024**2,2),'largest':sorted(records,key=lambda x:x['bytes'],reverse=True)[:3]},ensure_ascii=False))

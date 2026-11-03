@@ -1,0 +1,790 @@
+{
+  "version": "attribute-locator-1.0",
+  "fields": [
+    {
+      "key": "hp",
+      "label": "生命上限",
+      "page": "battle",
+      "percent": false,
+      "min": 1,
+      "max": 10000000,
+      "section": "基础属性",
+      "aliases": [
+        "生命",
+        "血量",
+        "生命值",
+        "HP"
+      ]
+    },
+    {
+      "key": "physicalMin",
+      "label": "最小物理伤害",
+      "page": "battle",
+      "percent": false,
+      "min": 0,
+      "max": 1000000,
+      "section": "基础属性",
+      "aliases": [
+        "最小攻击",
+        "物攻下限"
+      ]
+    },
+    {
+      "key": "physicalMax",
+      "label": "最大物理伤害",
+      "page": "battle",
+      "percent": false,
+      "min": 0,
+      "max": 1000000,
+      "section": "基础属性",
+      "aliases": [
+        "最大攻击",
+        "物攻上限"
+      ]
+    },
+    {
+      "key": "frequency",
+      "label": "攻击速度（次/秒）",
+      "page": "battle",
+      "percent": false,
+      "min": 0.1,
+      "max": 10,
+      "section": "基础属性",
+      "aliases": [
+        "攻速",
+        "攻击速度",
+        "攻击频率"
+      ]
+    },
+    {
+      "key": "critChance",
+      "label": "暴击率",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 100,
+      "section": "基础属性",
+      "aliases": [
+        "暴击几率",
+        "暴击概率"
+      ]
+    },
+    {
+      "key": "critBonus",
+      "label": "暴击额外伤害",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 500,
+      "section": "基础属性",
+      "aliases": [
+        "暴伤",
+        "暴击伤害",
+        "爆伤"
+      ]
+    },
+    {
+      "key": "fire",
+      "label": "每击火焰伤害",
+      "page": "battle",
+      "percent": false,
+      "min": 0,
+      "max": 1000000,
+      "section": "元素伤害与增强",
+      "aliases": [
+        "火伤",
+        "火焰伤害"
+      ]
+    },
+    {
+      "key": "ice",
+      "label": "每击冰霜伤害",
+      "page": "battle",
+      "percent": false,
+      "min": 0,
+      "max": 1000000,
+      "section": "元素伤害与增强",
+      "aliases": [
+        "冰伤",
+        "冰霜伤害"
+      ]
+    },
+    {
+      "key": "lightning",
+      "label": "每击闪电伤害",
+      "page": "battle",
+      "percent": false,
+      "min": 0,
+      "max": 1000000,
+      "section": "元素伤害与增强",
+      "aliases": [
+        "电伤",
+        "雷伤",
+        "闪电伤害",
+        "电伤害",
+        "雷电伤害"
+      ]
+    },
+    {
+      "key": "poison",
+      "label": "每击毒性直伤",
+      "page": "battle",
+      "percent": false,
+      "min": 0,
+      "max": 1000000,
+      "section": "元素伤害与增强",
+      "aliases": [
+        "毒伤",
+        "毒性伤害"
+      ]
+    },
+    {
+      "key": "armor",
+      "label": "护甲",
+      "page": "battle",
+      "percent": false,
+      "min": 0,
+      "max": 100000,
+      "section": "基础属性",
+      "aliases": [
+        "护甲值",
+        "物理防御"
+      ]
+    },
+    {
+      "key": "flatPen",
+      "label": "固定护甲穿透",
+      "page": "battle",
+      "percent": false,
+      "min": 0,
+      "max": 100000,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "固定穿甲",
+        "固定穿透"
+      ]
+    },
+    {
+      "key": "percentPen",
+      "label": "比例护甲穿透",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 100,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "百分比穿甲",
+        "护甲穿透率"
+      ]
+    },
+    {
+      "key": "physicalBonus",
+      "label": "物理增强",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 1000,
+      "section": "元素伤害与增强",
+      "aliases": [
+        "物理增伤"
+      ]
+    },
+    {
+      "key": "fireBonus",
+      "label": "火焰增强",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 1000,
+      "section": "元素伤害与增强",
+      "aliases": [
+        "火焰增伤",
+        "火伤增强"
+      ]
+    },
+    {
+      "key": "iceBonus",
+      "label": "冰霜增强",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 1000,
+      "section": "元素伤害与增强",
+      "aliases": [
+        "冰霜增伤",
+        "冰伤增强"
+      ]
+    },
+    {
+      "key": "lightningBonus",
+      "label": "闪电增强",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 1000,
+      "section": "元素伤害与增强",
+      "aliases": [
+        "电增伤",
+        "雷增伤",
+        "闪电增伤",
+        "电伤增强",
+        "闪电增强",
+        "雷电增伤"
+      ]
+    },
+    {
+      "key": "poisonBonus",
+      "label": "毒性增强",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 1000,
+      "section": "元素伤害与增强",
+      "aliases": [
+        "毒性增伤"
+      ]
+    },
+    {
+      "key": "physicalResist",
+      "label": "物理抗性",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 75,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "物抗",
+        "物理减伤"
+      ]
+    },
+    {
+      "key": "fireResist",
+      "label": "火焰抗性",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 75,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "火抗",
+        "火焰抗性",
+        "火抵抗"
+      ]
+    },
+    {
+      "key": "iceResist",
+      "label": "冰霜抗性",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 75,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "冰抗",
+        "冰抗性"
+      ]
+    },
+    {
+      "key": "lightningResist",
+      "label": "闪电抗性",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 75,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "电抗",
+        "电抗性",
+        "雷抗",
+        "雷电抗性",
+        "闪电抵抗",
+        "雷抗性"
+      ]
+    },
+    {
+      "key": "poisonResist",
+      "label": "毒性抗性",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 75,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "毒抗",
+        "毒抗性"
+      ]
+    },
+    {
+      "key": "critAvoid",
+      "label": "暴击率减免",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 100,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "抗暴",
+        "抗暴率"
+      ]
+    },
+    {
+      "key": "critBonusReduction",
+      "label": "暴击额外伤害减免",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 500,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "暴伤减免"
+      ]
+    },
+    {
+      "key": "blockChance",
+      "label": "格挡率",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 100,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "格挡概率",
+        "格挡几率"
+      ]
+    },
+    {
+      "key": "blockReduction",
+      "label": "格挡减伤比例",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 100,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "格挡减伤"
+      ]
+    },
+    {
+      "key": "regen",
+      "label": "每秒生命回复",
+      "page": "battle",
+      "percent": false,
+      "min": 0,
+      "max": 100000,
+      "section": "基础属性",
+      "aliases": [
+        "回血",
+        "生命回复",
+        "生命恢复"
+      ]
+    },
+    {
+      "key": "leech",
+      "label": "生命偷取比例",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 100,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "吸血",
+        "生命偷取"
+      ]
+    },
+    {
+      "key": "leechResist",
+      "label": "生命偷取减免",
+      "page": "battle",
+      "percent": true,
+      "min": 0,
+      "max": 100,
+      "section": "抗性、格挡与恢复",
+      "aliases": [
+        "吸血减免",
+        "吸血抵抗"
+      ]
+    },
+    {
+      "key": "stage_cap",
+      "label": "一共有多少关",
+      "page": "growth",
+      "percent": false,
+      "min": 1,
+      "max": 10000,
+      "unit": "关",
+      "aliases": [
+        "总关数",
+        "总关数"
+      ]
+    },
+    {
+      "key": "chapter_size",
+      "label": "多少关算一章",
+      "page": "growth",
+      "percent": false,
+      "min": 1,
+      "max": 10000,
+      "unit": "关",
+      "aliases": [
+        "每章关数"
+      ]
+    },
+    {
+      "key": "hp_base",
+      "label": "第1关怪物有多少血",
+      "page": "growth",
+      "percent": false,
+      "min": 0.001,
+      "max": 1000000000000,
+      "unit": "点",
+      "aliases": [
+        "首关生命",
+        "首关血量",
+        "第1关怪物血量"
+      ]
+    },
+    {
+      "key": "hp_growth",
+      "label": "往后每关，怪物血量乘几倍",
+      "page": "growth",
+      "percent": false,
+      "min": 1,
+      "max": 2,
+      "unit": "倍",
+      "aliases": [
+        "每关生命倍率",
+        "血量成长",
+        "每关血量增长"
+      ]
+    },
+    {
+      "key": "attack_base",
+      "label": "还没升级时，一下打多少伤害",
+      "page": "growth",
+      "percent": false,
+      "min": 0.001,
+      "max": 1000000000000,
+      "unit": "点",
+      "aliases": [
+        "基础攻击",
+        "基础攻击",
+        "初始伤害"
+      ]
+    },
+    {
+      "key": "defense",
+      "label": "怪物的固定防御",
+      "page": "growth",
+      "percent": false,
+      "min": 0,
+      "max": 1000000000000,
+      "unit": "点",
+      "aliases": [
+        "固定敌方防御"
+      ]
+    },
+    {
+      "key": "defense_scale",
+      "label": "防御抵消伤害时用的数",
+      "page": "growth",
+      "percent": false,
+      "min": 0.001,
+      "max": 1000000000000,
+      "unit": "点",
+      "aliases": [
+        "减伤尺度"
+      ]
+    },
+    {
+      "key": "attack_gain",
+      "label": "攻击每升1级，伤害乘几倍",
+      "page": "growth",
+      "percent": false,
+      "min": 1,
+      "max": 3,
+      "unit": "倍",
+      "aliases": [
+        "每次攻击升级倍率"
+      ]
+    },
+    {
+      "key": "attack_cost_base",
+      "label": "第一次升级攻击的基础价",
+      "page": "growth",
+      "percent": false,
+      "min": 0.001,
+      "max": 1000000000000,
+      "unit": "资源",
+      "aliases": [
+        "攻击升级原始起价",
+        "攻击升级起价"
+      ]
+    },
+    {
+      "key": "attack_cost_growth",
+      "label": "攻击每升1级，下次涨价多少",
+      "page": "growth",
+      "percent": true,
+      "min": 0,
+      "max": 200,
+      "unit": "倍",
+      "aliases": [
+        "攻击价格递增倍率",
+        "攻击涨价",
+        "攻击升级涨价"
+      ]
+    },
+    {
+      "key": "income_gain",
+      "label": "赚钱能力每升1级，奖励乘几倍",
+      "page": "growth",
+      "percent": false,
+      "min": 1,
+      "max": 3,
+      "unit": "倍",
+      "aliases": [
+        "每次收益升级倍率"
+      ]
+    },
+    {
+      "key": "income_cost_base",
+      "label": "第一次升级赚钱能力的基础价",
+      "page": "growth",
+      "percent": false,
+      "min": 0.001,
+      "max": 1000000000000,
+      "unit": "资源",
+      "aliases": [
+        "收益升级原始起价"
+      ]
+    },
+    {
+      "key": "income_cost_growth",
+      "label": "赚钱能力每升1级，下次涨价多少",
+      "page": "growth",
+      "percent": true,
+      "min": 0,
+      "max": 200,
+      "unit": "倍",
+      "aliases": [
+        "收益价格递增倍率",
+        "赚钱升级涨价",
+        "收益升级涨价"
+      ]
+    },
+    {
+      "key": "cost_scale",
+      "label": "全部升级统一调价",
+      "page": "growth",
+      "percent": false,
+      "min": 0.001,
+      "max": 1000,
+      "unit": "倍",
+      "aliases": [
+        "升级价格整体倍率"
+      ]
+    },
+    {
+      "key": "reward_base",
+      "label": "打第1关，一次给多少资源",
+      "page": "growth",
+      "percent": false,
+      "min": 0.001,
+      "max": 1000000000000,
+      "unit": "资源",
+      "aliases": [
+        "首关基础奖励",
+        "基础奖励",
+        "首关奖励"
+      ]
+    },
+    {
+      "key": "reward_growth",
+      "label": "往后每关，基础奖励乘几倍",
+      "page": "growth",
+      "percent": false,
+      "min": 1,
+      "max": 2,
+      "unit": "倍",
+      "aliases": [
+        "逐关奖励倍率",
+        "奖励增长",
+        "逐关奖励"
+      ]
+    },
+    {
+      "key": "chapter_power",
+      "label": "过完一章，总共变强几倍",
+      "page": "growth",
+      "percent": false,
+      "min": 1,
+      "max": 3,
+      "unit": "倍",
+      "aliases": [
+        "每章累计成长倍率"
+      ]
+    },
+    {
+      "key": "boss_hp_multiplier",
+      "label": "Boss的血是普通怪的几倍",
+      "page": "growth",
+      "percent": false,
+      "min": 1,
+      "max": 10,
+      "unit": "倍",
+      "aliases": [
+        "Boss生命倍率",
+        "Boss血量倍率"
+      ]
+    },
+    {
+      "key": "boss_first_reward",
+      "label": "Boss第一次打赢，奖励乘几倍",
+      "page": "growth",
+      "percent": false,
+      "min": 1,
+      "max": 20,
+      "unit": "倍",
+      "aliases": [
+        "Boss首次奖励倍率"
+      ]
+    },
+    {
+      "key": "attack_interval_seconds",
+      "label": "隔多久攻击一下",
+      "page": "growth",
+      "percent": false,
+      "min": 0.02,
+      "max": 30,
+      "unit": "秒",
+      "aliases": [
+        "攻击间隔"
+      ]
+    },
+    {
+      "key": "timeout_seconds",
+      "label": "一场最多允许打多久",
+      "page": "growth",
+      "percent": false,
+      "min": 1,
+      "max": 600,
+      "unit": "秒",
+      "aliases": [
+        "战斗限时"
+      ]
+    },
+    {
+      "key": "transition_seconds",
+      "label": "打完一场，休息多久再打",
+      "page": "growth",
+      "percent": false,
+      "min": 0,
+      "max": 60,
+      "unit": "秒",
+      "aliases": [
+        "换场时间"
+      ]
+    },
+    {
+      "key": "crit_chance",
+      "label": "暴击机会有多大",
+      "page": "growth",
+      "percent": false,
+      "min": 0,
+      "max": 1,
+      "unit": "比例",
+      "aliases": [
+        "暴击概率"
+      ]
+    },
+    {
+      "key": "crit_multiplier",
+      "label": "暴击时，伤害是平时的几倍",
+      "page": "growth",
+      "percent": false,
+      "min": 1,
+      "max": 10,
+      "unit": "倍",
+      "aliases": [
+        "暴击伤害倍率"
+      ]
+    },
+    {
+      "key": "offline_cap_hours",
+      "label": "下线后最多替玩家刷多久",
+      "page": "growth",
+      "percent": false,
+      "min": 0,
+      "max": 168,
+      "unit": "小时",
+      "aliases": [
+        "离线收益上限"
+      ]
+    },
+    {
+      "key": "push_success_threshold",
+      "label": "有多大赢面，才自动挑战新关",
+      "page": "growth",
+      "percent": false,
+      "min": 0,
+      "max": 1,
+      "unit": "比例",
+      "aliases": [
+        "自动挑战准入概率"
+      ]
+    },
+    {
+      "key": "move",
+      "label": "移动速度",
+      "aliases": [
+        "移速",
+        "移动速度"
+      ],
+      "note": "当前工具没有移动和走位计算，不要填进“攻击速度”。",
+      "page": "unsupported"
+    },
+    {
+      "key": "dodge",
+      "label": "闪避",
+      "aliases": [
+        "闪避",
+        "闪避率"
+      ],
+      "note": "当前战斗规则没有闪避判定，不能改填成格挡率。",
+      "page": "unsupported"
+    },
+    {
+      "key": "hit",
+      "label": "命中",
+      "aliases": [
+        "命中",
+        "命中率"
+      ],
+      "note": "当前战斗规则没有命中率输入。",
+      "page": "unsupported"
+    },
+    {
+      "key": "dot",
+      "label": "持续伤害",
+      "aliases": [
+        "持续伤害",
+        "持续毒伤",
+        "每秒毒伤",
+        "dot"
+      ],
+      "note": "当前毒性按每击直接伤害计算，不能用它代替持续伤害。",
+      "page": "unsupported"
+    },
+    {
+      "key": "elementPen",
+      "label": "元素穿透",
+      "aliases": [
+        "元素穿透",
+        "电穿透",
+        "闪电穿透"
+      ],
+      "note": "当前只支持护甲穿透，不能代替元素穿透。",
+      "page": "unsupported"
+    }
+  ]
+}

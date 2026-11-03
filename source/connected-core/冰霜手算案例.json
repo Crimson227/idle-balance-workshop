@@ -1,0 +1,156 @@
+{
+  "format": "idle-connected-game-v2",
+  "version": "connected-growth-2.0.0",
+  "name": "手算",
+  "player": {
+    "hp": "100",
+    "physicalMin": "1",
+    "physicalMax": "1",
+    "frequency": "1",
+    "critChance": null,
+    "critBonus": null,
+    "fire": null,
+    "ice": "4",
+    "lightning": null,
+    "poison": null,
+    "armor": null,
+    "flatPen": null,
+    "percentPen": null,
+    "physicalBonus": null,
+    "fireBonus": null,
+    "iceBonus": null,
+    "lightningBonus": null,
+    "poisonBonus": null,
+    "physicalResist": "0",
+    "fireResist": null,
+    "iceResist": "0",
+    "lightningResist": null,
+    "poisonResist": null,
+    "critAvoid": null,
+    "critBonusReduction": null,
+    "blockChance": null,
+    "blockReduction": null,
+    "regen": null,
+    "leech": null,
+    "leechResist": null,
+    "physicalReduction": "0",
+    "iceReduction": "0"
+  },
+  "world": {
+    "stageCount": 2,
+    "enemy": {
+      "hp": "6",
+      "physicalMin": "0",
+      "physicalMax": "0",
+      "frequency": "1",
+      "critChance": null,
+      "critBonus": null,
+      "fire": null,
+      "ice": "0",
+      "lightning": null,
+      "poison": null,
+      "armor": null,
+      "flatPen": null,
+      "percentPen": null,
+      "physicalBonus": null,
+      "fireBonus": null,
+      "iceBonus": null,
+      "lightningBonus": null,
+      "poisonBonus": null,
+      "physicalResist": "0",
+      "fireResist": null,
+      "iceResist": "0.5",
+      "lightningResist": null,
+      "poisonResist": null,
+      "critAvoid": null,
+      "critBonusReduction": null,
+      "blockChance": null,
+      "blockReduction": null,
+      "regen": null,
+      "leech": null,
+      "leechResist": null,
+      "physicalReduction": "0",
+      "iceReduction": "0"
+    },
+    "hpStep": "8",
+    "hitStep": "0.5",
+    "elementStep": "0.1",
+    "rewardBase": "10",
+    "rewardStep": "0",
+    "steps": {
+      "hp": "2"
+    }
+  },
+  "upgrades": [
+    {
+      "id": "iceup",
+      "name": "冰霜",
+      "enabled": false,
+      "fields": [
+        "ice"
+      ],
+      "increment": "4",
+      "maxLevel": 1,
+      "costBase": "10",
+      "costStep": "0"
+    }
+  ],
+  "strategy": {
+    "order": [
+      "iceup"
+    ],
+    "failureMode": "retry_after_delay"
+  },
+  "economy": {
+    "initialCoins": "0",
+    "incomePerSecond": "0",
+    "incomeDuringCombat": true,
+    "costScale": "1",
+    "rewardScale": "1"
+  },
+  "rules": {
+    "armorK": "100",
+    "battleTimeoutSeconds": "30",
+    "victoryDelaySeconds": "0",
+    "retryDelaySeconds": "0.1"
+  },
+  "behavior": {
+    "mode": "continuous",
+    "visitHours": [
+      0
+    ],
+    "sessionMinutes": "5",
+    "offlineCapHours": "8"
+  },
+  "goals": {
+    "minCompletionSeconds": null,
+    "maxCompletionSeconds": null,
+    "maxGapSeconds": null,
+    "stagesPerVisit": null
+  },
+  "simulation": {
+    "seeds": [
+      42
+    ],
+    "observationSeconds": "20",
+    "maxEvents": 1000,
+    "maxBattles": 100
+  },
+  "types": {
+    "physical": true,
+    "fire": false,
+    "ice": true,
+    "lightning": false,
+    "poison": false
+  },
+  "mechanisms": {
+    "critical": false,
+    "armor": false,
+    "block": false,
+    "leech": false,
+    "regen": false,
+    "bonuses": false,
+    "resistance": true
+  },
+  "battleVersion": "multi-exact-2.0.0"
+}

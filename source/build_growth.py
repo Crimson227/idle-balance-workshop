@@ -17,6 +17,7 @@ for key,value in {'CSS':(build/'workbench-fonts.css').read_text(encoding='utf-8'
 text=text.replace('__SHELL__',(build/'workbench-shell.js').read_text(encoding='utf-8'))
 text=text.replace('</style>',(build/'connected.css').read_text(encoding='utf8')+'</style>',1)
 text=text.replace('</style>',(build/'connected-editorial.css').read_text(encoding='utf8')+'</style>',1)
+text=text.replace('</style>',(build/'connected-expanded.css').read_text(encoding='utf8')+'</style>',1)
 text=text.replace('</body>','<script>'+(build/'connected-bundle.js').read_text(encoding='utf8')+'</script></body>')
 text=text.replace('__ATTRIBUTE_DATA__',(build/'attribute-catalog.json').read_text(encoding='utf-8')).replace('__ATTRIBUTE_PAGE__','growth').replace('__ATTRIBUTE_HELP__',(build/'attribute-help.js').read_text(encoding='utf-8'))
 (root/'06_成长模拟与卡点诊断.html').write_text(text,encoding='utf-8')
