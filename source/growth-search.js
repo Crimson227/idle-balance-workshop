@@ -5,7 +5,7 @@ async function findGrowthCandidates(config,problem,settings,run,isStopped,progre
  const seedList=c.simulation.seeds,searchSeeds=seedList.slice(0,Math.min(2,seedList.length)),validationSeeds=seedList.filter(x=>!searchSeeds.includes(x)).slice(0,2);
  for(let seed=1041;validationSeeds.length<2;seed++)if(!searchSeeds.includes(seed)&&!validationSeeds.includes(seed))validationSeeds.push(seed);
  c.simulation.seeds=[...searchSeeds,...validationSeeds];
- const record={status:'running',reason:null,base:[],baseValidation:[],rows:[],recommendations:[],searched:0,planned:0,seeds:{search:searchSeeds,validation:validationSeeds},config:copy(c),ranges:copy(settings)};
+ const record={format:'idle-growth-search-v1',modelVersion:G.VERSION,schedulerVersion:'growth-finite-adapter-1',status:'running',reason:null,base:[],baseValidation:[],rows:[],recommendations:[],searched:0,planned:0,seeds:{search:searchSeeds,validation:validationSeeds},config:copy(c),ranges:copy(settings)};
  const earliest=c.rules.stage_cap*c.rules.attack_interval_seconds+Math.max(0,c.rules.stage_cap-1)*c.rules.transition_seconds;
  if(c.goals.first_completion_min_days>c.goals.first_completion_max_days||earliest>c.goals.first_completion_max_days*86400){record.status='conflict';record.reason='即使每关一击就赢，最早也需'+time(earliest)+'，已晚于目标上限。';return record;}
  if(c.goals.first_completion_min_days>c.simulation.days){record.status='insufficient_budget';record.reason='观察期限早于目标周期下限，请先增加模拟天数；没有放宽目标。';return record;}
