@@ -27,5 +27,5 @@ function createDetailedOwnGrowthSetup(onFinish,onCancel,report){
  $('ownPrev').onclick=()=>{try{commit();page--;draw();}catch(e){showError(e);}};
  $('ownCancel').onclick=onCancel;
  $('ownFields').oninput=e=>{const hint=$('own-error-'+e.target.id);if(hint){hint.hidden=true;e.target.removeAttribute('aria-invalid');if($('help-'+e.target.id))e.target.setAttribute('aria-describedby','help-'+e.target.id);else e.target.removeAttribute('aria-describedby');} $('ownError').hidden=true;};
- return {open(){draft=copy(read());page=0;draw();}};
+ return {open(initial){draft=copy(initial||read());page=0;draw();}};
 }
