@@ -1,4 +1,4 @@
-function createOwnGrowthSetup(onFinish,onCancel,report){
+function createDetailedOwnGrowthSetup(onFinish,onCancel,report){
  let draft=null,page=0;
  function ownField(...args){return field(...args).replace('</label>',`<small id="own-error-${args[0]}" class="own-inline-error" role="alert" hidden></small></label>`);}
  function ownLabel(k){return k==='attack_cost_base'?'第一次升级攻击，实际花多少钱':k==='income_cost_base'?'第一次升级赚钱能力，实际花多少钱':labels[k];}

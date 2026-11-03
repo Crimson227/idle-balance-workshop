@@ -44,3 +44,5 @@
 #fullReturn{margin-bottom:20px}
 @media(max-width:720px){#easy{padding:24px 22px}.problem-choices{grid-template-columns:1fr;gap:12px;margin:22px 0}.problem-choices button{padding:17px 18px;gap:6px}.problem-choices .choice-action{padding-top:5px}.easy-secondary{display:block}.easy-secondary p{margin-top:9px}#easyConditions .fields{grid-template-columns:repeat(2,minmax(0,1fr))}.growth-page:not(.full-mode) .workspace-header h1{font-size:26px}}
 @media(max-width:480px){#easy{padding:22px 18px}#easy h2{font-size:22px}.easy-progress{gap:20px;font-size:12px;margin-bottom:22px}.easy-change{padding:18px}.easy-secondary button{width:100%}#easyResult .actions button{flex-basis:100%}}
+
+.search-card{padding:18px 0;border-bottom:1px solid var(--line)}.search-card h4{font-size:18px;margin:12px 0}.search-card p{font-size:14px;margin:8px 0}#easyEntry .actions{margin:28px 0}#advancedWorkbench>.workflow-path{display:none}#start .start-intro,#start .start-facts{display:none}#start .start-layout{display:block}

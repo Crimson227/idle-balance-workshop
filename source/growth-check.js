@@ -44,6 +44,6 @@ function explainGrowthComparison(groups){
  text+=`打完所需时间从约${days(a.completionMedianAmongCompleted)}变为约${days(b.completionMedianAmongCompleted)}。`;
  if(early)text+=`${early===after.length?'修改后每次都':`其中${early}次`}早于你设定的至少${after[0].config.goals.first_completion_min_days}天；更快在这里是代价。`;
  if(late)text+=`${late}次超过你设定的最晚${after[0].config.goals.first_completion_max_days}天。`;
- if(!early&&!late)text+=before.every(r=>r.metrics.completionDays>=r.config.goals.first_completion_min_days&&r.metrics.completionDays<=r.config.goals.first_completion_max_days)?'两份方案完成时都在你设定的游玩周期内。':'修改后每次完成都在周期目标内；修改前有不在范围内的情况。';
+ if(!early&&!late)text+=before.every(r=>r.metrics.completionDays>=r.config.goals.first_completion_min_days&&r.metrics.completionDays<=r.config.goals.first_completion_max_days)?'两份方案的完成周期都达标。':'修改后每次完成都在周期目标内；修改前有不在范围内的情况。';
  return text;
 }

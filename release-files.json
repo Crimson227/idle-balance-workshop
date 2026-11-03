@@ -2,23 +2,23 @@
   "files": [
     {
       "file": "数值工坊.html",
-      "bytes": 269183,
-      "sha256": "00bfcc85a4bda922fc14d7d461811a57a9ee7ec59620f5d74d6440aabc215ff4"
+      "bytes": 289292,
+      "sha256": "94233fafebf35e48c934773a0918a59602f7fdf138a8a52d94aef4e0f2522681"
     },
     {
       "file": "02_配置模板.html",
-      "bytes": 106619,
-      "sha256": "f626da199e113a3d351620a1cbe165812400944e550474133620e5bfefd60edf"
+      "bytes": 106433,
+      "sha256": "9bb4c475d6fdc466e02f79d5b2d95d32ae2ae6ecf6b2461c345011199fd8674c"
     },
     {
       "file": "04_多属性战斗诊断.html",
-      "bytes": 162818,
-      "sha256": "73a7d1aa1a06076b5172598c8c8c3823d8fd602688dacd5bf0b304259568a7d9"
+      "bytes": 162797,
+      "sha256": "437e95691fc5f38749c1defcbb228a783468f07f4d25ca55e133a5c431539e84"
     },
     {
       "file": "06_成长模拟与卡点诊断.html",
-      "bytes": 269183,
-      "sha256": "00bfcc85a4bda922fc14d7d461811a57a9ee7ec59620f5d74d6440aabc215ff4"
+      "bytes": 289292,
+      "sha256": "94233fafebf35e48c934773a0918a59602f7fdf138a8a52d94aef4e0f2522681"
     },
     {
       "file": "09_补充验证与未达标说明.html",
@@ -196,6 +196,6 @@
       "sha256": "d57dba77bdc89ff59504f05703bb3e8a6719463547126d8f3e2c39b10a7a59e9"
     }
   ],
-  "totalBytes": 144730462,
+  "totalBytes": 144770473,
   "browserValidation": "pending"
 }
