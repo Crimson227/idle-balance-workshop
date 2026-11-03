@@ -1,7 +1,7 @@
 <section id="connected" aria-label="我的游戏数值工作台">
 <nav class="connected-nav" aria-label="游戏工作区"><button id="cgDataTab" aria-current="page">我的游戏 / 数据</button><button id="cgRunTab">整体模拟</button><button id="cgResultsTab">结果与调整</button></nav>
 <p id="cgProjectLine" class="connected-project">还没有载入游戏。先用示例完整走一遍，或填写自己的规则。</p>
-<div id="cgEmpty"><h2>从角色到过关，放在同一个游戏里算。</h2><p>角色和敌人的战斗、升级花费、金币奖励与回访时间一起参与模拟。</p><div class="actions"><button id="cgExample" class="primary">载入《遗迹守卫》示例</button><button id="cgCreate">填写我的游戏</button><label class="file-button">打开配置或结果文件<input id="cgImport" type="file" accept=".json,application/json"></label></div></div>
+<div id="cgEmpty"><h2>从角色到过关，放在同一个游戏里算。</h2><p>角色和敌人的战斗、升级花费、金币奖励与回访时间一起参与模拟。</p><div class="actions"><button id="cgExample" class="primary">载入《遗迹守卫》示例</button><button id="cgCreate">填写我的游戏</button></div></div>
 <div id="cgData" hidden>
 <h2>我的游戏数据</h2><p id="cgDataIntro"></p>
 <form id="cgForm" novalidate><label>游戏名称<input id="cgName" maxlength="120" required></label><div id="cgFieldGroups"></div>
@@ -24,5 +24,6 @@
 <details><summary>逐关、购买与每次回访记录</summary><div class="scroll connected-records"><table><caption>点击关卡，在这里展开对应战斗</caption><thead><tr><th>关卡</th><th>到达 / 通过</th><th>战斗 / 等待</th><th>失败</th><th>到达时 / 通过后金币</th></tr></thead><tbody id="cgStageRows"></tbody></table></div><details><summary>升级购买记录</summary><div class="scroll"><table><thead><tr><th>时间 / 关卡</th><th>买了什么</th><th>实际价格</th><th>钱包余额</th></tr></thead><tbody id="cgPurchaseRows"></tbody></table></div></details><details><summary>每次回来过了几关</summary><div id="cgVisitRows"></div></details></details>
 </div>
 <p id="cgError" class="form-error" role="alert" hidden></p><p id="cgNotice" role="status" aria-live="polite"></p>
+<div class="connected-open-file"><label class="file-button">打开配置或结果文件<input id="cgImport" type="file" accept=".json,application/json"></label></div>
 <footer class="connected-footer"><div class="actions"><button id="cgSave" disabled>保存到这台电脑</button><button id="cgRestore">找回上次保存</button><button id="cgExportConfig" disabled>导出游戏配置</button><button id="cgExportResults" disabled>导出本次完整结果</button></div><details><summary>本版规则与旧工具</summary><p>一体化版本 connected-growth-1.0.0，逐击战斗 ddr-3.0.0。每场双方满血开始；伤害同刻结算，存活者按实际扣血吸血，再做整秒回复。只支持物理和一个火焰通道、固定三类加法升级。每次过关只领一次奖励，失败不给奖；这里没有重复刷旧关收入。固定金币收入在在线和离线时计时，离线达到上限暂停；下线不买升级、不主动开新战斗，已经开打的一场可以打完。</p><p>游戏、配置和结果版本一起导出。金币和战斗用精确分数计算，不自动取整。体验目标空着就不判断达标，模拟也不判断真人是否喜欢。</p><button id="cgLegacy">打开原单伤害研究工具</button></details></footer>
 </section>
