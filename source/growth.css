@@ -46,3 +46,5 @@
 @media(max-width:480px){#easy{padding:22px 18px}#easy h2{font-size:22px}.easy-progress{gap:20px;font-size:12px;margin-bottom:22px}.easy-change{padding:18px}.easy-secondary button{width:100%}#easyResult .actions button{flex-basis:100%}}
 
 .search-card{padding:18px 0;border-bottom:1px solid var(--line)}.search-card h4{font-size:18px;margin:12px 0}.search-card p{font-size:14px;margin:8px 0}#easyEntry .actions{margin:28px 0}#advancedWorkbench>.workflow-path{display:none}#start .start-intro,#start .start-facts{display:none}#start .start-layout{display:block}
+
+#advancedWorkbench>summary{display:none}
