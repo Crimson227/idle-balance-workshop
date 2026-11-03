@@ -23,7 +23,7 @@ function createDetailedOwnGrowthSetup(onFinish,onCancel,report){
   else{c.simulation.days=number('own-days','最多检查多少天');for(const [id,key] of [['min','first_completion_min_days'],['max','first_completion_max_days'],['wait','max_no_progress_hours'],['visit','expected_stages_per_visit']])c.goals[key]=number('own-'+id,'比较目标');}
   draft=G.prepare(c);
  }
- $('ownNext').onclick=()=>{try{commit();if(page===pages.length-1){draft.name='我的游戏试算草稿';onFinish(copy(draft));}else{page++;draw();}}catch(e){showError(e);}};
+ $('ownNext').onclick=()=>{try{commit();if(page===pages.length-1){draft.goals.confirmedKeys=['completion','wait','visits'];draft.goals.source='user';draft.name='我的游戏试算草稿';onFinish(copy(draft));}else{page++;draw();}}catch(e){showError(e);}};
  $('ownPrev').onclick=()=>{try{commit();page--;draw();}catch(e){showError(e);}};
  $('ownCancel').onclick=onCancel;
  $('ownFields').oninput=e=>{const hint=$('own-error-'+e.target.id);if(hint){hint.hidden=true;e.target.removeAttribute('aria-invalid');if($('help-'+e.target.id))e.target.setAttribute('aria-describedby','help-'+e.target.id);else e.target.removeAttribute('aria-describedby');} $('ownError').hidden=true;};

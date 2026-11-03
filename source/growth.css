@@ -28,7 +28,7 @@
 .easy-change{max-width:680px;background:#f3f6ef;border-radius:8px;padding:20px 22px;margin:24px 0}
 .easy-change input{max-width:260px;background:#fff;font-size:21px;min-height:54px}
 .easy-change label{font-size:15px;margin-top:18px;font-weight:600}
-#easyConditions .fields{grid-template-columns:repeat(4,minmax(0,1fr))}
+#easyConditions .fields{grid-template-columns:repeat(3,minmax(0,1fr))}.overall-choice{display:flex;flex-direction:column;align-items:flex-start;gap:6px;width:100%;padding:18px 22px;margin-top:24px}.overall-choice span{font-weight:400}.overall-check{padding:12px 0;border-bottom:1px solid var(--line)}.overall-check p{margin:6px 0}#searchFind{margin:18px 0}#searchDiscarded,#overallDetails{margin-top:20px}
 #easyStatus:not(:empty){margin-top:20px;font-size:14px;color:var(--mint)}
 #easyMisses{color:var(--amber);font-size:14px}
 #easyMisses[data-pass=true]{color:var(--mint)}
