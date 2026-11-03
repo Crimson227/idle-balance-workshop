@@ -1,7 +1,7 @@
 {
   "format": "idle-connected-game-v2",
   "version": "connected-growth-2.0.0",
-  "name": "手算",
+  "name": "两关冰霜升级例子",
   "player": {
     "hp": "100",
     "physicalMin": "1",
@@ -72,9 +72,6 @@
       "physicalReduction": "0",
       "iceReduction": "0"
     },
-    "hpStep": "8",
-    "hitStep": "0.5",
-    "elementStep": "0.1",
     "rewardBase": "10",
     "rewardStep": "0",
     "steps": {
