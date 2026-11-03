@@ -50,3 +50,5 @@
 #advancedWorkbench>summary{display:none}
 
 #easyCheck[data-results=true]>*:not(#easySearchResults){display:none}#searchAdjust{font-size:13px;margin-bottom:10px}
+
+#searchRecommended,#searchKeepOriginal{margin:8px 8px 8px 0}#searchConclusion{font-size:23px;line-height:1.5;margin-top:0}
