@@ -695,7 +695,7 @@ function checkGrowthOverview(runs){
  add('长期推进',stops.length?'提前停止':complete.length===runs.length?'已完成':'观察期内未完成',`${complete.length}/${runs.length}次打完，${runs.length-complete.length}次未完成。`+(complete.length?`完成用时中间值${time(facts.completionMedianAmongCompleted*86400)}。`:''));
  add('等待与回访',!known('wait')||!known('visits')?'部分目标待确认':runs.some(r=>!r.metrics.goal.wait||!r.metrics.goal.visits)?'未达到目标':'符合已设目标',`最长${time(facts.maxGapHours*3600)}没过新关；${visits.length}次有效回访中${empty}次零进展。`+(!known('wait')?'等待上限未设。':'')+(!known('visits')?'每次回访期望未设。':''));
  add('完成得太快或太慢',!known('completion')?'目标待确认':early||late?'未达到目标':'符合已设目标',!known('completion')?'没有设完成周期，不能把用时短判成过快。':early?`${early}/${runs.length}次早于你设的${time(c.goals.first_completion_min_days*86400)}。`:late?'有记录未在目标周期内完成。':'完成周期在你的目标范围内。');
- let title='未发现明显规则风险，先看实际节奏',summary=`本轮${complete.length}/${runs.length}次完成，最长${time(facts.maxGapHours*3600)}没过新关。`,evidence=[],directions=[];
+ let title='未发现明显规则风险，先看实际节奏',summary=`本轮${complete.length}/${runs.length}次完成${complete.length?'，完成用时中间值'+time(facts.completionMedianAmongCompleted*86400):''}，最长${time(facts.maxGapHours*3600)}没过新关。`,evidence=[],directions=[];
  if(stops.length){title='计算提前停止，后续推进尚未检查';summary=`${stops.length}/${runs.length}次触发计算保护，不能把未观察到的后续判为正常。`;}
  else if(early){title='主要问题：比你希望的完成得太早';summary=`${early}/${runs.length}次早于目标下限；先核对完成周期，当前没有证据支持继续降价或加奖励。`;}
  else if(witness){title='主要检查点：第'+witness.stage.stage+'关伤害与资源门槛';evidence.push(checks[0].text+' '+checks[1].text);directions=a.directions;}
@@ -780,7 +780,7 @@ function createOwnGrowthSetup(onFinish,onCancel,report){
  function capture(){return {current:copy(read()),baseline:copy(baseline),groups,executed,feedback:copy(feedback),resultSelection};}
  function restore(){if(!snapshot)return;current=copy(snapshot.current);baseline=copy(snapshot.baseline);feedback=copy(snapshot.feedback);generation++;groups=snapshot.groups;executed=snapshot.executed;resultSelection=snapshot.resultSelection;renderEditor();renderResults();renderFeedback();clearError();snapshot=null;}
  const units={minutes:1/1440,hours:1/24,days:1};
- function conditions(){const c=anchor,known=k=>G.goalKnown(c,k),custom=!!c.inputScope,unit=custom?'minutes':'days';$('goalUnit').value=unit;$('waitUnit').value=custom?'minutes':'hours';
+ function conditions(){const c=anchor,known=k=>G.goalKnown(c,k),custom=!!c.inputScope,unit=c.goals.completionUnit||(custom?(known('completion')?(c.goals.first_completion_max_days>=1?'days':c.goals.first_completion_max_days>=1/24?'hours':'minutes'):'minutes'):'days');$('goalUnit').value=unit;$('waitUnit').value=c.goals.waitUnit||(custom?'minutes':'hours');
  $('goalMode').value=c.goals.source==='user_pending'?'':!['completion','wait','visits'].some(known)?'pending':'set';$('goalInputs').hidden=$('goalMode').value!=='set';$('easyConditions').open=custom;
  $('goalSource').textContent=custom?(c.goals.source==='user_pending'?'这是你的新游戏，请确认自己的目标；没有沿用示例目标。':'使用你已确认的目标；未填项目不判断达标。'):'示例目标：14—21天、最长等待36小时、每次至少5关，可修改。';
  $('basicRules').textContent=`${strategyNames[c.behavior.strategy]}；${c.rules.family==='fixed'?'逐关给成长':'章末给成长'}；暴击率${f(c.rules.crit_chance*100)}%；离线${c.behavior.offlineMode==='farm'?'只刷旧关':c.behavior.offlineMode==='auto'?'也自动推关':'刷旧关并购买升级'}，上限${c.rules.offline_cap_hours}小时。`;
@@ -790,7 +790,7 @@ function createOwnGrowthSetup(onFinish,onCancel,report){
  function targetSummary(invalidateCheck=true){$('goalInputs').hidden=$('goalMode').value!=='set';const text=$('goalMode').value==='set'?'只按填写的目标比较；留空的项目待确认。':$('goalMode').value==='pending'?'先看实际情况；周期、等待和回访目标均待确认。':'还没有确认这款游戏的目标。';$('easyTargetSummary').textContent=text;$('easyEditTarget').textContent=text;if(invalidateCheck){analysis=null;searchRecord=null;$('easySearchResults').hidden=true;$('searchCards').innerHTML='';$('easyFindings').hidden=true;message('目标改变，请重新检查。');}}
  function goals(){const a=copy(anchor);if(problem==='easyBoss'&&a.inputScope?.needsBoss){for(const [id,key] of [['factBossEvery','chapter_size'],['factBossHp','boss_hp_multiplier']]){const raw=$(id).value;if(!raw.trim()||!Number.isFinite(Number(raw)))throw Error('还缺Boss间隔和血量倍率，请填实际数据。');a.rules[key]=Number(raw);}a.inputScope.needsBoss=false;}
  if(!$('goalMode').value){$('easyConditions').open=true;$('goalMode').focus();throw Error('请填写自己的目标，或选“暂不设目标，先看实际情况”。');}
- const g=a.goals;g.confirmedKeys=[];g.source=$('goalMode').value==='pending'?'user_deferred':a.inputScope?'user':'example';
+ const g=a.goals;g.completionUnit=$('goalUnit').value;g.waitUnit=$('waitUnit').value;g.confirmedKeys=[];g.source=$('goalMode').value==='pending'?'user_deferred':a.inputScope?'user':'example';
  if($('goalMode').value==='set'){
  const number=id=>{const raw=$(id).value.trim();if(!raw)return null;const v=Number(raw);if(!Number.isFinite(v)||v<=0)throw Error('目标请填大于0的数字，或留空表示待确认。');return v;},lo=number('easyMin'),hi=number('easyMax'),wait=number('easyWait'),visit=number('easyVisit');
  if(lo!==null||hi!==null){if(lo===null||hi===null)throw Error('请把最早和最晚完成时间一起填好，或一起留空。');g.first_completion_min_days=lo*units[$('goalUnit').value];g.first_completion_max_days=hi*units[$('goalUnit').value];if(lo>hi)throw Error('目标冲突：最早完成时间不能晚于最晚完成时间。');g.confirmedKeys.push('completion');}

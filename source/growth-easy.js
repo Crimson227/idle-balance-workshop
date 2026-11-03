@@ -15,7 +15,7 @@
  function capture(){return {current:copy(read()),baseline:copy(baseline),groups,executed,feedback:copy(feedback),resultSelection};}
  function restore(){if(!snapshot)return;current=copy(snapshot.current);baseline=copy(snapshot.baseline);feedback=copy(snapshot.feedback);generation++;groups=snapshot.groups;executed=snapshot.executed;resultSelection=snapshot.resultSelection;renderEditor();renderResults();renderFeedback();clearError();snapshot=null;}
  const units={minutes:1/1440,hours:1/24,days:1};
- function conditions(){const c=anchor,known=k=>G.goalKnown(c,k),custom=!!c.inputScope,unit=custom?'minutes':'days';$('goalUnit').value=unit;$('waitUnit').value=custom?'minutes':'hours';
+ function conditions(){const c=anchor,known=k=>G.goalKnown(c,k),custom=!!c.inputScope,unit=c.goals.completionUnit||(custom?(known('completion')?(c.goals.first_completion_max_days>=1?'days':c.goals.first_completion_max_days>=1/24?'hours':'minutes'):'minutes'):'days');$('goalUnit').value=unit;$('waitUnit').value=c.goals.waitUnit||(custom?'minutes':'hours');
  $('goalMode').value=c.goals.source==='user_pending'?'':!['completion','wait','visits'].some(known)?'pending':'set';$('goalInputs').hidden=$('goalMode').value!=='set';$('easyConditions').open=custom;
  $('goalSource').textContent=custom?(c.goals.source==='user_pending'?'这是你的新游戏，请确认自己的目标；没有沿用示例目标。':'使用你已确认的目标；未填项目不判断达标。'):'示例目标：14—21天、最长等待36小时、每次至少5关，可修改。';
  $('basicRules').textContent=`${strategyNames[c.behavior.strategy]}；${c.rules.family==='fixed'?'逐关给成长':'章末给成长'}；暴击率${f(c.rules.crit_chance*100)}%；离线${c.behavior.offlineMode==='farm'?'只刷旧关':c.behavior.offlineMode==='auto'?'也自动推关':'刷旧关并购买升级'}，上限${c.rules.offline_cap_hours}小时。`;
@@ -25,7 +25,7 @@
  function targetSummary(invalidateCheck=true){$('goalInputs').hidden=$('goalMode').value!=='set';const text=$('goalMode').value==='set'?'只按填写的目标比较；留空的项目待确认。':$('goalMode').value==='pending'?'先看实际情况；周期、等待和回访目标均待确认。':'还没有确认这款游戏的目标。';$('easyTargetSummary').textContent=text;$('easyEditTarget').textContent=text;if(invalidateCheck){analysis=null;searchRecord=null;$('easySearchResults').hidden=true;$('searchCards').innerHTML='';$('easyFindings').hidden=true;message('目标改变，请重新检查。');}}
  function goals(){const a=copy(anchor);if(problem==='easyBoss'&&a.inputScope?.needsBoss){for(const [id,key] of [['factBossEvery','chapter_size'],['factBossHp','boss_hp_multiplier']]){const raw=$(id).value;if(!raw.trim()||!Number.isFinite(Number(raw)))throw Error('还缺Boss间隔和血量倍率，请填实际数据。');a.rules[key]=Number(raw);}a.inputScope.needsBoss=false;}
  if(!$('goalMode').value){$('easyConditions').open=true;$('goalMode').focus();throw Error('请填写自己的目标，或选“暂不设目标，先看实际情况”。');}
- const g=a.goals;g.confirmedKeys=[];g.source=$('goalMode').value==='pending'?'user_deferred':a.inputScope?'user':'example';
+ const g=a.goals;g.completionUnit=$('goalUnit').value;g.waitUnit=$('waitUnit').value;g.confirmedKeys=[];g.source=$('goalMode').value==='pending'?'user_deferred':a.inputScope?'user':'example';
  if($('goalMode').value==='set'){
  const number=id=>{const raw=$(id).value.trim();if(!raw)return null;const v=Number(raw);if(!Number.isFinite(v)||v<=0)throw Error('目标请填大于0的数字，或留空表示待确认。');return v;},lo=number('easyMin'),hi=number('easyMax'),wait=number('easyWait'),visit=number('easyVisit');
  if(lo!==null||hi!==null){if(lo===null||hi===null)throw Error('请把最早和最晚完成时间一起填好，或一起留空。');g.first_completion_min_days=lo*units[$('goalUnit').value];g.first_completion_max_days=hi*units[$('goalUnit').value];if(lo>hi)throw Error('目标冲突：最早完成时间不能晚于最晚完成时间。');g.confirmedKeys.push('completion');}

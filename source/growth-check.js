@@ -44,7 +44,7 @@ function checkGrowthOverview(runs){
  add('长期推进',stops.length?'提前停止':complete.length===runs.length?'已完成':'观察期内未完成',`${complete.length}/${runs.length}次打完，${runs.length-complete.length}次未完成。`+(complete.length?`完成用时中间值${time(facts.completionMedianAmongCompleted*86400)}。`:''));
  add('等待与回访',!known('wait')||!known('visits')?'部分目标待确认':runs.some(r=>!r.metrics.goal.wait||!r.metrics.goal.visits)?'未达到目标':'符合已设目标',`最长${time(facts.maxGapHours*3600)}没过新关；${visits.length}次有效回访中${empty}次零进展。`+(!known('wait')?'等待上限未设。':'')+(!known('visits')?'每次回访期望未设。':''));
  add('完成得太快或太慢',!known('completion')?'目标待确认':early||late?'未达到目标':'符合已设目标',!known('completion')?'没有设完成周期，不能把用时短判成过快。':early?`${early}/${runs.length}次早于你设的${time(c.goals.first_completion_min_days*86400)}。`:late?'有记录未在目标周期内完成。':'完成周期在你的目标范围内。');
- let title='未发现明显规则风险，先看实际节奏',summary=`本轮${complete.length}/${runs.length}次完成，最长${time(facts.maxGapHours*3600)}没过新关。`,evidence=[],directions=[];
+ let title='未发现明显规则风险，先看实际节奏',summary=`本轮${complete.length}/${runs.length}次完成${complete.length?'，完成用时中间值'+time(facts.completionMedianAmongCompleted*86400):''}，最长${time(facts.maxGapHours*3600)}没过新关。`,evidence=[],directions=[];
  if(stops.length){title='计算提前停止，后续推进尚未检查';summary=`${stops.length}/${runs.length}次触发计算保护，不能把未观察到的后续判为正常。`;}
  else if(early){title='主要问题：比你希望的完成得太早';summary=`${early}/${runs.length}次早于目标下限；先核对完成周期，当前没有证据支持继续降价或加奖励。`;}
  else if(witness){title='主要检查点：第'+witness.stage.stage+'关伤害与资源门槛';evidence.push(checks[0].text+' '+checks[1].text);directions=a.directions;}
