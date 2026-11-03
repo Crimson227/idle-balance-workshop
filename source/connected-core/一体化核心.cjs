@@ -66,5 +66,6 @@ function diagnose(result,stage=result.longestGap.stage){
 }
 function compare(base,candidate){const median=a=>{const x=[...a].sort((a,b)=>a-b);return x.length?x[Math.floor(x.length/2)]:null;},summary=rs=>({samples:rs.length,completed:rs.filter(r=>r.status==='completed').length,completionSeconds:median(rs.filter(r=>r.completionSeconds!==null).map(r=>number(r.completionSeconds))),longestGap:Math.max(0,...rs.map(r=>number(r.longestGap.seconds))),purchases:median(rs.map(r=>r.purchases.length)),spent:median(rs.map(r=>number(r.spent))),goalMisses:rs.filter(r=>Object.values(r.goals).some(x=>x===false)).length});return {before:summary(base),after:summary(candidate)};}
 function multiply(a,b){return E.decimalText(q(a).mul(q(b)));}
+function divide(a,b){return E.decimalText(q(a).div(q(b)));}
 function verifyLedger(result){return q(result.initialCoins).add(q(result.passiveEarned)).add(q(result.rewardsEarned)).sub(q(result.spent)).eq(q(result.balance));}
-module.exports={VERSION,compile,run,replay,diagnose,compare,number,battleConfig,schedule,multiply,verifyLedger};
+module.exports={VERSION,compile,run,replay,diagnose,compare,number,battleConfig,schedule,multiply,divide,verifyLedger};

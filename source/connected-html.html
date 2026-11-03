@@ -4,7 +4,7 @@
 <div id="cgEmpty"><h2>从角色到过关，放在同一个游戏里算。</h2><p>角色和敌人的战斗、升级花费、金币奖励与回访时间一起参与模拟。</p><div class="actions"><button id="cgExample" class="primary">载入《遗迹守卫》示例</button><button id="cgCreate">填写我的游戏</button></div></div>
 <div id="cgData" hidden>
 <h2>我的游戏数据</h2><p id="cgDataIntro"></p>
-<form id="cgForm" novalidate><label>游戏名称<input id="cgName" maxlength="120" required></label><div id="cgFieldGroups"></div>
+<form id="cgForm" novalidate><label>游戏名称<input id="cgName" maxlength="120" aria-describedby="cg-error-cgName" required><small id="cg-error-cgName" class="cg-field-error" role="alert" hidden></small></label><div id="cgFieldGroups"></div>
 <details id="cgGoals"><summary>我希望玩多久，回来时有多少进展</summary>
 <label>这次按什么判断<select id="cgGoalMode"><option value="pending">暂不设目标，先看实际情况</option><option value="set">填写我的目标</option></select></label>
 <div id="cgGoalFields" class="fields" hidden>
