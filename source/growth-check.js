@@ -47,7 +47,7 @@ function checkGrowthOverview(runs){
  let title='未发现明显规则风险，先看实际节奏',summary=`本轮${complete.length}/${runs.length}次完成${complete.length?'，完成用时中间值'+time(facts.completionMedianAmongCompleted*86400):''}，最长${time(facts.maxGapHours*3600)}没过新关。`,evidence=[],directions=[];
  if(stops.length){title='计算提前停止，后续推进尚未检查';summary=`${stops.length}/${runs.length}次触发计算保护，不能把未观察到的后续判为正常。`;}
  else if(early){title='主要问题：比你希望的完成得太早';summary=`${early}/${runs.length}次早于目标下限；先核对完成周期，当前没有证据支持继续降价或加奖励。`;}
- else if(witness){title='主要检查点：第'+witness.stage.stage+'关伤害与资源门槛';evidence.push(checks[0].text+' '+checks[1].text);directions=a.directions;}
+ else if(witness){title='主要检查点：第'+witness.stage.stage+'关伤害与资源门槛';evidence.push(checks[0].text+' '+checks[1].text);const d=witness.diag;if(d.snapshot.highest>0&&d.attacksNeeded!==null&&d.resourceGap>0){directions=[d.snapshot.attackLevel===0||c.rules.attack_cost_growth===1?'priceBase':'easyPrice','easyReturn'];if(witness.stage.stage%c.rules.chapter_size===0&&c.rules.boss_hp_multiplier>1)directions.unshift('easyBoss');}}
  else if(complete.length<runs.length){title='主要问题：观察期内未打完';evidence.push('后续未到达关卡不作通过判断。');}
  else if(known('wait')&&runs.some(r=>!r.metrics.goal.wait)){title='主要问题：等待超过你的上限';evidence.push('伤害未必不足，请结合上线时点与战斗耗时查看最长等待记录。');}
  else if(known('visits')&&runs.some(r=>!r.metrics.goal.visits)){title='主要问题：回访进展未达预期';evidence.push('请查看零进展回访与购买记录。');directions=a.directions;}
