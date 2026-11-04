@@ -242,3 +242,23 @@ body.connected-active #connected>div#cgActionBar{position:fixed;bottom:0;left:18
 .cg-scope-check{border-block:1px solid var(--line,#bdc4ce);padding:20px 0;margin-block:12px 24px;overflow-wrap:anywhere}
 .cg-scope-check h3{margin-block:0 12px}
 .cg-scope-check button{margin:8px 12px 0 0}
+#connected #cgV2Editor .upgrade-row{display:block;padding-block:24px;border-bottom:1px solid var(--line);min-width:0}
+#connected #cgV2Editor .cg-upgrade-heading{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:16px 24px}
+#connected #cgV2Editor .cg-upgrade-heading h3{grid-column:auto;margin:0;overflow-wrap:anywhere}
+#connected #cgV2Editor .cg-upgrade-order{display:grid;grid-template-columns:auto 76px;align-items:center;gap:12px;font-size:14px}
+#connected #cgV2Editor .cg-upgrade-order input{min-width:0;width:76px}
+#connected #cgV2Editor .upgrade-row .cg-upgrade-rules{margin-block:24px 0}
+#connected #cgV2Editor .cg-upgrade-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;align-items:start}
+#connected #cgV2Editor .cg-upgrade-group{min-width:0}
+#connected #cgV2Editor .cg-upgrade-group h4{margin:0 0 16px;font-size:16px;font-weight:650}
+#connected #cgV2Editor .cg-upgrade-group .fields{grid-template-columns:minmax(0,1fr);gap:16px;margin:0}
+#connected #cgV2Editor .cg-upgrade-group .fields>label{display:grid;grid-template-rows:minmax(1.7em,auto) minmax(46px,auto);gap:8px;min-width:0}
+#connected #cgV2Editor .upgrade-row [data-upgrade-preview]{min-height:0;margin-block:20px 16px;padding-block:12px;border-block:1px solid var(--line);font-size:14px}
+#connected #cgV2Editor .upgrade-row .cg-upgrade-rules>details{margin-block:0}
+#connected #cgV2Editor .cg-upgrade-dependency{margin-top:16px}
+#connected #cgV2Editor .cg-upgrade-dependency p,#connected #cgV2Editor .cg-upgrade-notice{font-size:14px;line-height:1.7}
+#connected #cgV2Editor .cg-upgrade-dependency button{max-width:100%;white-space:normal;text-align:left}
+#connected #cgV2Editor .cg-upgrade-heading input:disabled{cursor:not-allowed}
+#connected #cgAppliedState{padding-block:0 20px;margin-bottom:24px;border-bottom:1px solid var(--line);max-width:75ch;line-height:1.7}
+#connected #cgAppliedState p{margin:8px 0;font-size:15px}
+@media(max-width:700px){#connected #cgV2Editor .cg-upgrade-columns{grid-template-columns:minmax(0,1fr);gap:24px}#connected #cgV2Editor .cg-upgrade-heading{grid-template-columns:minmax(0,1fr) auto;gap:12px}#connected #cgV2Editor .cg-upgrade-order{grid-column:1/-1;justify-content:start}}
