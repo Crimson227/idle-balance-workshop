@@ -65,8 +65,9 @@ function choose(g,upgrades,levels,stage,pointer=0){const br=config(g)?.behavior;
 function describe(g){const r=config(g);if(!r)return '原五通道规则：'+(g?.mechanisms?.armor===false?'防御已关闭':'物理使用K护甲换算')+'，各类伤害和机制以填写的开关为准';return DEFENSE[r.defense.id]+'（物理通道） · '+({fixed:'固定物理伤害',range:'区间直伤',scaled:'属性倍率伤害',expression:'受限伤害公式'}[r.damage.id])+' · 每次'+r.damage.segments+'段'+(r.dot.enabled?' · 周期持续伤害':'')+(r.states.some(s=>s.enabled!==false)?' · '+r.states.filter(s=>s.enabled!==false).length+'种状态':'')+(r.reactions.some(s=>s.enabled!==false)?' · '+r.reactions.filter(s=>s.enabled!==false).length+'种反应':'');}
 function changes(a,b){
  const x=config(a),y=config(b);if(!x&&!y)return [];if(!x||!y)return [y?'启用可选规则（'+VERSION+'）':'恢复原有规则'];
- const result=[],get=(o,p)=>p.split('.').reduce((v,k)=>v?.[k],o),add=(p,label,format)=>{const before=get(x,p),after=get(y,p);if(JSON.stringify(before)!==JSON.stringify(after))result.push(label+'：'+format(before)+' → '+format(after));};
- const growthText=s=>!s?'原有固定增加':GROWTH[s.id]+(s.id==='geometric'?' ×'+s.factor:s.id==='expression'?'（'+s.expression+'）':s.id==='piecewise'?'，'+s.segments.length+'段':''),on=v=>v?'开':'关',percent=v=>{const n=q(v);return Number((Number(n.n)/Number(n.d)*100).toFixed(4));};
+ const canonical=v=>{if(typeof v==='string'||typeof v==='number'){try{return q(v).toString();}catch{return v;}}if(Array.isArray(v))return v.map(canonical);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b)).map(([k,x])=>[k,canonical(x)]));return v;},equal=(a,b)=>JSON.stringify(canonical(a))===JSON.stringify(canonical(b)),number=v=>{try{const n=q(v);return new Intl.NumberFormat('zh-CN',{maximumFractionDigits:4}).format(Number(n.n)/Number(n.d));}catch{return String(v??'');}};
+ const result=[],get=(o,p)=>p.split('.').reduce((v,k)=>v?.[k],o),compare=(p,v)=>p==='dot'?{...v,name:v?.name||'开场周期伤害',owner:v?.owner||'both'}:v,add=(p,label,format)=>{const before=get(x,p),after=get(y,p);if(!equal(compare(p,before),compare(p,after)))result.push(label+'：'+format(before)+' → '+format(after));};
+ const growthText=s=>!s?'原有固定增加':GROWTH[s.id]+(s.id==='geometric'?' ×'+number(s.factor):s.id==='expression'?'（'+s.expression+'）':s.id==='piecewise'?'，'+s.segments.length+'段':''),on=v=>v?'开':'关',percent=v=>{const n=q(v);return Number((Number(n.n)/Number(n.d)*100).toFixed(4));};
  add('defense.id','防御公式',v=>DEFENSE[v]);
  add('damage','直伤',s=>({fixed:'固定伤害',range:'区间伤害',scaled:'属性 ×'+s.coefficient,expression:'公式 '+s.expression}[s.id])+'，每次'+s.segments+'段');
  add('critical','暴击',s=>(s.mode==='low_hp'?'低生命必暴击':'概率触发')+'，按'+(s.scope==='attack'?'整次攻击':'每段')+'判定，'+(s.guarantee?'连续'+s.guarantee+'次未暴击后保底':'无保底')+'，共用随机数'+on(s.sharedRandom));
@@ -77,8 +78,29 @@ function changes(a,b){
  add('behavior','购买与离线',s=>({order:'按填写顺序',cheapest:'先买便宜的',damage_first:'先提高伤害',survival_first:'先提高生命'}[s.strategy])+'；自动购买'+on(s.autoPurchase)+'，离线收入'+on(s.offlineIncome)+' / 购买'+on(s.offlinePurchase)+' / 战斗'+on(s.offlineBattle));
  add('lifecycle','跨战斗保留',s=>'状态'+on(s.carryStates)+' / 护盾'+on(s.carryShield)+' / 暴击保底'+on(s.carryPity)+'；战斗外状态'+(s.betweenBattles==='pause'?'暂停计时':'继续计时'));
  const upgradeDefault=s=>s||{attribute:{id:'linear'},cost:{id:'linear'},unlock:{stage:1,upgrade:'',level:0}},upgradeText=s=>'属性'+growthText(s.attribute)+'；价格'+growthText(s.cost)+'；第'+s.unlock.stage+'关起解锁'+(s.unlock.upgrade?'，需前置'+s.unlock.upgrade+' '+s.unlock.level+'级':'');
- for(const id of new Set([...Object.keys(x.growth.upgrades),...Object.keys(y.growth.upgrades)])){const before=upgradeDefault(x.growth.upgrades[id]),after=upgradeDefault(y.growth.upgrades[id]);if(JSON.stringify(before)!==JSON.stringify(after))result.push((b.upgrades.find(u=>u.id===id)?.name||id)+'成长：'+upgradeText(before)+' → '+upgradeText(after));}
- for(const key of ['labels','states','reactions','triggers','modules','missing'])if(JSON.stringify(x[key])!==JSON.stringify(y[key]))result.push(({labels:'属性显示名',states:'状态',reactions:'元素反应',triggers:'条件效果',modules:'扩展模块',missing:'未接入机制'})[key]+'配置已变化');
+ for(const id of new Set([...Object.keys(x.growth.upgrades),...Object.keys(y.growth.upgrades)])){const before=upgradeDefault(x.growth.upgrades[id]),after=upgradeDefault(y.growth.upgrades[id]);if(!equal(before,after))result.push((b.upgrades.find(u=>u.id===id)?.name||id)+'成长：'+upgradeText(before)+' → '+upgradeText(after));}
+ const channels={physical:'物理',fire:'火焰',ice:'冰霜',lightning:'闪电',poison:'毒性'};
+ const signature=(kind,g,row)=>{
+  if(!row)return null;const s={name:label(g,kind,row.id),enabled:row.enabled!==false};if(!s.enabled)return s;
+  const val=k=>{try{return q(row[k]).toString();}catch{return row[k];}},take=keys=>keys.forEach(k=>s[k]=row[k]);
+  take(['effect']);if(kind==='states'){take(['target','applyAt','refresh']);s.owner=row.owner||'both';s.duration=val('duration');s.maxStacks=Number(row.maxStacks);if(row.applyAt==='hit')s.source=row.source||'direct';if(row.effect==='dot'){take(['channel']);s.amount=val('amount');s.interval=val('interval');s.critical=!!row.critical;s.leech=!!row.leech;}}
+  if(kind==='reactions'){take(['states','consume']);if(row.effect==='freeze')s.duration=val('duration');else{s.amount=val('amount');if(row.effect==='damage')take(['channel']);}}
+  if(kind==='triggers'){take(['at','condition']);s.owner=row.owner||'both';s.cooldown=val('cooldown');s.once=!!row.once;if(row.at==='after_hit')s.source=row.source||'direct';if(row.condition==='hp_below')s.threshold=val('threshold');if(row.condition==='every_n')s.every=Number(row.every);if(row.effect==='state')take(['state']);else s.value=val('value');if(row.effect==='attack_multiplier')s.duration=val('duration');}return s;
+ };
+ const brief=(kind,g,row)=>{
+  if(row.enabled===false)return '关闭';const who={player:'角色',enemy:'敌人',both:'双方'}[row.owner||'both'];
+  if(kind==='states')return who+(row.applyAt==='start'?'开战时':'扣血后')+'给'+(row.target==='self'?'自己':'对手')+(row.effect==='dot'?'每'+number(row.interval)+'秒造成'+number(row.amount)+'点'+channels[row.channel]+'伤害':row.effect==='freeze'?'禁止行动':'附着标记')+'，持续'+number(row.duration)+'秒';
+  if(kind==='reactions')return row.states.map(id=>label(g,'states',id)).join('＋')+'相遇时'+(row.effect==='damage'?'造成'+number(row.amount)+'点'+channels[row.channel]+'伤害':row.effect==='shield'?'增加'+number(row.amount)+'点护盾':'禁止行动'+number(row.duration)+'秒');
+  return who+({battle_start:'开战时',before_attack:'攻击前',after_hit:'扣血后'}[row.at]||'')+(row.condition==='hp_below'?'生命不高于'+percent(row.threshold)+'%时':row.condition==='every_n'?'每第'+row.every+'次攻击时':'')+(row.effect==='attack_multiplier'?'伤害乘'+number(row.value)+'倍，持续'+number(row.duration)+'秒':row.effect==='state'?'施加'+label(g,'states',row.state):row.effect==='heal'?'回复'+number(row.value)+'点生命':row.effect==='shield'?'增加'+number(row.value)+'点护盾':'追加'+number(row.value)+'点物理伤害');
+ };
+ for(const kind of ['states','reactions','triggers'])for(const id of new Set([...x[kind],...y[kind]].map(row=>row.id))){
+  const before=x[kind].find(row=>row.id===id),after=y[kind].find(row=>row.id===id);if(JSON.stringify(signature(kind,a,before))===JSON.stringify(signature(kind,b,after)))continue;
+  if(!before){result.push('添加「'+label(b,kind,id)+'」：'+brief(kind,b,after));continue;}if(!after){result.push('删除「'+label(a,kind,id)+'」');continue;}
+  const oldName=label(a,kind,id),newName=label(b,kind,id),left=brief(kind,a,before),right=brief(kind,b,after);
+  if(oldName!==newName)result.push('「'+oldName+'」改名为「'+newName+'」');
+  if(left!==right)result.push('「'+newName+'」：'+left+' → '+right);else if(oldName===newName)result.push('「'+newName+'」的触发或叠加设置已调整');
+ }
+ for(const key of ['labels','modules','missing'])if(JSON.stringify(x[key])!==JSON.stringify(y[key]))result.push(({labels:'属性显示名',modules:'扩展模块',missing:'未接入机制'})[key]+'配置已变化');
  return result;
 }
 
