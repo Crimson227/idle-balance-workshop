@@ -238,3 +238,7 @@ body.connected-active #connected>div#cgActionBar{position:fixed;bottom:0;left:18
 }
 @media(max-width:380px){#connected .cg-wordmark{display:none}#connected .cg-top h1{font-size:15px}}
 @media(prefers-reduced-motion:reduce){#connected *,#connected *:before,#connected *:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+[hidden].cg-scope-check{display:none}
+.cg-scope-check{border-block:1px solid var(--line,#bdc4ce);padding:20px 0;margin-block:12px 24px;overflow-wrap:anywhere}
+.cg-scope-check h3{margin-block:0 12px}
+.cg-scope-check button{margin:8px 12px 0 0}
