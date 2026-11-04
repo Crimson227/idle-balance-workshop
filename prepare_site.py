@@ -44,5 +44,8 @@ for file in ['connected-html.html','connected-app.js','connected.css','connected
 shutil.copytree(source/'支持资料/一体化成长',site/'source/connected-core',dirs_exist_ok=True)
 for file in ['connected-lookup.js','attribute-catalog.json']:
     shutil.copyfile(source/'_构建'/file,site/'source'/file)
+for file in ['connected-workspace.js','connected-workspace.css','editorial-fonts.css']:
+    shutil.copyfile(source/'_构建'/file,site/'source'/file)
+shutil.copytree(source/'_构建/字体许可',site/'source/字体许可',dirs_exist_ok=True)
 (site/'release-files.json').write_text(json.dumps({'files':records,'totalBytes':sum(x['bytes']for x in records),'browserValidation':'pending'},ensure_ascii=False,indent=2),encoding='utf8')
 print(json.dumps({'files':len(records)+1,'totalMB':round(sum(x['bytes']for x in records)/1024**2,2),'largest':sorted(records,key=lambda x:x['bytes'],reverse=True)[:3]},ensure_ascii=False))

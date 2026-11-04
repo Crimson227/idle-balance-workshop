@@ -8,11 +8,11 @@
 <h2>先记录体验目标</h2><p class="note">填写目标，再生成关卡表或送入成长模拟。</p><div id="goals" class="grid"></div>
 <h2>先看这三项参数</h2><p class="note">这三项是现有千关研究主要调整的变量。倍率与百分比在这里分别标明。</p><div id="main-fields" class="grid"></div>
 <label style="max-width:330px;margin-top:14px">过关后什么时候变强<select id="family"><option value="fixed">每过一关，就变强一点</option><option value="chapter">过完一整章，才一起变强</option></select></label>
-<details><summary>展开其余战斗与经济规则</summary><p class="note">先保留基准。只有项目规则确实不同才修改；这些数值不是通用行业标准。</p><div id="other-fields" class="grid"></div></details>
+<details><summary>其余战斗与经济规则</summary><div id="other-fields" class="grid"></div></details>
 <div class="buttons"><button id="json" class="primary">导出参数JSON</button><button id="stages">导出基础关卡表CSV</button><button id="prices">导出升级价格表CSV</button><button id="dictionary">导出参数字段说明CSV</button></div>
 <div class="buttons"><button id="import">导入本模板参数</button><button id="reset">恢复模板初始值</button><input type="file" id="file" accept=".json,application/json" class="file"></div>
 <div id="status" role="status" aria-live="polite"></div>
-<p class="note">关卡表只包含基础生命、0级收益奖励和过关增益。升级表列出0—300级的价格与累计倍率，这是导出范围，不是游戏等级上限。两张表都不代表玩家届时一定拥有这些属性。</p>
+<p class="note">导出关卡基础生命、0级奖励与过关增益，以及0—300级的升级价格和累计倍率。</p>
 <h2>当前输入生成了什么</h2><div id="readout" class="readout"></div><div class="tables"><table><thead><tr><th>关卡</th><th>Boss</th><th>生命</th><th>首次奖励<br>收益0级</th><th>通关前成长倍率</th></tr></thead><tbody id="preview"></tbody></table></div>
 <details><summary>交给开发时怎样接入</summary><p>JSON中的 <code>rules</code> 是计算输入，<code>goals</code> 只记录体验目标。按附带字段说明读取参数，使用关卡表与升级表；也可按同目录配套公式重新计算。</p><p>本模板可重新导入自己导出的JSON。原千关试玩和原Python研究脚本使用冻结配置，不会自动读取此文件；接入修改后的参数需要开发明确替换对应字段，再做检查。</p><p>交接时同时说明首次奖励与重复奖励、攻击间隔、暴击、取整和离线规则。当前口径为连续资源、不取整；离线固定关卡与属性，最多按上限结算，不自动购买或推进。</p><p>至少核对第1关、首个Boss和末关；然后比较不同购买选择与回访预算。先记录不达标结果，再决定改参数或改目标。</p></details>
 </section><footer>范围：已有输出与挂机经济模型。没有新增装备、开箱、怪物机制或留存预测。参数格式正确 ≠ 推进达标 ≠ 玩家喜欢。</footer>

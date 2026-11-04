@@ -2,16 +2,18 @@ from pathlib import Path
 import json,hashlib,subprocess
 root=Path(__file__).resolve().parent.parent
 build=root/'_构建';core=root/'支持资料/一体化成长'
-names=['战斗引擎.cjs','原成长核心.cjs','一体化核心.cjs','示例.cjs','多属性战斗.cjs','旧多属性规则.cjs']
+names=['战斗引擎.cjs','原成长核心.cjs','一体化核心.cjs','示例.cjs','多属性战斗.cjs','旧多属性规则.cjs','方案搜索.cjs']
 entries=[]
 for name in names:
     source=(core/name).read_text(encoding='utf8')
     entries.append(json.dumps('./'+name,ensure_ascii=False)+':function(module,exports,require){\n'+source+'\n}')
 loader='const modules={'+',\n'.join(entries)+'};const cache={};const Buffer={byteLength:(s)=>new TextEncoder().encode(s).length};function load(name){if(cache[name])return cache[name].exports;if(!modules[name])throw Error("未提供计算模块"+name);const module={exports:{}};cache[name]=module;modules[name](module,module.exports,load);return module.exports;}\n'
 main='const ConnectedCore=(()=>{'+loader+'return load("./一体化核心.cjs");})();\nconst CONNECTED_EXAMPLE=(()=>{'+loader+'return load("./示例.cjs").ruins();})();\n'
+main+='const ConnectedSearch=(()=>{'+loader+'return load("./方案搜索.cjs");})();\n'
 worker=loader+(build/'connected-worker-tail.js').read_text(encoding='utf8')
 main+='const CONNECTED_ATTRS='+json.dumps([f for f in json.loads((build/'attribute-catalog.json').read_text(encoding='utf8'))['fields'] if f['page']=='battle'],ensure_ascii=False)+';\nconst CONNECTED_ICE_EXAMPLE='+json.dumps(json.loads((core/'冰霜手算案例.json').read_text(encoding='utf8')),ensure_ascii=False)+';\n'
-script=main+'const CONNECTED_WORKER_SOURCE='+json.dumps(worker,ensure_ascii=False)+';\n'+(build/'connected-v2-editor.js').read_text(encoding='utf8')+'\n'+(build/'connected-lookup.js').read_text(encoding='utf8')+'\n'+(build/'connected-charts.js').read_text(encoding='utf8')+'\n'+(build/'connected-app.js').read_text(encoding='utf8')
+app=(build/'connected-app.js').read_text(encoding='utf8').replace('/*__CONNECTED_WORKSPACE__*/',(build/'connected-workspace.js').read_text(encoding='utf8'))
+script=main+'const CONNECTED_WORKER_SOURCE='+json.dumps(worker,ensure_ascii=False)+';\n'+(build/'connected-v2-editor.js').read_text(encoding='utf8')+'\n'+(build/'connected-lookup.js').read_text(encoding='utf8')+'\n'+(build/'connected-charts.js').read_text(encoding='utf8')+'\n'+app
 (build/'connected-bundle.js').write_text(script,encoding='utf8')
 data=json.loads(subprocess.check_output(['node','-e',"const C=require('./一体化核心.cjs'),D=require('./示例.cjs'),fs=require('fs'),vm=require('vm');const g=vm.runInNewContext(fs.readFileSync('../../_构建/connected-v2-editor.js','utf8')+';ConnectedV2.example()',{ConnectedCore:C,CONNECTED_EXAMPLE:D.ruins(),structuredClone});const r=C.run(g,42);console.log(JSON.stringify(r.visits))"],cwd=core,text=True,encoding='utf8'))
 cum=0;bars=[]
