@@ -2,8 +2,8 @@
   "files": [
     {
       "file": "数值工坊.html",
-      "bytes": 1052563,
-      "sha256": "bfce5513ce42cd59aa0d8b66999c3d1f92f811229fad66bdd156760d88ae848e"
+      "bytes": 1285532,
+      "sha256": "eba5ca3a3cdc36530a8250a2e2dda6809a3799c77e10c2b64f26352ee3d76764"
     },
     {
       "file": "02_配置模板.html",
@@ -17,8 +17,8 @@
     },
     {
       "file": "06_成长模拟与卡点诊断.html",
-      "bytes": 1052563,
-      "sha256": "bfce5513ce42cd59aa0d8b66999c3d1f92f811229fad66bdd156760d88ae848e"
+      "bytes": 1285532,
+      "sha256": "eba5ca3a3cdc36530a8250a2e2dda6809a3799c77e10c2b64f26352ee3d76764"
     },
     {
       "file": "09_补充验证与未达标说明.html",
@@ -196,6 +196,6 @@
       "sha256": "d57dba77bdc89ff59504f05703bb3e8a6719463547126d8f3e2c39b10a7a59e9"
     }
   ],
-  "totalBytes": 146297015,
+  "totalBytes": 146762953,
   "browserValidation": "pending"
 }

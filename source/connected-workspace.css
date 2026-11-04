@@ -28,6 +28,17 @@ body.connected-active #connected{max-width:none;margin:0;padding:128px 48px 128p
 #connected input:hover,#connected select:hover{border-color:var(--ink)}
 #connected .cg-top{position:fixed;inset:0 0 auto;z-index:50;height:88px;background:var(--paper);border-top:4px solid var(--accent);border-bottom:1px solid var(--ink);display:flex;align-items:center;gap:32px;padding:0 32px;box-sizing:border-box}
 #connected .cg-wordmark{font-family:'Workshop Serif','Songti SC','SimSun',serif;font-weight:700;font-size:28px;letter-spacing:-.05em;white-space:nowrap;min-width:152px}
+#connected button.cg-wordmark{border:0;padding:8px 0;background:transparent;text-align:left;cursor:pointer}
+#connected button.cg-wordmark:not(:disabled):hover{color:var(--accent);background:transparent}
+#connected button.cg-wordmark:not(:disabled):active{color:var(--red)}
+#connected .cg-home-dialog{max-width:560px}
+#connected .cg-home-dialog .actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+#connected textarea{font:inherit;font-size:14px;line-height:1.6;color:var(--ink);background:var(--paper);border:1px solid var(--control-line);border-radius:0;padding:12px;width:100%;max-width:100%;box-sizing:border-box;resize:vertical}
+#connected #cgV2Editor details details>summary{font-family:inherit;font-size:17px}
+#connected #cgV2Editor details details{border-color:var(--line);margin-top:18px}
+#connected #cgV2Editor output{display:block;border-left:3px solid var(--accent);background:var(--ground);padding:12px 16px;margin:16px 0;font-size:14px;line-height:1.7}
+#connected .cg-rule-note,#connected #cgCoverage{font-size:14px;color:var(--muted)}
+#connected #cgForm:has(#cgRuleEnabled:checked) label:has(>#cg-armorK){display:none}
 #connected .cg-top-title{min-width:0;flex:1}
 #connected .cg-top h1{font:600 17px/1.35 'Workshop UI','Microsoft YaHei',sans-serif;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #connected .cg-top p{font-size:12px;color:var(--muted);margin:5px 0 0;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
