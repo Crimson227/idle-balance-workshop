@@ -125,6 +125,7 @@ body.connected-active #connected>div#cgActionBar{position:fixed;bottom:0;left:18
 #connected .cg-choice h3{font-size:24px;margin:0 0 12px}
 #connected .cg-choice p{margin:8px 0;font-size:15px}
 #connected .cg-choice .cg-verdict{color:var(--accent);font-size:14px;font-weight:600;margin-top:0}
+#connected .cg-pace-change{font-weight:600;color:var(--accent)}
 #connected .cg-choice-selected{background:var(--ground);border-top-color:var(--ink)}
 #connected .cg-choice-selected:before{display:none}
 #connected .cg-search-tuning{margin-top:28px;border-top:1px solid var(--ink)}
