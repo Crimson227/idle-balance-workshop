@@ -36,7 +36,28 @@ body.connected-active #connected{max-width:none;margin:0;padding:128px 48px 128p
 #connected textarea{font:inherit;font-size:14px;line-height:1.6;color:var(--ink);background:var(--paper);border:1px solid var(--control-line);border-radius:0;padding:12px;width:100%;max-width:100%;box-sizing:border-box;resize:vertical}
 #connected #cgV2Editor details details>summary{font-family:inherit;font-size:17px}
 #connected #cgV2Editor details details{border-color:var(--line);margin-top:18px}
-#connected #cgV2Editor output{display:block;border-left:3px solid var(--accent);background:var(--ground);padding:12px 16px;margin:16px 0;font-size:14px;line-height:1.7}
+#connected #cgV2Editor output{display:block;border-block:1px solid var(--line);padding:12px 0;margin:16px 0;font-size:14px;line-height:1.7}
+#connected .fields>.cg-inline-rule,#connected .fields>details{grid-column:1/-1;min-width:0}
+#connected .cg-inline-rule{border-top:1px solid var(--line);padding-top:16px;margin-top:4px}
+#connected .cg-inline-rule>.fields{margin-top:0}
+#connected .cg-effect-add{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin:20px 0}
+#connected .cg-effect-add>label{flex:1;min-width:180px;max-width:420px}
+#connected .cg-effect-add button{min-height:46px}
+#connected .cg-rule-checks,#connected .cg-rule-consume{display:flex;gap:8px 22px;flex-wrap:wrap;border:0;padding:12px 0;margin:8px 0}
+#connected .cg-rule-checks label,#connected .cg-rule-consume label{display:flex;align-items:center;gap:8px;min-height:44px}
+#connected .cg-rule-consume legend{font-weight:600;padding:0;margin:12px 0 4px}
+#connected .cg-rule-consume small{width:100%}
+#connected .cg-rule-consume input,#connected .cg-rule-checks input{width:20px;min-height:20px;height:20px;flex:0 0 20px}
+#connected .fields>.cg-switch{display:flex;align-items:center;gap:10px;min-height:46px}
+#connected .fields>.cg-switch input[type=checkbox]{width:20px;height:20px;min-height:20px;flex:0 0 20px;order:-1}
+#connected .cg-rule-sentence{font-size:15px;padding-block:14px;margin:8px 0;color:var(--ink)}
+#connected .cg-rule-off,#connected .cg-rule-internal{font-size:13px;color:var(--muted)}
+#connected .cg-rule-dependency{padding:16px;background:var(--ground);border-block:1px solid var(--control-line);margin-block:16px}
+#connected .cg-rule-dependency button{margin:4px 8px 4px 0}
+#connected .cg-rule-edit{font-size:13px;padding:7px 10px;min-height:44px;margin-top:8px;display:block}
+#connected .cg-upgrade-rules{margin-block:16px}
+#connected #cgRuleActionMessage:empty{display:none}
+#connected #cgRuleAdvanced pre{white-space:pre-wrap;overflow-wrap:anywhere;max-width:100%;font-size:13px}
 #connected .cg-rule-note,#connected #cgCoverage{font-size:14px;color:var(--muted)}
 #connected #cgForm:has(#cgRuleEnabled:checked) label:has(>#cg-armorK){display:none}
 #connected .cg-top-title{min-width:0;flex:1}
