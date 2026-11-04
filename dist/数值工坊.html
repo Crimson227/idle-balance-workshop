@@ -222,6 +222,16 @@ body.connected-active #connected>div#cgActionBar{position:fixed;bottom:0;left:18
 #connected .cg-dialog-body table{min-width:650px;font-size:14px}
 #connected .cg-dialog-body #cgBattleMoment table{min-width:680px}
 #connected #cgBattleMoment{background:var(--ground)}
+#connected #cgBattleTitle{font-size:20px;margin:0 0 16px;line-height:1.5}
+#connected .cg-battle-transport{display:flex;align-items:end;flex-wrap:wrap;gap:10px;margin:16px 0 22px}
+#connected .cg-battle-transport>label{flex:1;min-width:220px}
+#connected #cgBattleKeyFacts{border-top:1px solid var(--line);padding-top:16px;margin-bottom:22px}
+#connected #cgBattleKeyFacts h4{font-size:17px;margin:0 0 10px}
+#connected #cgBattleKeyFacts p{font-size:14px;margin:6px 0}
+#connected #cgOpeningStats,#connected #cgMomentDetails{border-top:1px solid var(--line);margin-block:14px}
+#connected #cgConflict{max-width:75ch;border-top:1px solid var(--line);padding-top:12px;margin-bottom:26px}
+#connected #cgConflict p{font-size:15px;margin:12px 0 18px}
+#connected #cgConflictEvidence{font-size:13px;color:var(--muted)}
 #connected .cg-file-dialog{width:min(620px,calc(100vw - 40px));max-height:calc(100dvh - 40px)}
 #connected .cg-file-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 24px}
 #connected .cg-file-actions button{width:100%;text-align:left}
@@ -296,6 +306,9 @@ body.connected-active #connected>div#cgActionBar{position:fixed;bottom:0;left:18
  #connected .cg-dialog-head{padding:12px 20px;min-height:64px;box-sizing:border-box}
  #connected .cg-dialog-head h2{font-size:22px}#connected .cg-dialog-head button{font-size:13px;padding:9px 12px}
  #connected .cg-dialog-body{padding:18px 20px max(18px,env(safe-area-inset-bottom))}
+ #connected .cg-battle-transport{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 8px}
+ #connected .cg-battle-transport button{padding:10px 5px;font-size:13px}
+ #connected .cg-battle-transport>label{grid-column:1/-1;min-width:0}
  #connected .cg-file-actions{grid-template-columns:1fr}
  #connected #cgTradeoff .cg-comparison-line{gap:10px;grid-template-columns:58px minmax(0,1fr)}
  #connected .cg-detail-links{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -4000,11 +4013,70 @@ entryLead.className='cg-entry-lead';entryIndex.className='cg-entry-index';entryL
 for(const node of Array.from(by('cgEmpty').children))(node.tagName==='DETAILS'?entryIndex:entryLead).append(node);
 entryIndex.insertAdjacentHTML('afterbegin','<h3>示例与手算</h3>');entryLayout.append(entryLead,entryIndex);by('cgEmpty').append(entryLayout);
 const make=(tag,id,html='')=>{const el=document.createElement(tag);el.id=id;el.innerHTML=html;return el;};
+function clearFieldErrors(target=null){
+ const owner=target?.dataset.cgErrorOwner||target?.id,form=by('cgForm');
+ for(const input of form.querySelectorAll('[aria-invalid=true]'))if(!target||input.id===owner||input.dataset.cgErrorOwner===owner){input.removeAttribute('aria-invalid');delete input.dataset.cgErrorOwner;}
+ for(const hint of form.querySelectorAll('.cg-field-error'))if(!target||hint.id==='cg-error-'+owner){hint.hidden=true;hint.textContent='';}
+}
+function clearTransient({draft=false,feedback=true}={}){
+ if(draft)dirty=false;clearFieldErrors();by('cgError').hidden=true;by('cgError').textContent='';by('cgProgress').textContent='';
+ if(feedback){by('cgNotice').textContent='';by('cgFileState').textContent='';lastFeedback='';}
+}
+function revealField(id){const input=by(id);if(!input)return;for(let p=input.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;input.scrollIntoView({block:'center',behavior:'instant'});input.focus({preventScroll:true});}
+function fieldLabel(input){return input.closest('label')?.childNodes[0]?.textContent.trim()||'这一项';}
+function invalidField(id,message,related=[]){const error=Error(message);error.fieldId=id;error.related=related;throw error;}
+function showFieldError(error){
+ let id=error.fieldId;
+ if(!id){
+  const list=ConnectedCore.multi.FIELDS.filter(([,label])=>error.message.includes(label)).sort((a,b)=>b[1].length-a[1].length),field=list[0];
+  if(field){const key=field[0];if(error.message.startsWith('满级角色'))id=Array.from(by('cgForm').querySelectorAll('[id^="cg-up-"][id$="-increment"]')).find(e=>fieldLabel(e).includes(field[1]))?.id;
+   else if(/^第\d+关敌人/.test(error.message)&&by('cg-step-'+key))id='cg-step-'+key;
+   else id='cg-'+(error.message.includes('敌人')?'enemy':'player')+'-'+key;}
+  if(!id&&error.message.includes('升级'))id=Array.from(by('cgForm').querySelectorAll('[id^="cg-up-"]')).find(e=>e.id.endsWith(error.message.includes('上限')?'-maxLevel':error.message.includes('价格')?'-costBase':'-increment'))?.id;
+ }
+ const input=by(id);if(!input)return false;const hintId='cg-error-'+id;let hint=by(hintId);if(!hint){hint=make('small',hintId);hint.className='cg-field-error';hint.setAttribute('role','alert');input.closest('label').append(hint);}hint.textContent=error.message;hint.hidden=false;
+ for(const fieldId of [id,...(error.related||[])]){const field=by(fieldId);if(!field)continue;field.setAttribute('aria-invalid','true');field.dataset.cgErrorOwner=id;field.setAttribute('aria-describedby',Array.from(new Set([...(field.getAttribute('aria-describedby')||'').split(/\s+/).filter(Boolean),hintId])).join(' '));}
+ revealField(id);return true;
+}
+function validateFormFields(){
+ const common={'cg-stageCount':[1,1000,true],'cg-rewardBase':[0,1e12],'cg-rewardStep':[0,1e9],'cg-initialCoins':[0,1e12],'cg-income':[0,1e6],'cg-session':[.1,120],'cg-cap':[0,72],'cg-timeout':[1,120],'cg-victoryDelay':[0,86400],'cg-retryDelay':[.1,86400],'cg-armorK':[1,10000],'cg-budget':[0,2160,false,true],'cg-maxEvents':[1,100000,true],'cg-maxBattles':[1,10000,true]},goalIds=['cgGoalMin','cgGoalMax','cgGoalGap','cgGoalVisit'];
+ for(const input of by('cgForm').querySelectorAll('input')){
+  const id=input.id,isGoal=goalIds.includes(id);if(isGoal&&by('cgGoalMode').value!=='set')continue;
+  const actor=id.match(/^cg-(player|enemy)-(.+)$/),upgrade=id.match(/^cg-up-\d+-(increment|costBase|costStep|maxLevel|rank)$/),isStep=id.startsWith('cg-step-');let range=common[id];
+  if(actor&&by('cgV2Editor')){const row=ConnectedCore.multi.FIELDS.find(f=>f[0]===actor[2])||(actor[2].endsWith('Reduction')?[actor[2],'',0,1]:null);if(row){const pct=ConnectedV2.percent.has(actor[2])||actor[2].endsWith('Reduction')&&!['critBonusReduction','blockReduction'].includes(actor[2]);range=[row[2]*(pct?100:1),row[3]*(pct?100:1)];}}
+  if(upgrade)range=upgrade[1]==='maxLevel'?[0,2000,true]:upgrade[1]==='costBase'?[1e-9,1e12]:upgrade[1]==='costStep'?[0,1e12]:upgrade[1]==='increment'?[0,Infinity,false,true]:[-Infinity,Infinity];
+  if(isStep)range=[0,Infinity];
+  if(isGoal)range=id==='cgGoalVisit'?[1,1000,true]:[0,7776000/units[by(id==='cgGoalGap'?'cgWaitUnit':'cgGoalUnit').value]];
+  if(!range)continue;const raw=input.value.trim(),label=fieldLabel(input);if(!raw){if(isGoal&&!input.validity.badInput)continue;invalidField(id,'请填写'+label+'的数值');}
+  let value;try{value=ConnectedCore.number(raw);if(!Number.isFinite(value))throw Error();}catch{invalidField(id,label+'请填数值');}
+  const[lo,hi,integer,exclusive]=range;if(Number.isFinite(lo)&&(num(ConnectedCore.offset(raw,String(lo)))<0||exclusive&&num(ConnectedCore.offset(raw,String(lo)))===0)||Number.isFinite(hi)&&num(ConnectedCore.offset(raw,String(hi)))>0)invalidField(id,label+(exclusive&&lo===0?'请填大于0的数值':Number.isFinite(hi)?'请填'+f(lo)+'至'+f(hi):'不能小于'+f(lo)));
+  if(integer&&!Number.isInteger(value))invalidField(id,label+'请填整数');
+ }
+ for(const side of ['player','enemy']){const a=by('cg-'+side+'-physicalMin'),b=by('cg-'+side+'-physicalMax');if(a&&b&&num(ConnectedCore.offset(a.value,b.value))>0)invalidField(b.id,'最大物理伤害不能小于最小物理伤害',[a.id]);}
+ if(by('cgGoalMode').value==='set'&&by('cgGoalMin').value!==''&&by('cgGoalMax').value!==''&&num(ConnectedCore.offset(by('cgGoalMin').value,by('cgGoalMax').value))>0)invalidField('cgGoalMax','最晚完成时间不能早于最早完成时间',['cgGoalMin']);
+ const hours=by('cg-hours').value.split(',').map(x=>x.trim());if(!hours.length||hours.length>24||hours.some(x=>x===''||!Number.isFinite(Number(x)))||Number(hours[0])!==0||hours.some((x,i)=>Number(x)<0||Number(x)>=24||i&&Number(x)<=Number(hours[i-1])))invalidField('cg-hours','上线时间请从0开始递增填写，例如0,5,12');
+ if(hours.some((h,i)=>Number(by('cg-session').value)>((Number(hours[i+1]??24))-Number(h))*60))invalidField('cg-session','每次在线时长不能超过相邻两次回访的间隔',['cg-hours']);
+ const seeds=by('cg-seeds').value.split(',').map(x=>x.trim());if(seeds.length>8||seeds.some(x=>x===''||!Number.isInteger(Number(x))||Number(x)<0||Number(x)>4294967295))invalidField('cg-seeds','请填1至8个有效试算编号，用逗号隔开');
+}
 const topBar=make('header','cgTop','<strong class="cg-wordmark">数值工坊</strong><div class="cg-top-title"><h1 id="cgGameTitle">选择一份游戏数据</h1><p id="cgWorkspaceState">未载入</p></div><button type="button" id="cgFiles">文件 / 更多</button>');topBar.className='cg-top';by('connected').prepend(topBar);
 const rail=make('aside','cgRail');rail.className='cg-rail';rail.setAttribute('aria-label','主导航');rail.append(by('connected').querySelector('.connected-nav'));topBar.after(rail);
 by('cgDataTab').textContent='游戏数据';by('cgRunTab').textContent='整体检查';by('cgResultsTab').textContent='解决方案';
 const actionBar=make('div','cgActionBar','<span id="cgActionState" class="cg-action-state" role="status"></span><button type="button" id="cgSecondary" hidden></button><button type="button" id="cgPrimary" class="primary"></button>');actionBar.className='cg-action-bar';actionBar.setAttribute('aria-label','当前任务操作');by('connected').append(actionBar);
 const solutionView=make('section','cgSolutions','<h2>解决方案</h2><p id="cgSearchState">先运行整体检查。</p><progress id="cgSearchProgress" hidden></progress><div id="cgSearchCards"></div><details class="cg-search-tuning" id="cgSearchSettings"><summary>限制修改范围</summary><div class="fields"><label>运行时限（秒）<input id="cgSearchSeconds" type="number" min="1" max="300" value="30"></label><label>最多完整试算次数<input id="cgSearchRuns" type="number" min="5" max="300" value="100"></label><label>累计事件上限<input id="cgSearchEvents" type="number" min="100" max="500000" value="50000"></label></div><div id="cgSearchBounds"></div></details><details class="cg-search-audit"><summary>搜索记录与未采用方案</summary><div id="cgSearchAudit"></div></details>');solutionView.hidden=true;by('cgResults').after(solutionView);
+const conflictBox=make('div','cgConflict','<p id="cgConflictTiming"></p><p id="cgConflictReason"></p><button type="button" id="cgChangeWaitGoal">修改最长等待目标</button><details><summary>查看精确时间依据</summary><p id="cgConflictEvidence"></p></details>');conflictBox.hidden=true;by('cgSearchState').after(conflictBox);
+function openSetting(id){if(!formReady)drawForm(false);show('data');revealField(id);}
+by('cgChangeWaitGoal').onclick=()=>openSetting('cgGoalGap');
+function durationExact(raw){const value=num(raw),hours=Math.floor(value/3600),minutes=Math.floor((value-hours*3600)/60),seconds=ConnectedCore.offset(raw,String(hours*3600+minutes*60));return (hours?hours+'小时':'')+(minutes?minutes+'分':'')+(num(seconds)?seconds+'秒':'')||'0秒';}
+function dayClock(raw){const seconds=num(raw),day=Math.floor(seconds/86400),h=Math.floor(seconds%86400/3600),m=Math.floor(seconds%3600/60),s=ConnectedCore.offset(raw,String(day*86400+h*3600+m*60));return '第'+(day+1)+'天 '+h+':'+String(m).padStart(2,'0')+(num(s)?':'+(num(s)<10?'0':'')+s:'');}
+function showConflict(record){
+ const c=record.conflict;if(!c)return;const g=record.game,{v,behavior}=ConnectedCore.compile(g),slots=ConnectedCore.schedule(behavior,v.simulation.observationSeconds),index=slots.findIndex((s,i)=>slots[i+1]&&Math.abs(num(s.end.toString())+num(g.rules.battleTimeoutSeconds)-c.from)<1e-6&&Math.abs(num(slots[i+1].start.toString())-c.to)<1e-6);if(index<0)return;
+ const slot=slots[index],next=slots[index+1].start.toString(),end=slot.end.toString(),lastBattle=ConnectedCore.offset(end,ConnectedCore.scaled(g.rules.battleTimeoutSeconds,'-1')),gap=ConnectedCore.offset(next,lastBattle);
+ const shortClock=raw=>Math.floor(num(raw)/86400)===Math.floor(num(slot.start.toString())/86400)?dayClock(raw).split(' ')[1]:dayClock(raw);
+ by('cgConflictTiming').textContent=dayClock(slot.start.toString())+'上线，'+shortClock(end)+'下线，下一次要到'+shortClock(next)+'才回来。下线后不继续挑战新关。';
+ by('cgConflictReason').textContent='即使预留正在打的那场战斗，仍至少有'+durationExact(gap)+'没有新关，超过你设的'+durationExact(g.goals.maxGapSeconds)+'。你还要求至少'+durationExact(g.goals.minCompletionSeconds)+'才打完，无法在这段空档开始前结束全部关卡。';
+ by('cgConflictEvidence').textContent='下线时刻 '+dayClock(end)+'；已开始的战斗最多再结算'+durationExact(g.rules.battleTimeoutSeconds)+'。因此从'+dayClock(lastBattle)+'到'+dayClock(next)+'，没有新关的精确下界为'+durationExact(gap)+'（'+gap+'秒）。最长等待目标为'+durationExact(g.goals.maxGapSeconds)+'。';
+ conflictBox.hidden=false;
+}
 by('cgSearchSettings').append(make('button','cgRerunSearch','重新搜索当前配置'));by('cgRerunSearch').type='button';by('cgRerunSearch').onclick=()=>{if(!busy)startSearch();};
 const filesDialog=make('dialog','cgFileDialog','<header class="cg-dialog-head"><h2>文件 / 更多</h2><button type="button" id="cgFileClose">关闭</button></header><div class="cg-dialog-body"><p id="cgFileState"></p><div id="cgFileImport"></div><div class="cg-file-actions" id="cgFileActions"></div><details id="cgManual"><summary>在修改前方案上手动试改</summary><div id="cgManualActions"></div></details><div id="cgRulesHome"></div></div>');filesDialog.className='cg-file-dialog';by('connected').append(filesDialog);
 by('cgFileImport').append(by('cgImport').closest('.connected-open-file'));for(const id of ['cgSave','cgRestore','cgExportConfig','cgExportResults'])by('cgFileActions').append(by(id));
@@ -4018,17 +4090,31 @@ const records=by('cgStageRows').closest('details');records.id='cgRecords';record
 const detailLinks=make('div','cgDetailLinks','<button type="button" id="cgShowBattle">战斗过程</button><button type="button" id="cgShowRecords">逐关与购买记录</button><button type="button" id="cgShowEvidence">时间与金币依据</button>');detailLinks.className='cg-detail-links';by('cgFundingProof').after(detailLinks);by('cgOpenBattle').closest('.actions').hidden=true;
 const comparePanel=make('details','cgComparisonPanel','<summary>完整前后数据</summary>');by('cgComparison').before(comparePanel);comparePanel.append(by('cgComparison'));
 by('cgBattle').append(by('cgBattleChecks'));
+const battleTransport=make('div','cgBattleTransport');battleTransport.className='cg-battle-transport';
+const oldStepActions=by('cgBattlePrev').parentElement,battleExports=by('cgExportBattle').parentElement,stepLabel=by('cgBattleStep').closest('label');
+battleTransport.append(by('cgPlayBattle'),by('cgBattlePrev'),by('cgBattleNext'),stepLabel);battleExports.append(by('cgCloseBattle'));if(!oldStepActions.children.length)oldStepActions.remove();
+const openingStats=make('details','cgOpeningStats','<summary>开打时属性</summary>');openingStats.append(by('cgBattleSummary'),by('cgActors'));
+const battleFacts=make('div','cgBattleKeyFacts');
+const momentDetails=make('details','cgMomentDetails','<summary>本时刻逐击伤害与恢复拆解</summary>');momentDetails.append(by('cgBattleMoment'));
+const channelDetails=by('cgChannelTotals').closest('details'),logDetails=by('cgLogRows').closest('details');
+by('cgBattle').prepend(by('cgBattleTitle'),battleTransport,by('cgHealthChart'),battleFacts,openingStats);by('cgBattle').append(channelDetails,momentDetails,logDetails,battleExports,by('cgBattleChecks'));
+by('cgLogRows').addEventListener('click',e=>{if(e.target.closest('[data-log-step]'))momentDetails.open=true;},true);
+function presentBattle(){
+ const battle=replay?.executed.battle;if(battle?.time!==undefined)by('cgBattleTitle').textContent+=' · '+time(battle.time);
+ battleFacts.innerHTML='<h4>伤害与恢复</h4>'+(replay?.executed.metrics||[]).map((m,i)=>{const parts=[];if(m.actualDamage!==undefined)parts.push('造成伤害'+f(m.actualDamage));if(num(m.leechApplied)>0)parts.push('实际吸血'+f(m.leechApplied));if(num(m.regenApplied)>0)parts.push('实际回复'+f(m.regenApplied));return parts.length?'<p>'+(i?'敌人':'角色')+'：'+escape(parts.join('，'))+'。</p>':'';}).join('');
+ by('cgPlayBattle').disabled=!replay?.executed.steps.length;
+}
 function panelRefresh(){ConnectedCharts.refresh?.();}
 function openDetail(node,title,trigger=document.activeElement){const previous=detailStack.at(-1);if(previous){previous.contentTop=by('cgDetailContent').scrollTop;previous.node.hidden=true;}const anchor=document.createComment('detail home');node.before(anchor);detailStack.push({node,title,trigger,anchor,top:window.scrollY,contentTop:0});node.hidden=false;node.classList.add('cg-panel-active');if(node.tagName==='DETAILS')node.open=true;by('cgDetailContent').append(node);by('cgDetailTitle').textContent=title;by('cgDetailBack').textContent=detailStack.length>1?'返回'+previous.title:'返回检查结果';if(!detailDialog.open)detailDialog.showModal();by('cgDetailContent').scrollTop=0;by('cgDetailBack').focus();panelRefresh();}
 function closeDetail(){const state=detailStack.pop();if(!state)return;state.node.classList.remove('cg-panel-active');if(state.node.id==='cgBattle'){stopPlayback();state.node.hidden=true;}else state.node.hidden=false;state.anchor.replaceWith(state.node);const previous=detailStack.at(-1);if(previous){previous.node.hidden=false;by('cgDetailTitle').textContent=previous.title;by('cgDetailBack').textContent=detailStack.length>1?'返回'+detailStack[detailStack.length-2].title:'返回检查结果';by('cgDetailContent').scrollTop=previous.contentTop;}else{detailDialog.close();window.scrollTo({top:state.top,behavior:'instant'});}state.trigger?.focus?.({preventScroll:true});panelRefresh();}
 by('cgDetailBack').onclick=closeDetail;detailDialog.addEventListener('cancel',e=>{e.preventDefault();closeDetail();});
-const replayInPage=openBattle;openBattle=async function(trigger=document.activeElement){await replayInPage();if(replay&&!by('cgBattle').hidden){notice('');openDetail(by('cgBattle'),'战斗过程',trigger);}};by('cgOpenBattle').onclick=()=>openBattle(by('cgShowBattle'));by('cgShowBattle').onclick=()=>openBattle(by('cgShowBattle'));by('cgCloseBattle').onclick=closeDetail;
+const replayInPage=openBattle;openBattle=async function(trigger=document.activeElement){await replayInPage();if(replay&&!by('cgBattle').hidden){presentBattle();notice('');openDetail(by('cgBattle'),'战斗过程',trigger);}};by('cgOpenBattle').onclick=()=>openBattle(by('cgShowBattle'));by('cgShowBattle').onclick=()=>openBattle(by('cgShowBattle'));by('cgCloseBattle').onclick=closeDetail;
 by('cgShowRecords').onclick=()=>openDetail(records,'逐关与购买记录',by('cgShowRecords'));by('cgShowEvidence').onclick=()=>openDetail(by('cgTimeEvidence'),'时间与金币依据',by('cgShowEvidence'));
 const stageClick=by('cgStageRows').onclick;by('cgStageRows').onclick=async e=>{stageClick(e);const target=e.target.closest('[data-cg-stage]');if(target)await openBattle(target);};
 function selection(){return {run:by('cgRunSelect').value,stage:selectedStage};}
 function applySelection(s){if(!s)return;if(Array.from(by('cgRunSelect').options).some(o=>o.value===s.run)){by('cgRunSelect').value=s.run;selectRun();}if(selectedRun&&Number.isInteger(s.stage)&&selectedRun.stages[s.stage-1]?.arrival!=null)showDiagnosis(s.stage);}
 function capture(){return copy({game,baseGame,baseRuns,candidateRuns,failures,rejected,history,battleChecks,appliedName,selection:selection(),places:{...scrollPlaces,[workspaceView]:window.scrollY}});}
-function restoreSnapshot(s){({game,baseGame,baseRuns,candidateRuns,failures,rejected,history,battleChecks,appliedName}=copy(s));Object.assign(scrollPlaces,s.places||{});dirty=false;formReady=false;selectedRun=candidateRuns[0]||baseRuns[0]||null;if(selectedRun){renderResults();applySelection(s.selection);}}
+function restoreSnapshot(s){({game,baseGame,baseRuns,candidateRuns,failures,rejected,history,battleChecks,appliedName}=copy(s));Object.assign(scrollPlaces,s.places||{});clearTransient({draft:true});formReady=false;selectedRun=candidateRuns[0]||baseRuns[0]||null;if(selectedRun){renderResults();applySelection(s.selection);}}
 function recordMatches(){return !!(searchRecord&&game&&(fingerprint(searchRecord.sourceGame)===fingerprint(game)||appliedUndo&&fingerprint(searchRecord.sourceGame)===fingerprint(appliedUndo.game)));}
 function updateChrome(){
  const oldTitle='旧配置结果，当前修改尚未重新核对';if(dirty){if(staleResultTitle===null)staleResultTitle=by('cgResultTitle').textContent;by('cgResultTitle').textContent=oldTitle;}else if(staleResultTitle!==null){if(by('cgResultTitle').textContent===oldTitle)by('cgResultTitle').textContent=staleResultTitle;staleResultTitle=null;}
@@ -4040,7 +4126,7 @@ function updateChrome(){
  else if(previewState){primary.textContent=workspaceView==='solutions'&&selectedChoice!==previewState.id?'预览选中方案':'应用这个方案';secondary.hidden=false;secondary.textContent='取消预览';}
  else if(dirty){primary.textContent='保存并运行';if(workspaceView!=='data')by('cgActionState').textContent='有未保存修改';}
  else if(workspaceView==='data')primary.textContent='保存并运行';
- else if(workspaceView==='solutions'){const row=searchRecord?.rows.find(x=>x.id===selectedChoice);primary.textContent=row&&recordMatches()?'预览选中方案':currentRuns().length?'查找解决方案':'先运行整体检查';if(searchRecord?.status==='already_meets'&&recordMatches()){primary.textContent='当前方案符合目标';primary.disabled=true;}if(['no_fault','conflict','insufficient_observation'].includes(searchRecord?.status)&&recordMatches())primary.textContent=searchRecord.status==='insufficient_observation'?'调整观察期':'调整目标或回访';secondary.hidden=!currentRuns().length;secondary.textContent='返回检查结果';}
+ else if(workspaceView==='solutions'){const row=searchRecord?.rows.find(x=>x.id===selectedChoice);primary.textContent=row&&recordMatches()?'预览选中方案':currentRuns().length?'查找解决方案':'先运行整体检查';if(searchRecord?.status==='already_meets'&&recordMatches()){primary.textContent='当前方案符合目标';primary.disabled=true;}if(['no_fault','conflict','insufficient_observation'].includes(searchRecord?.status)&&recordMatches())primary.textContent={insufficient_observation:'调整观察期',conflict:'调整回访安排',no_fault:'填写体验目标'}[searchRecord.status];secondary.hidden=!currentRuns().length;secondary.textContent='返回检查结果';}
  else if(workspaceView==='results')primary.textContent=searchRecord&&recordMatches()?'查看解决方案':'查找解决方案';
  if(!busy&&!previewState&&dirty){secondary.hidden=false;secondary.textContent='撤回未保存修改';}else if(!busy&&!previewState&&appliedUndo){secondary.hidden=false;secondary.textContent='撤销本次应用';}
  by('cgSave').disabled=!game||dirty||busy;by('cgManual').hidden=!baseRuns.length;by('cgComparisonPanel').hidden=by('cgComparison').hidden;by('cgShowBattle').disabled=busy||!selectedRun?.battles.some(b=>b.stage===selectedStage);
@@ -4060,13 +4146,15 @@ function summarizeResults(){const rows=candidateRuns.length?candidateRuns:baseRu
 }
 const renderCore=renderResults;renderResults=function(){renderCore();summarizeResults();updateChrome();};
 const diagnosisCore=showDiagnosis;showDiagnosis=function(stage){diagnosisCore(stage);if(selectedRun){const d=ConnectedCore.diagnose(selectedRun,stage);if(!d.unreached){by('cgBlockWhat').textContent=(d.passed?'这关已通过。':time(selectedRun.inputGame.simulation.observationSeconds)+'内未通过。')+'失败'+d.failures+'场，停滞'+time(d.seconds)+'。';}}updateChrome();};
-const lockCore=lock;lock=function(value){lockCore(value);updateChrome();};by('cgForm').addEventListener('input',()=>{savedWorkspace=false;lastFeedback='';updateChrome();});
+const lockCore=lock;lock=function(value){lockCore(value);updateChrome();};by('cgForm').addEventListener('input',e=>{clearFieldErrors(e.target);by('cgError').hidden=true;by('cgError').textContent='';by('cgNotice').textContent='';by('cgProgress').textContent='';lastFeedback='';updateChrome();});
 const noticeCore=notice;notice=function(s,error=false){noticeCore(s,error);lastFeedback=s;if(filesDialog.open)by('cgFileState').textContent=s;updateChrome();};
-const saveCore=saveForm;saveForm=function(){const before=game?copy(game):null,ok=saveCore();if(ok){savedWorkspace=false;scrollPlaces.results=0;const changed=before?(ConnectedV2.is(before)&&ConnectedV2.is(game)?ConnectedV2.changes(before,game).length>0:fingerprint(before)!==fingerprint(game)):true;if(changed){appliedUndo=null;appliedName='';}}updateChrome();return ok;};
+const saveCore=saveForm;saveForm=function(){clearTransient();const before=game?copy(game):null,ok=saveCore();if(ok){savedWorkspace=false;scrollPlaces.results=0;const changed=before?(ConnectedV2.is(before)&&ConnectedV2.is(game)?ConnectedV2.changes(before,game).length>0:fingerprint(before)!==fingerprint(game)):true;if(changed){appliedUndo=null;appliedName='';}}else if(by('cgForm').querySelector('[aria-invalid=true]')){by('cgError').hidden=true;by('cgError').textContent='';lastFeedback='请修改标出的字段。';}updateChrome();return ok;};
 const shortInput=x=>String(Number(Number(x).toPrecision(12)));
 const drawWorkspace=drawForm;drawForm=function(...args){drawWorkspace(...args);by('cgDataIntro').textContent='';for(const id of ['cg-budget','cg-session','cgGoalMin','cgGoalMax','cgGoalGap'])if(by(id)?.value!=='')by(id).value=shortInput(by(id).value);};
 const readWorkspace=readForm;readForm=function(){const original=game,raw={budget:by('cg-budget').value,session:by('cg-session').value,min:by('cgGoalMin').value,max:by('cgGoalMax').value,gap:by('cgGoalGap').value,mode:by('cgGoalMode').value,unit:by('cgGoalUnit').value,wait:by('cgWaitUnit').value},next=readWorkspace();if(original){if(raw.budget===shortInput(num(original.simulation.observationSeconds)/3600))next.simulation.observationSeconds=original.simulation.observationSeconds;if(raw.session===shortInput(num(original.behavior.sessionMinutes)))next.behavior.sessionMinutes=original.behavior.sessionMinutes;for(const[key,field,unit]of [['minCompletionSeconds','min','unit'],['maxCompletionSeconds','max','unit'],['maxGapSeconds','gap','wait']]){const oldUnit=original.goalUnits?.[unit==='wait'?'wait':'completion']||'hours';if(raw.mode==='set'&&raw[unit]===oldUnit&&original.goals[key]!==null&&raw[field]===shortInput(num(original.goals[key])/units[oldUnit]))next.goals[key]=original.goals[key];}}ConnectedCore.compile(next);return next;};
-const installCore=install;install=function(g,options){if(previewState)previewState=null;appliedUndo=null;appliedName='';savedWorkspace=false;installCore(g,options);by('cgProgress').textContent='';updateChrome();};
+const readChecked=readForm;readForm=function(){try{validateFormFields();return readChecked();}catch(error){showFieldError(error);throw error;}};
+const installCore=install;install=function(g,options){ConnectedCore.compile(g);clearTransient({draft:true});if(previewState)previewState=null;appliedUndo=null;appliedName='';savedWorkspace=false;installCore(g,options);updateChrome();};
+by('cgDiscard').onclick=()=>{const selected=selection();clearTransient({draft:true});stopPlayback();if(!game){formReady=false;selectedRun=null;replay=null;show('empty');return;}drawForm(false);if(currentRuns().length){renderResults();applySelection(selected);show('results');}else{show('simulation');runSummary();}};
 async function runFromData(){if(workspaceView!=='data')show('data');if(saveForm()){show('simulation');await simulate(!!baseRuns.length);}}
 by('cgForm').onsubmit=e=>{e.preventDefault();runFromData();};
 by('cgPrimary').onclick=async()=>{
@@ -4075,6 +4163,7 @@ by('cgPrimary').onclick=async()=>{
  if(dirty||workspaceView==='data'){await runFromData();return;}
  if(workspaceView==='solutions'){
   if(['no_fault','conflict','insufficient_observation'].includes(searchRecord?.status)&&recordMatches()){
+   if(searchRecord.status==='conflict'){openSetting('cg-hours');return;}
    if(!formReady)drawForm(false);show('data');
    if(searchRecord.status==='insufficient_observation'){
     const field=by('cg-budget');field.closest('details').open=true;field.focus();
@@ -4110,9 +4199,10 @@ async function startSearch(){if(busy||dirty||!game)return;if(!ConnectedV2.is(gam
 function changeText(row){return row.path.map(p=>{const k=searchRecord.knobs.find(k=>k.id===p.id),ratio=k.current?p.value/k.current:null,amount=ratio!==null&&(ratio>=1.5||ratio<=2/3)?'（'+(ratio<.01?'降至原来的'+pretty(ratio*100)+'%':pretty(ratio)+'倍')+'）':'';if(k.id==='enemy_hp')return '敌人生命 '+pretty(searchRecord.game.world.enemy.hp)+' → '+pretty(row.game.world.enemy.hp)+amount+(searchRecord.game.world.steps.hp!==undefined?'；每关增加 '+pretty(searchRecord.game.world.steps.hp)+' → '+pretty(row.game.world.steps.hp):'');if(k.fields?.length===2)return '物理伤害 '+k.fields.map(f=>pretty(searchRecord.game.player[f])).join('–')+' → '+k.fields.map(f=>pretty(row.game.player[f])).join('–')+amount;return (k.id==='cost'?'原卡点同笔升级':k.label)+' '+pretty(k.current*(k.id.startsWith('resist_')?100:1))+' → '+pretty(p.value*(k.id.startsWith('resist_')?100:1))+(k.id.startsWith('resist_')?'%':'')+amount;}).join('；');}
 function tradeoffText(row){const out=[paceText(row.grade.before,row.grade.after)],rs=[...row.discovery,...row.validation],range=key=>{const a=rs.map(r=>num(r[key]));return pretty(Math.min(...a))+(Math.min(...a)!==Math.max(...a)?'–'+pretty(Math.max(...a)):'');};for(const p of row.path){const k=searchRecord.knobs.find(k=>k.id===p.id);if(k.id==='cost')out.push('金币换等级的门槛降低');else if(k.id==='income')out.push('本轮固定发币 '+range('passiveEarned'));else if(k.id==='reward')out.push('本轮首通发币 '+range('rewardsEarned'));else if(k.id==='hp'||k.id==='armor')out.push('生存压力降低');else if(k.fields)out.push(p.value>k.current?'基础输出提高':'每击输出降低');else if(k.id==='enemy_hp')out.push(p.value>k.current?'每关血量要求提高':'每关血量要求降低');else if(k.id==='frequency')out.push('每次出手 '+time(1/k.current)+' → '+time(1/p.value));else if(k.id==='visits')out.push('每天多打开'+(p.value-k.current)+'次，总在线分钟不变');else if(k.upgrade)out.push('同一次升级获得更多属性');else if(k.field)out.push('敌人抗性降低');}return out.join('；');}
 function renderSearch(){
+ conflictBox.hidden=true;
  const r=searchRecord;if(!r){by('cgSearchState').textContent=currentRuns().length?'按当前卡点计算改法。':'先运行整体检查。';by('cgSearchCards').textContent='';by('cgSearchAudit').textContent='';updateChrome();return;}
  const ids=r.recommendations||[],stale=dirty||!recordMatches()&&!previewState,status={complete:'搜索完成',cancelled:'搜索已停止',time_budget:'达到运行时限',run_budget:'达到试算次数上限',event_budget:'达到累计事件上限',conflict:'目标冲突',insufficient_observation:'观察期不足',baseline_error:'基准计算中断',already_meets:'当前方案符合目标，建议保持',no_fault:'当前已全部通过',error:'搜索中断'}[r.status]||'搜索进行中';
- by('cgSearchState').textContent=stale?'配置或目标已改，旧推荐已失效；需重新检查和搜索。':status+(ids.length?' · 找到'+ids.length+'个已核对方案':r.reason&&r.status!=='already_meets'?' · '+r.reason:'');if(!ids.includes(selectedChoice))selectedChoice=ids[0]||null;
+ by('cgSearchState').textContent=stale?'配置或目标已改，旧推荐已失效；需重新检查和搜索。':r.status==='conflict'?'目标冲突：回访空档超过了等待目标。':status+(ids.length?' · 找到'+ids.length+'个已核对方案':r.reason&&r.status!=='already_meets'?' · '+r.reason:'');if(!stale&&r.status==='conflict')showConflict(r);if(!ids.includes(selectedChoice))selectedChoice=ids[0]||null;
  by('cgSearchCards').innerHTML=ids.map((id,index)=>{const row=r.rows.find(x=>x.id===id),verdict=stale?'旧配置结果，需重新核对':row.grade.hasGoals&&!row.grade.allMet?'部分改善，仍未达标：'+goalText(r.game,row.grade):goalText(r.game,row.grade);return '<article class="cg-choice'+(id===selectedChoice?' cg-choice-selected':'')+'"><input type="radio" name="cgChoice" value="'+id+'" aria-label="选择方案'+(index+1)+'"'+(id===selectedChoice?' checked':'')+(stale?' disabled':'')+'><div><h3>方案'+(index+1)+' · '+escape(r.knobs.find(k=>k.id===row.path[0].id).label)+'</h3><p class="cg-verdict">'+escape(verdict)+'</p><p>'+escape(changeText(row))+'</p><p>主要收益：'+escape(benefitText(row.grade))+'</p><p class="cg-pace-change">节奏与代价：'+escape(tradeoffText(row))+'</p></div><button type="button" data-search-preview="'+id+'"'+(stale?' disabled':'')+'>预览</button></article>';}).join('');
  const summary='<p>搜索编号：'+r.seeds.discovery.join('、')+'；独立核对：'+r.seeds.validation.join('、')+'。</p><p>'+r.runs+'次试算，'+r.rows.length+'组修改，'+r.events+'个事件；'+Math.round((r.elapsedMs||0)/1000)+'秒。</p><p>生成规则 '+escape(r.version)+'；评价规则 '+escape(r.evaluationVersion||r.version)+'。等待不足1秒或原等待1%的变化，不单独作为明显收益。</p>';by('cgSearchAudit').innerHTML=summary+r.rows.map(row=>'<p>'+escape(row.id+'：'+(row.path||[]).map(p=>(r.knobs.find(k=>k.id===p.id)?.label||p.id)+'='+pretty(p.value)).join('；'))+' · '+escape(row.verified?'已核对':row.state==='invalid'?'配置无效':'独立核对未完成')+(row.errors.length?' · '+escape(row.errors.map(e=>e.message).join('；')):'')+(row.grade?' · '+escape((row.decision||'搜索样本')+'；'+benefitText(row.grade)+'；'+(row.verified?goalText(r.game,row.grade):'搜索样本：'+goalText(r.game,row.grade)+'，待独立核对')):'')+'</p>').join('');updateChrome();
 }
@@ -4126,7 +4216,7 @@ function optionsFromFormSafe(){try{return optionsFromForm();}catch{return null;}
 function validateSearch(r){return ConnectedSearch.validateRecord(r);}
 function validateSnapshot(s){if(!s)return;ConnectedCore.compile(s.game);if(s.baseGame)ConnectedCore.compile(s.baseGame);validateStoredRuns(s.baseRuns);validateStoredRuns(s.candidateRuns);if(!Array.isArray(s.history)||!Array.isArray(s.failures))throw Error('工作区回退记录不完整');}
 const loadCore=loadProject;loadProject=function(data){validateSearch(data.search);if(data.searchHistory&&!Array.isArray(data.searchHistory))throw Error('搜索历史格式不匹配');for(const r of data.searchHistory||[])validateSearch(r);validateSnapshot(data.applicationUndo);validateSnapshot(data.workspace?.preview?.original);loadCore(data);searchRecord=copy(data.search||null);searchHistory=copy(data.searchHistory||[]);selectedChoice=data.workspace?.selectedChoice||null;appliedName=typeof data.workspace?.appliedName==='string'?data.workspace.appliedName:'';appliedUndo=data.applicationUndo||null;previewState=data.workspace?.preview||null;pendingSearchOptions=data.searchOptions?copy(data.searchOptions):null;if(data.searchOptions){for(const[id,key]of [['cgSearchSeconds','seconds'],['cgSearchRuns','maxRuns'],['cgSearchEvents','maxEvents']])by(id).value=data.searchOptions[key];}if(data.workspace?.scrollPlaces)for(const[k,v]of Object.entries(data.workspace.scrollPlaces))if(['data','results','solutions','simulation','empty'].includes(k)&&Number.isFinite(v)&&v>=0)scrollPlaces[k]=v;by('cgSearchBounds').dataset.game='';by('cgSearchBounds').innerHTML='';prepareBounds();renderSearch();applySelection(data.workspace?.selection);if(data.workspace?.view==='solutions'&&searchRecord)show('solutions',{remember:false});else if(data.workspace?.view==='data'&&game){if(!formReady)drawForm(false);show('data',{remember:false});}updateChrome();};
-const loadEvaluated=loadProject;loadProject=function(data){loadEvaluated(data);if(previewState){if(!searchRecord?.recommendations.includes(previewState.id)){const original=previewState.original;previewState=null;restoreSnapshot(original);renderSearch();show('solutions',{remember:false});notice('旧预览未通过本轮筛选，已恢复修改前配置。');}else{previewState.number=searchRecord.recommendations.indexOf(previewState.id)+1;updateChrome();}}};
+const loadEvaluated=loadProject;loadProject=function(data){loadEvaluated(data);clearTransient({feedback:false});if(previewState){if(!searchRecord?.recommendations.includes(previewState.id)){const original=previewState.original;previewState=null;restoreSnapshot(original);renderSearch();show('solutions',{remember:false});notice('旧预览未通过本轮筛选，已恢复修改前配置。');}else{previewState.number=searchRecord.recommendations.indexOf(previewState.id)+1;updateChrome();}}};
 function database(){return new Promise((resolve,reject)=>{const req=indexedDB.open('idle-connected-workspace',1);req.onupgradeneeded=()=>req.result.createObjectStore('workspace');req.onerror=()=>reject(req.error);req.onsuccess=()=>resolve(req.result);});}
 by('cgSave').onclick=async()=>{if(dirty)return;try{const db=await database(),tx=db.transaction('workspace','readwrite');tx.objectStore('workspace').put(copy(project(true)),'current');await new Promise((resolve,reject)=>{tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});db.close();savedWorkspace=true;notice('工作区已保存到本机。');updateChrome();}catch(e){notice('本机保存失败，请导出完整结果：'+e.message,true);}};
 by('cgRestore').onclick=async()=>{try{const db=await database(),tx=db.transaction('workspace','readonly'),req=tx.objectStore('workspace').get('current'),data=await new Promise((resolve,reject)=>{req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});db.close();if(data)loadProject(data);else{const raw=localStorage.getItem(stateKey);if(!raw)throw Error('没有本机存档');loadProject(JSON.parse(raw));}savedWorkspace=true;filesDialog.close();updateChrome();notice('工作区已恢复。');}catch(e){notice(e.message,true);}};

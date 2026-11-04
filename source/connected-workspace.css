@@ -110,6 +110,16 @@ body.connected-active #connected>div#cgActionBar{position:fixed;bottom:0;left:18
 #connected .cg-dialog-body table{min-width:650px;font-size:14px}
 #connected .cg-dialog-body #cgBattleMoment table{min-width:680px}
 #connected #cgBattleMoment{background:var(--ground)}
+#connected #cgBattleTitle{font-size:20px;margin:0 0 16px;line-height:1.5}
+#connected .cg-battle-transport{display:flex;align-items:end;flex-wrap:wrap;gap:10px;margin:16px 0 22px}
+#connected .cg-battle-transport>label{flex:1;min-width:220px}
+#connected #cgBattleKeyFacts{border-top:1px solid var(--line);padding-top:16px;margin-bottom:22px}
+#connected #cgBattleKeyFacts h4{font-size:17px;margin:0 0 10px}
+#connected #cgBattleKeyFacts p{font-size:14px;margin:6px 0}
+#connected #cgOpeningStats,#connected #cgMomentDetails{border-top:1px solid var(--line);margin-block:14px}
+#connected #cgConflict{max-width:75ch;border-top:1px solid var(--line);padding-top:12px;margin-bottom:26px}
+#connected #cgConflict p{font-size:15px;margin:12px 0 18px}
+#connected #cgConflictEvidence{font-size:13px;color:var(--muted)}
 #connected .cg-file-dialog{width:min(620px,calc(100vw - 40px));max-height:calc(100dvh - 40px)}
 #connected .cg-file-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 24px}
 #connected .cg-file-actions button{width:100%;text-align:left}
@@ -184,6 +194,9 @@ body.connected-active #connected>div#cgActionBar{position:fixed;bottom:0;left:18
  #connected .cg-dialog-head{padding:12px 20px;min-height:64px;box-sizing:border-box}
  #connected .cg-dialog-head h2{font-size:22px}#connected .cg-dialog-head button{font-size:13px;padding:9px 12px}
  #connected .cg-dialog-body{padding:18px 20px max(18px,env(safe-area-inset-bottom))}
+ #connected .cg-battle-transport{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 8px}
+ #connected .cg-battle-transport button{padding:10px 5px;font-size:13px}
+ #connected .cg-battle-transport>label{grid-column:1/-1;min-width:0}
  #connected .cg-file-actions{grid-template-columns:1fr}
  #connected #cgTradeoff .cg-comparison-line{gap:10px;grid-template-columns:58px minmax(0,1fr)}
  #connected .cg-detail-links{display:grid;grid-template-columns:1fr 1fr;gap:8px}
