@@ -14,7 +14,7 @@ function clearTransient({draft=false,feedback=true}={}){
  if(draft)dirty=false;clearFieldErrors();by('cgError').hidden=true;by('cgError').textContent='';by('cgProgress').textContent='';
  if(feedback){by('cgNotice').textContent='';by('cgFileState').textContent='';lastFeedback='';}
 }
-function revealField(id){const input=by(id);if(!input)return;for(let p=input.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;input.scrollIntoView({block:'center',behavior:'instant'});input.focus({preventScroll:true});}
+function revealField(id){const input=by(id);if(!input)return;if(input.closest('.cg-longterm-fields')&&typeof setEntryMode==='function')setEntryMode('full');for(let p=input.parentElement;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;by('cgForm').querySelectorAll('.cg-field-target').forEach(e=>e.classList.remove('cg-field-target'));(input.closest('label')||input).classList.add('cg-field-target');input.scrollIntoView({block:'center',behavior:'instant'});input.focus({preventScroll:true});}
 function fieldLabel(input){return input.closest('label')?.childNodes[0]?.textContent.trim()||'这一项';}
 function invalidField(id,message,related=[]){const error=Error(message);error.fieldId=id;error.related=related;throw error;}
 function showFieldError(error){
@@ -30,10 +30,10 @@ function showFieldError(error){
  for(const fieldId of [id,...(error.related||[])]){const field=by(fieldId);if(!field)continue;field.setAttribute('aria-invalid','true');field.dataset.cgErrorOwner=id;field.setAttribute('aria-describedby',Array.from(new Set([...(field.getAttribute('aria-describedby')||'').split(/\s+/).filter(Boolean),hintId])).join(' '));}
  revealField(id);return true;
 }
-function validateFormFields(){
+function validateFormFields(scope='all'){
  const common={'cg-stageCount':[1,1000,true],'cg-rewardBase':[0,1e12],'cg-rewardStep':[0,1e9],'cg-initialCoins':[0,1e12],'cg-income':[0,1e6],'cg-session':[.1,120],'cg-cap':[0,72],'cg-timeout':[1,120],'cg-victoryDelay':[0,86400],'cg-retryDelay':[.1,86400],'cg-armorK':[1,10000],'cgRuleK':[1,10000],'cg-budget':[0,2160,false,true],'cg-maxEvents':[1,100000,true],'cg-maxBattles':[1,10000,true]},goalIds=['cgGoalMin','cgGoalMax','cgGoalGap','cgGoalVisit'];
  for(const input of by('cgForm').querySelectorAll('input')){
-  const id=input.id,isGoal=goalIds.includes(id);if(input.disabled||isGoal&&by('cgGoalMode').value!=='set')continue;
+  const id=input.id,isGoal=goalIds.includes(id);if(input.disabled||isGoal&&by('cgGoalMode').value!=='set'||scope==='combat'&&!/^cg-(player|enemy)-/.test(id)&&!['cg-timeout','cg-armorK','cgRuleK'].includes(id))continue;
   const actor=id.match(/^cg-(player|enemy)-(.+)$/),upgrade=id.match(/^cg-up-\d+-(increment|costBase|costStep|maxLevel|rank)$/),isStep=id.startsWith('cg-step-');let range=common[id];
   if(actor&&by('cgV2Editor')){const row=ConnectedCore.multi.FIELDS.find(f=>f[0]===actor[2])||(actor[2].endsWith('Reduction')?[actor[2],'',0,1]:null);if(row){const pct=ConnectedV2.percent.has(actor[2])||actor[2].endsWith('Reduction')&&!['critBonusReduction','blockReduction'].includes(actor[2]);range=[row[2]*(pct?100:1),row[3]*(pct?100:1)];}}
   if(actor?.[2]==='armor'&&by('cgRuleDefense')?.value==='ratio'&&by('cgRuleEnabled')?.checked)range=[0,100];
@@ -46,6 +46,7 @@ function validateFormFields(){
   if(integer&&!Number.isInteger(value))invalidField(id,label+'请填整数');
  }
  for(const side of ['player','enemy']){const a=by('cg-'+side+'-physicalMin'),b=by('cg-'+side+'-physicalMax');if(a&&b&&num(ConnectedCore.offset(a.value,b.value))>0)invalidField(b.id,'最大物理伤害不能小于最小物理伤害',[a.id]);}
+ if(scope==='combat')return;
  if(by('cgGoalMode').value==='set'&&by('cgGoalMin').value!==''&&by('cgGoalMax').value!==''&&num(ConnectedCore.offset(by('cgGoalMin').value,by('cgGoalMax').value))>0)invalidField('cgGoalMax','最晚完成时间不能早于最早完成时间',['cgGoalMin']);
  const hours=by('cg-hours').value.split(',').map(x=>x.trim());if(!hours.length||hours.length>24||hours.some(x=>x===''||!Number.isFinite(Number(x)))||Number(hours[0])!==0||hours.some((x,i)=>Number(x)<0||Number(x)>=24||i&&Number(x)<=Number(hours[i-1])))invalidField('cg-hours','上线时间请从0开始递增填写，例如0,5,12');
  if(hours.some((h,i)=>Number(by('cg-session').value)>((Number(hours[i+1]??24))-Number(h))*60))invalidField('cg-session','每次在线时长不能超过相邻两次回访的间隔',['cg-hours']);

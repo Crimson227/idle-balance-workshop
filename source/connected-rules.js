@@ -86,11 +86,12 @@ const ConnectedRules=(()=>{
   return details('高级自定义',body,'cgRuleAdvanced');
  }
 
- function snapshot(g,strict=false){
+ function snapshot(g,strict=false,scope='all'){
   if(!g.ruleLibrary||!g.ruleLibrary.enabled)return;const r=ensure(g);
   if(by('cgRuleArmorName'))r.labels.armor=by('cgRuleArmorName').value;
   if(by('cgRuleK')){g.rules.armorK=by('cgRuleK').value;if(by('cg-armorK'))by('cg-armorK').value=g.rules.armorK;}
   for(const e of document.querySelectorAll('#cgV2Editor [data-rule]')){
+   if(scope==='combat'&&/^(growth|behavior|lifecycle)\./.test(e.dataset.rule))continue;
    if(e.dataset.rule.startsWith('rounding.')&&!r.rounding&&by('cgRule-rounding-mode')?.value==='none')continue;
    if(e.dataset.rule==='behavior.awaitFirstPurchase'&&!e.checked&&r.behavior.awaitFirstPurchase===undefined)continue;
    let v=e.type==='checkbox'?e.checked:e.value;
@@ -147,6 +148,18 @@ const ConnectedRules=(()=>{
   if(target.dataset.ruleRemove){const[kind,id]=target.dataset.ruleRemove.split(':');if(kind==='states'&&deps(g,id).length){pending={kind,id,mode:'delete'};focusAfter=pathId(kind+'.'+r[kind].findIndex(x=>x.id===id)+'.enabled');return {render:true,dirty:false};}r[kind]=r[kind].filter(x=>x.id!==id);focusAfter='cgRuleTemplate';return true;}
   return false;
  }
+ function unitLabel(g,k){return k==='frequency'?'次/秒':k==='regen'?'点/秒':C.multi.legacy.PERCENT_FIELDS.has(k)||percent(g,k)||k.endsWith('Reduction')&&!['critBonusReduction','blockReduction'].includes(k)?'%':'点';}
+ function upgradePreview(g,u){
+  const s=R.config(g)?.growth.upgrades[u.id],required=[['等级上限',u.maxLevel],...u.fields.map(k=>[name(g,k,C.multi.FIELDS.find(f=>f[0]===k)?.[1]||k)+'初始值',g.player[k]])];
+  if(!s||['linear','expression'].includes(s.attribute.id))required.push(['每级增加数值',u.increment]);
+  if(s?.cost.id!=='piecewise')required.push(['第一次购买金币',u.costBase]);
+  if(!s||['linear','expression'].includes(s.cost.id))required.push(['以后每级加价',u.costStep]);
+  const missing=required.filter(([,v])=>empty(v));if(missing.length)throw Error('还缺：'+missing.map(([n])=>n).join('、'));
+  const max=R.integer(u.maxLevel,0,2000,'等级上限');
+  const attribute=n=>u.fields.map(k=>{const raw=R.upgraded(g,u,g.player[k],n,k).toString(),unit=unitLabel(g,k);return {field:k,label:name(g,k,C.multi.FIELDS.find(f=>f[0]===k)?.[1]||k),value:raw,display:(unit==='%'?pct(raw):fmt(raw))+unit};});
+  const initial=attribute(0),rows=[];for(let n=1;n<=Math.min(3,max);n++){const cost=R.cost(g,u,n-1).mul(q(g.economy.costScale)).toString();if(q(cost).cmp(q(0))<=0)throw Error('第'+n+'次升级费用须大于0');rows.push({level:n,cost,before:attribute(n-1),after:attribute(n)});}
+  return {initial,rows,maxLevel:max};
+ }
  function preview(g){
   const r=R.config(g)||R.initial(g);
   for(const kind of Object.keys(kinds))for(const x of r[kind]){const el=document.querySelector('[data-rule-summary="'+kind+':'+x.id+'"]');if(el)el.textContent=summary(g,kind,x);const title=document.querySelector('[data-rule-title="'+kind+':'+x.id+'"]');if(title)title.textContent=label(g,kind,x.id);}
@@ -154,7 +167,8 @@ const ConnectedRules=(()=>{
   for(const e of document.querySelectorAll('[data-rule-state-pair] option,[data-rule$=".state"] option'))if(e.value)e.textContent=label(g,'states',e.value)+(r.states.find(s=>s.id===e.value)?.enabled===false?'（已关闭）':'');
   if(by('cgRulePreview'))try{const a=g.player.physicalMin,d=g.world.enemy.armor;if(empty(a)||empty(d))throw Error('填写双方伤害和防御后可核对');const n=R.mitigate(q(a),{percentPen:q(g.player.percentPen||'0'),flatPen:q(g.player.flatPen||'0')},{armor:q(d)},{armorK:q(R.defense(g)==='armor_k'?g.rules.armorK:'1'),defenseId:R.defense(g)});by('cgRulePreview').textContent='物理'+fmt(a)+'点，经敌人防御后为'+fmt(n.toString())+'点（未计取整、抗性等其他机制）。';}catch(e){by('cgRulePreview').textContent=e.message;}
   if(by('cgRuleGrowthPreview'))try{by('cgRuleGrowthPreview').textContent='前3关基础奖励：'+[0,1,2].map(n=>fmt(R.reward(g,n).toString())).join('、')+'金币。';}catch{by('cgRuleGrowthPreview').textContent='填好奖励后，这里核对前3关。';}
-  for(const out of document.querySelectorAll('[data-upgrade-preview]'))try{const u=g.upgrades.find(x=>x.id===out.dataset.upgradePreview);out.textContent=String(u.maxLevel)==='0'?'等级上限为0，这一项不会购买。':'按当前公式：0级/1级属性 '+[0,1].map(n=>fmt(R.upgraded(g,u,g.player[u.fields[0]],n,u.fields[0]).toString())).join(' → ')+'；前3次价格 '+[0,1,2].map(n=>fmt(R.cost(g,u,n).toString())).join('、')+'金币。';}catch{out.textContent='填好属性和升级价格后，这里核对一次实际变化。';}
+  for(const out of document.querySelectorAll('[data-upgrade-preview]'))try{const u=g.upgrades.find(x=>x.id===out.dataset.upgradePreview),p=upgradePreview(g,u),attrs=a=>a.map(x=>esc(x.label+' '+x.display)).join('<br>');out.innerHTML='<p>初始状态（0级）：'+attrs(p.initial)+'</p>'+(p.rows.length?'<div class="cg-table-scroll" tabindex="0" aria-label="前三次升级预览"><table><thead><tr><th>升级</th><th>本次花费</th><th>升级前</th><th>升级后</th></tr></thead><tbody>'+p.rows.map(row=>'<tr><th>第'+row.level+'次</th><td>'+fmt(row.cost)+'金币</td><td>'+attrs(row.before)+'</td><td>'+attrs(row.after)+'</td></tr>').join('')+'</tbody></table></div>':'<p>等级上限为0，这一项不会购买。</p>')+'<small>只预览这一项连续升级；实际购买还按顺序、解锁条件和金币余额。'+(p.maxLevel<3?'当前上限'+p.maxLevel+'级。':'')+'</small>';}catch(e){out.textContent='升级预览待补齐。'+e.message;}
+
  }
  function afterRefresh(){if(!focusAfter)return;const id=focusAfter;focusAfter=null;const el=by(id);if(!el)return;for(let p=el;p;p=p.parentElement)if(p.tagName==='DETAILS')p.open=true;const focus=el.matches('input,select,textarea,button')?el:el.querySelector('input,select,textarea,button,summary');focus?.focus();focus?.scrollIntoView({block:'center',behavior:'instant'});}
  function prepare(g){
@@ -163,9 +177,9 @@ const ConnectedRules=(()=>{
   toggle('cg-armorK',!!by('cgRuleK'));toggle('cgRuleK',!g.mechanisms.armor||R.defense(g)!=='armor_k');toggle('cg-rewardBase',r?.growth.reward.id==='piecewise');toggle('cg-rewardStep',r&&!['linear','expression'].includes(r.growth.reward.id));
   if(g.ruleLibrary?.enabled===false)for(const e of document.querySelectorAll('#cgV2Editor [data-rule],#cgV2Editor [data-rule-list],#cgV2Editor [data-rule-state-pair],#cgV2Editor [data-rule-consume],#cgV2Editor [data-rule-remove],#cgRuleTemplate,#cgRuleAddTemplate,#cgRuleDefense,#cgRuleK,#cgRuleArmorName,#cgRuleLabelField,#cgRuleLabelName,#cgRuleRename,#cgRuleRemovePeriodic'))e.disabled=true;
  }
- function read(g){
-  snapshot(g,true);if(!R.config(g))return g;
-  for(const e of document.querySelectorAll('#cgV2Editor input[data-rule][inputmode=decimal]')){if(e.disabled)continue;const p=e.dataset.rule,v=get(g.ruleLibrary,p),title=e.closest('label').childNodes[0].textContent;
+ function read(g,scope='all'){
+  snapshot(g,true,scope);if(!R.config(g))return g;
+  for(const e of document.querySelectorAll('#cgV2Editor input[data-rule][inputmode=decimal]')){const p=e.dataset.rule;if(e.disabled||scope==='combat'&&/^(growth|behavior|lifecycle)\./.test(p))continue;const v=get(g.ruleLibrary,p),title=e.closest('label').childNodes[0].textContent;
    try{if(empty(v))throw Error('请填写'+title);try{q(v);}catch{throw Error(title+'请填写有效数值');}let lo=0,hi=1e9,isInt=false;
     if(p==='damage.segments'){lo=1;hi=20;isInt=true;}else if(p.endsWith('.guarantee')){hi=100;isInt=true;}else if(p.endsWith('.maxStacks')){lo=1;hi=20;isInt=true;}else if(p.endsWith('.every')){lo=1;hi=100;isInt=true;}else if(p.endsWith('.stage')){lo=1;hi=1000;isInt=true;}else if(p.endsWith('.level')){hi=2000;isInt=true;}else if(p.endsWith('.duration')||p.endsWith('.interval')){lo=.1;hi=120;}else if(p.endsWith('.cooldown'))hi=120;else if(e.dataset.percent)hi=1;else if(p.endsWith('.factor')||p==='damage.coefficient')hi=100;
     if(isInt)R.integer(v,lo,hi,title);else R.bounded(v,lo,hi,title);
@@ -197,5 +211,5 @@ const ConnectedRules=(()=>{
  function normalizeEconomy(g){const r=R.config(g);if(!r)return;for(const u of g.upgrades){const spec=r.growth.upgrades[u.id]?.cost;for(const segment of spec?.id==='piecewise'&&Array.isArray(spec.segments)?spec.segments:[])for(const k of ['base','step'])if(segment[k]!=null)segment[k]=C.scaled(segment[k],g.economy.costScale);}for(const segment of r.growth.reward.id==='piecewise'&&Array.isArray(r.growth.reward.segments)?r.growth.reward.segments:[])for(const k of ['base','step'])if(segment[k]!=null)segment[k]=C.scaled(segment[k],g.economy.rewardScale);}
  function example(base){const g=copy(base);g.name='规则组合 · 遗迹守卫';g.world.stageCount=12;g.player.hp='30';g.player.physicalMin=g.player.physicalMax='5';g.world.rewardBase='8';g.world.rewardStep='1';g.economy.costScale='1';g.economy.incomePerSecond='0.2';g.ruleLibrary=R.initial(g);const r=g.ruleLibrary;r.damage.segments=2;r.shield.player='10';r.critical.guarantee=2;r.dot={enabled:true,owner:'player',channel:'fire',amount:'2',interval:'1',duration:'6',critical:false,leech:false};r.states=[{id:'wet',effect:'marker',owner:'player',target:'target',applyAt:'hit',duration:'3',interval:'1',amount:'0',channel:'fire',maxStacks:1,refresh:'refresh'},{id:'heat',effect:'marker',owner:'player',target:'target',applyAt:'hit',duration:'3',interval:'1',amount:'0',channel:'fire',maxStacks:1,refresh:'refresh'}];r.reactions=[{id:'steam',states:['wet','heat'],consume:['wet','heat'],effect:'damage',channel:'fire',amount:'3',duration:'1'}];r.triggers=[{id:'last_stand',owner:'player',at:'before_attack',condition:'hp_below',threshold:'0.3',every:1,effect:'attack_multiplier',value:'1.5',duration:'2',cooldown:'2',once:false}];r.growth.upgrades.physical={attribute:{id:'geometric',factor:'1.05'},cost:{id:'geometric',factor:'1.15'},unlock:{stage:1,upgrade:'',level:0}};for(const u of g.upgrades)u.maxLevel=10;g.goals={minCompletionSeconds:null,maxCompletionSeconds:'7200',maxGapSeconds:'40',stagesPerVisit:null};return g;}
 
- return {html,attack,defense,critical,recovery,leech,upgrade,economy,behavior,advanced,snapshot,begin,change,action,preview,afterRefresh,read,name,percent,label,example,prepare,normalizeEconomy,locate,reset,addTemplate,stateSummary,reactionSummary,triggerSummary,eventInfo};
+ return {html,attack,defense,critical,recovery,leech,upgrade,economy,behavior,advanced,snapshot,begin,change,action,preview,afterRefresh,read,name,percent,label,unitLabel,upgradePreview,example,prepare,normalizeEconomy,locate,reset,addTemplate,stateSummary,reactionSummary,triggerSummary,eventInfo};
 })();

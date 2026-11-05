@@ -55,3 +55,21 @@
 @media(max-width:760px) {#connected .cg-top{gap:10px;padding-inline:16px}#connected .cg-top-title{min-width:0}#connected #cgProjects{font-size:12px;padding:8px;min-width:44px}#connected #cgFiles{font-size:12px;padding:8px}#connected .cg-wordmark{font-size:18px;min-width:72px}#connected .cg-top h1{font-size:12px}#connected .cg-top p{font-size:10px}#connected .cg-entry-lead>.actions{align-items:stretch}#connected .cg-entry-lead>.actions>button{min-width:0;width:100%}#connected .cg-project-row{gap:12px;align-items:flex-start}#connected .cg-project-row>div{min-width:0}#connected .cg-project-row button{font-size:13px;white-space:nowrap;padding-inline:10px}#connected .cg-data-completion{gap:12px}#connected .cg-data-completion button{font-size:13px;gap:8px}#connected .cg-data-completion strong{font-size:11px}#connected .cg-section-heading{align-items:start;flex-direction:column;gap:14px}#connected .cg-section-heading h3{font-size:24px}#connected .cg-damage-chain{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}#connected .cg-battle-sample{margin-block:24px}#connected #cgRecentProjects{margin-top:36px}#connected #cgSampleOutput .actions{display:flex;flex-wrap:wrap;gap:10px}}
 @media(prefers-reduced-motion:reduce) {#connected button {transition:none}}
 @media(max-width:760px) {#connected #cgIntakeActions{width:100%;flex-wrap:nowrap}#connected #cgIntakeActions>button{flex:1 1 0;min-width:0;width:auto}}
+
+#cgEntryMode{margin:16px 0 22px;padding:14px 0;border-block:1px solid var(--line,#d2ccc0)}
+#cgEntryMode p{margin-top:0;max-width:64ch}
+#cgEntryMode button[aria-pressed=true]{color:#fffdf8;background:#20211f;border-color:#20211f}
+#cgData.cg-single-mode .cg-longterm-fields{display:none!important}
+#cgSingleSettings{margin-block:18px}
+.cg-single-result{margin-block:18px;border-left:3px solid #b43632;padding:4px 18px}
+.cg-single-result h4{font-size:1.4rem;margin:0 0 8px}
+.cg-single-scope{font-size:.9rem;color:#62615b;max-width:68ch}
+#cgFieldFix,#cgPendingIntake,#cgIntakeIssues{margin-block:14px;padding:12px 16px;background:#f5f2eb;border-left:3px solid #b43632;overflow-wrap:anywhere}
+#cgFieldFix p{margin-top:0}
+#cgIntakeIssues button{margin-block:6px}
+.cg-field-target{outline:2px solid #b43632;outline-offset:4px}
+[data-upgrade-preview]{display:block;margin-top:14px;max-width:100%;overflow-wrap:anywhere}
+[data-upgrade-preview] table{width:100%;min-width:440px}
+[data-upgrade-preview] small{display:block;margin-top:10px}
+.cg-intake-table input{width:100%;min-width:90px}
+@media(max-width:760px){#cgEntryMode .actions{display:grid;grid-template-columns:1fr}#cgEntryMode button{width:100%}.cg-single-result{padding-left:12px}#cgFieldFix,#cgPendingIntake,#cgIntakeIssues{padding:10px 12px}#cgIntakeActions{flex-wrap:wrap}}
