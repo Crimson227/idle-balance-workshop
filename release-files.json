@@ -2,8 +2,8 @@
   "files": [
     {
       "file": "数值工坊.html",
-      "bytes": 1447210,
-      "sha256": "34fddfce7b9b046408e5accb5b01280e1fbbdca677cf550260a25122e1038eea"
+      "bytes": 1512038,
+      "sha256": "64807f6e860c9f4e6fffe282a6f21cb3abb3a28fca41f8e1a6f03de304a41388"
     },
     {
       "file": "02_配置模板.html",
@@ -17,13 +17,23 @@
     },
     {
       "file": "06_成长模拟与卡点诊断.html",
-      "bytes": 1447210,
-      "sha256": "34fddfce7b9b046408e5accb5b01280e1fbbdca677cf550260a25122e1038eea"
+      "bytes": 1512038,
+      "sha256": "64807f6e860c9f4e6fffe282a6f21cb3abb3a28fca41f8e1a6f03de304a41388"
+    },
+    {
+      "file": "支持资料/表格导入/LICENSE.txt",
+      "bytes": 11355,
+      "sha256": "4d2a38ac35cda06a555c84074a819d413339cd3691b822cae50f8f322fe01f64"
     },
     {
       "file": "09_补充验证与未达标说明.html",
       "bytes": 20278,
       "sha256": "73d90319a66108d2eedccab6e4d163bc139193f817baaefb6ec6ea00e2a2dac0"
+    },
+    {
+      "file": "支持资料/表格导入/xlsx.full.min.js",
+      "bytes": 951904,
+      "sha256": "cc015130aa8521e7f088f88898eba949ccdcbfb38df0bd129b44b7273c3a6f41"
     },
     {
       "file": "08_回访与购买策略研究证据.html",
@@ -196,6 +206,6 @@
       "sha256": "d57dba77bdc89ff59504f05703bb3e8a6719463547126d8f3e2c39b10a7a59e9"
     }
   ],
-  "totalBytes": 147086309,
+  "totalBytes": 148179224,
   "browserValidation": "pending"
 }

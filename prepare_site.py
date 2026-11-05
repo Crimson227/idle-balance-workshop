@@ -13,7 +13,7 @@ class Links(HTMLParser):
         for key in ['href','src']:
             if key in a:self.links.append(a[key])
 
-queue=['数值工坊.html','02_配置模板.html','04_多属性战斗诊断.html','06_成长模拟与卡点诊断.html']
+queue=['数值工坊.html','02_配置模板.html','04_多属性战斗诊断.html','06_成长模拟与卡点诊断.html','支持资料/表格导入/LICENSE.txt']
 seen=set();records=[]
 while queue:
     rel=Path(queue.pop(0))
@@ -44,8 +44,9 @@ for file in ['connected-html.html','connected-app.js','connected.css','connected
 shutil.copytree(source/'支持资料/一体化成长',site/'source/connected-core',dirs_exist_ok=True)
 for file in ['connected-lookup.js','attribute-catalog.json']:
     shutil.copyfile(source/'_构建'/file,site/'source'/file)
-for file in ['connected-workspace.js','connected-workspace.css','editorial-fonts.css','connected-rules.js','connected-preflight.js']:
+for file in ['connected-workspace.js','connected-workspace.css','editorial-fonts.css','connected-rules.js','connected-preflight.js','connected-projects.js','connected-projects.css','connected-intake.js','connected-intake-ui.js','connected-sample.js']:
     shutil.copyfile(source/'_构建'/file,site/'source'/file)
+shutil.copytree(source/'支持资料/表格导入',site/'source/表格导入',dirs_exist_ok=True)
 shutil.copytree(source/'_构建/字体许可',site/'source/字体许可',dirs_exist_ok=True)
 (site/'release-files.json').write_text(json.dumps({'files':records,'totalBytes':sum(x['bytes']for x in records),'browserValidation':'pending'},ensure_ascii=False,indent=2),encoding='utf8')
 print(json.dumps({'files':len(records)+1,'totalMB':round(sum(x['bytes']for x in records)/1024**2,2),'largest':sorted(records,key=lambda x:x['bytes'],reverse=True)[:3]},ensure_ascii=False))

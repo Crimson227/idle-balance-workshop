@@ -1,0 +1,57 @@
+#connected .cg-top {gap:24px}
+#connected .cg-top>button {flex-shrink:0}
+#connected .cg-top-title {min-width:100px}
+#connected .cg-entry-lead>.actions {display:flex;flex-direction:column;align-items:flex-start;gap:12px}
+#connected .cg-entry-lead>.actions>button {min-width:240px;text-align:left}
+#connected .cg-entry-index>#cgExample {display:block;width:100%;text-align:left;margin-bottom:24px}
+#connected .cg-entry-index>.editorial-preview {display:block;max-width:360px;width:100%;margin:0 0 28px}
+#connected .cg-entry-index>.editorial-preview svg {height:210px}
+#connected .cg-entry-index>.editorial-preview figcaption {font-size:12px;line-height:1.7;margin-top:12px}
+#connected #cgRecentProjects {margin-top:52px;border-top:2px solid var(--ink);padding-top:20px}
+#connected #cgRecentProjects>h3 {font-family:'Workshop Serif','SimSun',serif;font-size:28px;margin:0 0 12px}
+#connected #cgRecentProjects>p {color:var(--muted);font-size:14px}
+#connected .cg-project-row {display:flex;align-items:center;justify-content:space-between;gap:24px;border-top:1px solid var(--line);padding:22px 0}
+#connected .cg-project-row h4 {margin:0 0 8px;font-size:19px;overflow-wrap:anywhere}
+#connected .cg-project-row p {font-size:13px;margin:0;color:var(--muted)}
+#connected .cg-data-completion {display:flex;gap:28px;border-block:1px solid var(--ink);margin:0 0 28px}
+#connected .cg-data-completion button {display:flex;justify-content:space-between;gap:18px;text-align:left;flex:1;border:0;background:transparent;padding:16px 0;font-size:14px}
+#connected .cg-data-completion strong {color:var(--accent);font-size:12px;align-self:center;font-weight:500}
+#connected .cg-battle-sample {border-block:1px solid var(--ink);padding:22px 0 24px;margin:24px 0 32px}
+#connected .cg-schedule-notice {border-block:1px solid var(--accent);padding:22px 0;margin:24px 0}
+#connected .cg-schedule-notice h3 {font-size:21px;margin-top:0}
+#connected .cg-schedule-notice .actions {display:flex;flex-wrap:wrap;gap:12px}
+#connected .cg-section-heading {display:flex;justify-content:space-between;align-items:center;gap:20px}
+#connected .cg-section-heading h3 {font:700 25px/1.5 'Workshop Serif','SimSun',serif;margin:0}
+#connected #cgSample p {font-size:14px}
+#connected #cgSampleOutput:empty {display:none}
+#connected .cg-damage-chain {display:flex;list-style:none;padding:18px 0;margin:18px 0;border-block:1px solid var(--line);gap:24px}
+#connected .cg-damage-chain li {flex:1;min-width:0}
+#connected .cg-damage-chain span {display:block;font-size:12px;color:var(--muted);margin-bottom:10px}
+#connected .cg-damage-chain strong {font-size:25px;line-height:1.2;font-weight:600;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#connected .cg-damage-chain li:last-child strong {color:var(--accent)}
+#connected .cg-sample-stale #cgSampleOutput {color:var(--muted)}
+#connected .cg-table-scroll {overflow:auto;max-width:100%;overscroll-behavior-inline:contain}
+#connected .cg-intake-table {width:100%;min-width:850px}
+#connected .cg-intake-table th:nth-child(2) {width:35%}
+#connected .cg-intake-table th:nth-child(3) {width:22%}
+#connected .cg-intake-table td {vertical-align:top}
+#connected .cg-intake-table td p {margin:8px 0}
+#connected .cg-intake-table td small {font-size:12px;color:var(--muted)}
+#connected .cg-intake-table select {width:100%;max-width:100%;font-size:13px}
+#connected .cg-intake-table label {position:relative;display:block;min-width:0}
+#connected .cg-intake-error {color:var(--red)}
+#connected #cgTableIntake .actions {display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+#connected #cgTableState {font-size:17px}
+#connected #cgTableControls {margin:24px 0}
+#connected #cgTableMeaning {font-size:14px;color:var(--muted)}
+#connected .cg-intake-pager {display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:24px 0}
+#connected .cg-intake-pager span {margin-right:auto;font-size:13px;color:var(--muted)}
+#connected #cgIntakeActions {display:flex;gap:12px;margin:0;flex-wrap:wrap}
+#connected .cg-sr-only {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+#connected :is(button,summary,select,input[type=checkbox],input[type=radio],a[href]) {cursor:pointer}
+#connected :is(button,select,input):disabled {cursor:not-allowed}
+#connected :is(button,summary):active {text-decoration:underline;text-underline-offset:4px}
+@media(max-width:1100px) {#connected .cg-data-completion{gap:16px}#connected .cg-data-completion button{flex-direction:column;gap:4px}#connected .cg-data-completion strong{align-self:start}#connected .cg-damage-chain{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 18px}}
+@media(max-width:760px) {#connected .cg-top{gap:10px;padding-inline:16px}#connected .cg-top-title{min-width:0}#connected #cgProjects{font-size:12px;padding:8px;min-width:44px}#connected #cgFiles{font-size:12px;padding:8px}#connected .cg-wordmark{font-size:18px;min-width:72px}#connected .cg-top h1{font-size:12px}#connected .cg-top p{font-size:10px}#connected .cg-entry-lead>.actions{align-items:stretch}#connected .cg-entry-lead>.actions>button{min-width:0;width:100%}#connected .cg-project-row{gap:12px;align-items:flex-start}#connected .cg-project-row>div{min-width:0}#connected .cg-project-row button{font-size:13px;white-space:nowrap;padding-inline:10px}#connected .cg-data-completion{gap:12px}#connected .cg-data-completion button{font-size:13px;gap:8px}#connected .cg-data-completion strong{font-size:11px}#connected .cg-section-heading{align-items:start;flex-direction:column;gap:14px}#connected .cg-section-heading h3{font-size:24px}#connected .cg-damage-chain{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}#connected .cg-battle-sample{margin-block:24px}#connected #cgRecentProjects{margin-top:36px}#connected #cgSampleOutput .actions{display:flex;flex-wrap:wrap;gap:10px}}
+@media(prefers-reduced-motion:reduce) {#connected button {transition:none}}
+@media(max-width:760px) {#connected #cgIntakeActions{width:100%;flex-wrap:nowrap}#connected #cgIntakeActions>button{flex:1 1 0;min-width:0;width:auto}}
