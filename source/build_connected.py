@@ -2,7 +2,7 @@ from pathlib import Path
 import json,hashlib,subprocess
 root=Path(__file__).resolve().parent.parent
 build=root/'_构建';core=root/'支持资料/一体化成长'
-names=['战斗引擎.cjs','原成长核心.cjs','一体化核心.cjs','示例.cjs','多属性战斗.cjs','旧多属性规则.cjs','方案搜索.cjs','规则库.cjs','规则战斗.cjs','规则模块示例.cjs','收入节拍.cjs','规则检查.cjs']
+names=['战斗引擎.cjs','原成长核心.cjs','一体化核心.cjs','示例.cjs','多属性战斗.cjs','旧多属性规则.cjs','方案搜索.cjs','规则库.cjs','规则战斗.cjs','规则模块示例.cjs','收入节拍.cjs','规则检查.cjs','推进归因.cjs']
 entries=[]
 for name in names:
     source=(core/name).read_text(encoding='utf8')

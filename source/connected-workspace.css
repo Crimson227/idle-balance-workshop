@@ -262,3 +262,11 @@ body.connected-active #connected>div#cgActionBar{position:fixed;bottom:0;left:18
 #connected #cgAppliedState{padding-block:0 20px;margin-bottom:24px;border-bottom:1px solid var(--line);max-width:75ch;line-height:1.7}
 #connected #cgAppliedState p{margin:8px 0;font-size:15px}
 @media(max-width:700px){#connected #cgV2Editor .cg-upgrade-columns{grid-template-columns:minmax(0,1fr);gap:24px}#connected #cgV2Editor .cg-upgrade-heading{grid-template-columns:minmax(0,1fr) auto;gap:12px}#connected #cgV2Editor .cg-upgrade-order{grid-column:1/-1;justify-content:start}}
+#connected .cg-gap-summary{max-width:75ch;margin:12px 0 24px;padding:16px 0;border-block:1px solid var(--line)}
+#connected .cg-gap-summary p{font-size:15px;line-height:1.75;margin:0 0 10px}
+#connected .cg-gap-summary p:first-child span{font-size:13px;color:var(--muted);margin-left:8px}
+#connected .cg-gap-events{margin:12px 0}
+#connected .cg-gap-events summary{cursor:pointer}
+#connected .cg-gap-events .cg-table-scroll{max-width:100%;overflow:auto}
+#connected .cg-gap-events table{min-width:540px;font-size:13px}
+#connected #cgGapDefinition{font-size:13px;line-height:1.65;color:var(--muted)}
