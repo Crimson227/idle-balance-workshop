@@ -99,6 +99,7 @@
 .cg-gap-affects,.cg-template-choices{display:flex;gap:12px 24px;flex-wrap:wrap;margin:14px 0}
 .cg-check-table td,.cg-check-table th{overflow-wrap:anywhere;max-width:260px;vertical-align:top}
 .cg-check-table button{white-space:nowrap}
+.cg-real-error-state{color:#b43632;font-weight:600}
 #cgCalibration textarea,#cgSearchTemplates textarea{width:100%;max-width:100%;box-sizing:border-box}
 #cgSearchDepth{border-top:1px solid var(--line,#d8d6ce);margin-top:18px;padding-top:18px}
 #cgSearchCount{font-weight:600}

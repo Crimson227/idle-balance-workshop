@@ -2,22 +2,32 @@
 const C=require('./一体化核心.cjs'),R=C.rules,q=R.q,copy=structuredClone;
 const VERSION='connected-validation-1.0.0';
 const metrics={hit:['单次伤害','cg-player-physicalMin'],outcome:['整场胜负','cgRule-damage-id'],seconds:['战斗耗时（秒）','cg-timeout'],playerHp:['角色剩余生命','cg-player-hp'],enemyHp:['敌人剩余生命','cg-enemy-hp'],before:['升级前属性','cgUpgradeRules'],after:['升级后属性','cgUpgradeRules'],cost:['本次实际费用','cg-costScale']};
-function decimal(value,label,nonnegative=true){if(typeof value!=='string'||value.length>160||!value.trim())throw Error(label+'请填写有效精确值');const n=q(value);if(nonnegative&&n.cmp(q(0))<0)throw Error(label+'不能为负值');return n;}
-function calibrate(input){
- const x=copy(input),expected=x.expected||{},tolerances=x.tolerances||{},rows=[],errors={};let battle;
- for(const key of Object.keys(expected))if(!Object.hasOwn(metrics,key))throw Error('不支持的核对项目');
+function inputError(message,fieldId){const error=Error(message);if(fieldId)error.fieldId=fieldId;return error;}
+function decimal(value,label,nonnegative=true,fieldId){let n;try{if(typeof value!=='string'||value.length>160||!value.trim())throw Error();n=q(value);}catch{throw inputError(label+'请填写有效精确值',fieldId);}if(nonnegative&&n.cmp(q(0))<0)throw inputError(label+'不能为负值',fieldId);return n;}
+function calibrationFields(x){
+ if(!x||typeof x!=='object'||Array.isArray(x))throw inputError('请提供有效的核对输入');
+ if(x.expected!=null&&(typeof x.expected!=='object'||Array.isArray(x.expected)))throw inputError('期望值须按核对项目填写');
+ if(x.tolerances!=null&&(typeof x.tolerances!=='object'||Array.isArray(x.tolerances)))throw inputError('容差须按核对项目填写');
+ const expected=x.expected||{},tolerances=x.tolerances||{},wanted={},tolerance={};
+ for(const key of Object.keys(expected))if(!Object.hasOwn(metrics,key))throw inputError('不支持的核对项目：'+key);
  const selected=Object.keys(metrics).filter(k=>expected[k]!==undefined&&String(expected[k]).trim()!=='');
- if(x.hit?.side&&!['player','enemy'].includes(x.hit.side))throw Error('请选择角色或敌人的直接伤害');
- if(selected.some(k=>['hit','outcome','seconds','playerHp','enemyHp'].includes(k))){try{if(!x.battleInput)throw Error(x.battleInputError||'还缺双方战斗数据');const gaps=C.scope.issues(x.battleInput.game).filter(i=>i.affects.includes('combat'));if(gaps.length)throw Error('当前战斗核对还缺规则：'+C.scope.message(gaps));battle=C.multi.run(x.battleInput).exact;}catch(e){errors.battle=e.message;}}
+ for(const key of selected){const label=metrics[key][0];if(key==='outcome'){wanted[key]=String(expected[key]);if(!['win','death','draw','timeout'].includes(wanted[key]))throw inputError('胜负请选通过、死亡、同归于尽或超时','cgRealOutcome');tolerance[key]=null;}else{wanted[key]=decimal(String(expected[key]),label,true,'cgReal-'+key).toString();tolerance[key]=decimal(String(tolerances[key]??'0'),label+'绝对容差',true,'cgRealTol-'+key).toString();}}
+ const integer=(value,lo,hi,label,id)=>{try{return R.integer(value,lo,hi,label);}catch(e){throw inputError(e.message,id);}};
+ const hit={side:x.hit?.side||'player',basis:x.hit?.basis||'actualHpLost',ordinal:1};
+ if(selected.includes('hit')){if(!['player','enemy'].includes(hit.side))throw inputError('请选择角色或敌人的直接伤害','cgRealSide');if(!['actualHpLost','attempted'].includes(hit.basis))throw inputError('请选择有效的伤害口径','cgRealBasis');hit.ordinal=integer(x.hit?.ordinal??1,1,1000,'第几次直接伤害','cgRealOrdinal');}
  let upgrade,level,field;
- if(selected.some(k=>['before','after','cost'].includes(k))){try{upgrade=x.growthGame?.upgrades?.find(u=>u.id===x.upgrade?.id);if(!upgrade)throw Error('请选择要核对的升级');const gaps=C.scope.issues(x.growthGame).filter(i=>i.affects.includes('growth'));if(gaps.length)throw Error('当前升级核对还缺规则：'+C.scope.message(gaps));level=R.integer(x.upgrade.level,0,1999,'升级前等级');field=x.upgrade.field;if(!upgrade.fields.includes(field))throw Error('所选属性不在这项升级中');if(upgrade.maxLevel!==null&&upgrade.maxLevel!==undefined&&level>=upgrade.maxLevel)throw Error('已经达到这项升级的等级上限');}catch(e){errors.upgrade=e.message;}}
- for(const key of selected){const [label,fieldId]=metrics[key];let computed=null,issue=null,difference=null,pass=null,tolerance=key==='outcome'?null:decimal(String(tolerances[key]??'0'),label+'绝对容差').toString();
-  const wanted=key==='outcome'?String(expected[key]):decimal(String(expected[key]),label).toString();
-  if(key==='outcome'&&!['win','death','draw','timeout'].includes(wanted))throw Error('胜负请选通过、死亡、同归于尽或超时');
+ if(selected.some(k=>['before','after','cost'].includes(k))){upgrade=x.growthGame?.upgrades?.find(u=>u.id===x.upgrade?.id);if(!upgrade)throw inputError('请选择要核对的升级','cgRealUpgrade');level=integer(x.upgrade.level,0,1999,'升级前等级','cgRealLevel');field=x.upgrade.field;if(selected.some(k=>['before','after'].includes(k))&&!upgrade.fields.includes(field))throw inputError('所选属性不在这项升级中','cgRealField');if(upgrade.maxLevel!==null&&upgrade.maxLevel!==undefined&&level>=upgrade.maxLevel)throw inputError('升级前等级已经达到这项升级的上限','cgRealLevel');}
+ return {selected,wanted,tolerance,hit,upgrade,level,field};
+}
+function calibrate(input){
+ const x=copy(input),fields=calibrationFields(x),{selected,hit,upgrade,level,field}=fields,rows=[],errors={};let battle;
+ if(selected.some(k=>['hit','outcome','seconds','playerHp','enemyHp'].includes(k))){try{if(!x.battleInput)throw Error(x.battleInputError||'还缺双方战斗数据');const gaps=C.scope.issues(x.battleInput.game).filter(i=>i.affects.includes('combat'));if(gaps.length)throw Error('当前战斗核对还缺规则：'+C.scope.message(gaps));battle=C.multi.run(x.battleInput).exact;}catch(e){errors.battle=e.message;}}
+ if(upgrade){const gaps=C.scope.issues(x.growthGame).filter(i=>i.affects.includes('growth'));if(gaps.length)errors.upgrade='当前升级核对还缺规则：'+C.scope.message(gaps);}
+ for(const key of selected){const [label,fieldId]=metrics[key],tolerance=fields.tolerance[key],wanted=fields.wanted[key];let computed=null,issue=null,difference=null,pass=null;
   try{
    if(['hit','outcome','seconds','playerHp','enemyHp'].includes(key)){
     if(errors.battle)throw Error(errors.battle);
-    if(key==='hit'){const side=x.hit?.side==='enemy'?1:0,ordinal=R.integer(x.hit?.ordinal??1,1,1000,'第几次直接伤害'),hits=battle.steps.flatMap(s=>s.attacks.filter(a=>a.side===side));if(!hits[ordinal-1])throw Error('本场没有所选的第'+ordinal+'次直接伤害');if(!['actualHpLost','attempted'].includes(x.hit?.basis||'actualHpLost'))throw Error('伤害口径无效');computed=hits[ordinal-1][x.hit?.basis||'actualHpLost'];}
+    if(key==='hit'){const side=hit.side==='enemy'?1:0,hits=battle.steps.flatMap(s=>s.attacks.filter(a=>a.side===side));if(!hits[hit.ordinal-1])throw Error('本场没有所选的第'+hit.ordinal+'次直接伤害');computed=hits[hit.ordinal-1][hit.basis];}
     else computed=battle.battle[key==='seconds'?'time':key];
    }else{
     if(errors.upgrade)throw Error(errors.upgrade);
@@ -54,4 +64,4 @@ function validateBatch(record){if(!record)return null;if(record.format!=='idle-s
  for(const[i,row]of record.results.entries()){if(row.seed!==record.seeds[i])throw Error('验证结果的编号顺序不一致');for(const side of ['before','after']){const x=row[side];if(!x)continue;if(Number(!!x.result)+Number(!!x.error)+Number(!!x.interrupted)!==1)throw Error('验证计算状态不明确');if(x.result){const r=x.result;if(r.seed!==row.seed||!['completed','policy_blocked','funding_blocked','structural_block','budget_exhausted'].includes(r.status)||!Number.isInteger(r.highest)||r.highest<0||r.highest>record[side].world.stageCount||!r.checks?.ledger||!r.checks?.time||typeof r.goalsMet!=='boolean')throw Error('验证摘要数据不完整');if(r.status==='completed'&&r.completionSeconds===null||r.status!=='completed'&&r.completionSeconds!==null)throw Error('通关与耗时口径不匹配');for(const k of ['longestGap','spent'])decimal(r[k],k);if(r.completionSeconds!==null)decimal(r.completionSeconds,'通关用时');if(!r.battles||Object.entries(r.battles).some(([k,v])=>!['win','death','draw','timeout','interrupted_budget'].includes(k)||!Number.isInteger(v)||v<0))throw Error('验证战斗次数格式不匹配');}}}
  if(record.active||record.status==='running')finish(record,'interrupted_import');else record.summary=stats(record);return record;
 }
-module.exports={VERSION,calibrate,validateCalibration,seedsFor,compact,distribution,stats,finish,reduce,batch,validateBatch};
+module.exports={VERSION,calibrationFields,calibrate,validateCalibration,seedsFor,compact,distribution,stats,finish,reduce,batch,validateBatch};
