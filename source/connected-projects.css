@@ -87,3 +87,23 @@
 #connected #cgProjectName{margin-top:20px}
 @media(max-width:1000px){#connected .cg-actors-entry{gap:20px}#connected #cgFieldGroups .cg-actors-entry .fields{grid-template-columns:1fr}}
 @media(max-width:760px){#connected .cg-actors-entry{grid-template-columns:1fr;gap:22px}#connected #cgFieldGroups .cg-actors-entry .fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}#connected #cgFieldGroups .cg-actors-entry>details>summary{font-size:22px}#connected #cgData.cg-single-mode>h2{font-size:25px}#connected #cgData.cg-single-mode #cgEntryMode button{flex:1 1 auto;font-size:12px;padding-inline:8px}}
+/* 核对结果沿用数据表与红色批注，避免增加一套视觉层级。 */
+.cg-optional-check,.cg-rule-evidence{margin:20px 0;border-top:1px solid var(--line,#d8d6ce);padding-top:14px}
+.cg-optional-check>summary{font-weight:650;cursor:pointer}
+.cg-rule-evidence>p{font-weight:600}
+.cg-optional-check fieldset{margin:18px 0;padding:16px;border:1px solid var(--line,#d8d6ce);min-width:0}
+.cg-optional-check legend{padding:0 8px;font-weight:650}
+.cg-real-metric{display:grid;grid-template-columns:minmax(0,2fr) minmax(100px,1fr);gap:16px;max-width:680px}
+.cg-real-confirm,.cg-gap-affects label,.cg-template-choices label{display:flex;align-items:center;gap:8px}
+.cg-real-confirm input,.cg-gap-affects input,.cg-template-choices input{width:auto;flex:none}
+.cg-gap-affects,.cg-template-choices{display:flex;gap:12px 24px;flex-wrap:wrap;margin:14px 0}
+.cg-check-table td,.cg-check-table th{overflow-wrap:anywhere;max-width:260px;vertical-align:top}
+.cg-check-table button{white-space:nowrap}
+#cgCalibration textarea,#cgSearchTemplates textarea{width:100%;max-width:100%;box-sizing:border-box}
+#cgSearchDepth{border-top:1px solid var(--line,#d8d6ce);margin-top:18px;padding-top:18px}
+#cgSearchCount{font-weight:600}
+.cg-search-variant{padding:12px 0;border-top:1px solid var(--line,#d8d6ce)}
+.cg-choice>[data-stability]{grid-column:2/-1;justify-self:start;white-space:nowrap}
+#cgStability{border-top:2px solid currentColor;margin-top:32px;padding-top:20px}
+#cgStabilityProgress{width:100%}
+@media(max-width:600px){.cg-real-metric{grid-template-columns:minmax(0,1fr) 110px;gap:10px}.cg-optional-check fieldset{padding:10px}.cg-choice>[data-stability]{grid-column:2/-1;justify-self:start}.cg-check-table{min-width:600px}}

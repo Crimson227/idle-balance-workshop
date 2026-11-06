@@ -44,7 +44,7 @@ for file in ['connected-html.html','connected-app.js','connected.css','connected
 shutil.copytree(source/'支持资料/一体化成长',site/'source/connected-core',dirs_exist_ok=True)
 for file in ['connected-lookup.js','attribute-catalog.json']:
     shutil.copyfile(source/'_构建'/file,site/'source'/file)
-for file in ['connected-workspace.js','connected-workspace.css','editorial-fonts.css','connected-rules.js','connected-preflight.js','connected-projects.js','connected-projects.css','connected-intake.js','connected-intake-ui.js','connected-sample.js']:
+for file in ['connected-workspace.js','connected-workspace.css','editorial-fonts.css','connected-rules.js','connected-preflight.js','connected-projects.js','connected-projects.css','connected-intake.js','connected-intake-ui.js','connected-sample.js','connected-verification.js']:
     shutil.copyfile(source/'_构建'/file,site/'source'/file)
 shutil.copytree(source/'支持资料/表格导入',site/'source/表格导入',dirs_exist_ok=True)
 shutil.copytree(source/'_构建/字体许可',site/'source/字体许可',dirs_exist_ok=True)
