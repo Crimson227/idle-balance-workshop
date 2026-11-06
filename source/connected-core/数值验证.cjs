@@ -8,7 +8,7 @@ function calibrate(input){
  for(const key of Object.keys(expected))if(!Object.hasOwn(metrics,key))throw Error('不支持的核对项目');
  const selected=Object.keys(metrics).filter(k=>expected[k]!==undefined&&String(expected[k]).trim()!=='');
  if(x.hit?.side&&!['player','enemy'].includes(x.hit.side))throw Error('请选择角色或敌人的直接伤害');
- if(selected.some(k=>['hit','outcome','seconds','playerHp','enemyHp'].includes(k))){try{if(!x.battleInput)throw Error(x.battleInputError||'还缺双方战斗数据');battle=C.multi.run(x.battleInput).exact;}catch(e){errors.battle=e.message;}}
+ if(selected.some(k=>['hit','outcome','seconds','playerHp','enemyHp'].includes(k))){try{if(!x.battleInput)throw Error(x.battleInputError||'还缺双方战斗数据');const gaps=C.scope.issues(x.battleInput.game).filter(i=>i.affects.includes('combat'));if(gaps.length)throw Error('当前战斗核对还缺规则：'+C.scope.message(gaps));battle=C.multi.run(x.battleInput).exact;}catch(e){errors.battle=e.message;}}
  let upgrade,level,field;
  if(selected.some(k=>['before','after','cost'].includes(k))){try{upgrade=x.growthGame?.upgrades?.find(u=>u.id===x.upgrade?.id);if(!upgrade)throw Error('请选择要核对的升级');const gaps=C.scope.issues(x.growthGame).filter(i=>i.affects.includes('growth'));if(gaps.length)throw Error('当前升级核对还缺规则：'+C.scope.message(gaps));level=R.integer(x.upgrade.level,0,1999,'升级前等级');field=x.upgrade.field;if(!upgrade.fields.includes(field))throw Error('所选属性不在这项升级中');if(upgrade.maxLevel!==null&&upgrade.maxLevel!==undefined&&level>=upgrade.maxLevel)throw Error('已经达到这项升级的等级上限');}catch(e){errors.upgrade=e.message;}}
  for(const key of selected){const [label,fieldId]=metrics[key];let computed=null,issue=null,difference=null,pass=null,tolerance=key==='outcome'?null:decimal(String(tolerances[key]??'0'),label+'绝对容差').toString();
