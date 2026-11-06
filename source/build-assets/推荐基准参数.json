@@ -1,0 +1,41 @@
+{
+  "format": "idle-design-template-v1",
+  "name": "现有推荐平滑方案",
+  "goals": {
+    "visits_per_day": 3,
+    "session_minutes": 5,
+    "first_completion_min_days": 14,
+    "first_completion_max_days": 21,
+    "max_no_progress_hours": 36
+  },
+  "rules": {
+    "stage_cap": 1000,
+    "chapter_size": 50,
+    "family": "fixed",
+    "hp_base": 600,
+    "hp_growth": 1.04,
+    "attack_base": 100,
+    "defense": 100,
+    "defense_scale": 100,
+    "attack_gain": 1.12,
+    "attack_cost_base": 20,
+    "attack_cost_growth": 1.15,
+    "income_gain": 1.1,
+    "income_cost_base": 50,
+    "income_cost_growth": 1.8,
+    "cost_scale": 5.625,
+    "reward_base": 10,
+    "reward_growth": 1.0275,
+    "chapter_power": 1.475,
+    "boss_hp_multiplier": 2,
+    "boss_first_reward": 5,
+    "attack_interval_seconds": 0.5,
+    "timeout_seconds": 30,
+    "transition_seconds": 0.8,
+    "crit_chance": 0.2,
+    "crit_multiplier": 2,
+    "offline_cap_hours": 24,
+    "push_success_threshold": 0.9
+  },
+  "scope": "基础表生成，不自动平衡，不预测通关或留存；不自动替换原试玩配置。"
+}
