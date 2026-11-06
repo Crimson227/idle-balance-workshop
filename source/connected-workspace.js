@@ -181,6 +181,24 @@ function benefitText(grade,source=game){
 }
 function goalText(g,grade){if(!grade.hasGoals)return '未设体验目标，显示实际变化';const c=grade.afterGoals.counts,count=grade.after.samples,out=[];if(c.early)out.push(c.early+'/'+count+'次低于'+time(g.goals.minCompletionSeconds)+'下限');if(c.late)out.push(c.late+'/'+count+'次超出'+time(g.goals.maxCompletionSeconds)+'上限');if(c.unfinished)out.push(c.unfinished+'/'+count+'次未完成');if(c.wait)out.push(c.wait+'/'+count+'次未推进时间超过'+time(g.goals.maxGapSeconds));if(c.visits)out.push(c.visits+'/'+count+'次未达回访进展');return (ConnectedCore.rules.coverage(g).complete?'':'已建模部分：')+(out.join('；')||count+'/'+count+'次均达到所填目标');}
 function gapTime(value){if(value==null)return '未记录';const n=num(value);if(n>0&&n<.001)return Number(n.toPrecision(3))+'秒';const h=Math.floor(n/3600),m=Math.floor(n%3600/60),s=Number((n%60).toFixed(3));return (h?h+'小时':'')+(m?m+'分':'')+(s||!h&&!m?s+'秒':'');}
+function resultGoalsText(rows){
+ const groups=new Map();for(const r of rows){const key=JSON.stringify(r.inputGame.goals);if(!groups.has(key))groups.set(key,[]);groups.get(key).push(r);}
+ const span=values=>{const low=Math.min(...values.map(num)),high=Math.max(...values.map(num));return gapTime(low)+(low===high?'':'至'+gapTime(high));},descriptions=[];
+ for(const group of groups.values()){
+  const g=group[0].inputGame.goals,total=group.length,counts={early:0,late:0,unfinished:0,wait:0,visits:0};for(const r of group){const c=ConnectedSearch.goals(r.inputGame,[r]).counts;for(const k of Object.keys(counts))counts[k]+=c[k];}
+  if(g.minCompletionSeconds!==null||g.maxCompletionSeconds!==null){
+   const bounds=g.minCompletionSeconds!==null&&g.maxCompletionSeconds!==null?gapTime(g.minCompletionSeconds)+'至'+gapTime(g.maxCompletionSeconds):g.minCompletionSeconds!==null?'至少'+gapTime(g.minCompletionSeconds):'不超过'+gapTime(g.maxCompletionSeconds),finished=group.filter(r=>r.completionSeconds!==null),notes=[];
+   if(counts.early)notes.push(counts.early+'/'+total+'次试算早于目标下限');if(counts.late)notes.push(counts.late+'/'+total+'次试算晚于目标上限');if(counts.unfinished)notes.push(counts.unfinished+'/'+total+'次试算在'+span(group.map(r=>r.inputGame.simulation.observationSeconds))+'观察期内未通关');
+   descriptions.push('完成周期：目标'+bounds+'，'+(finished.length?(finished.length===total?'实际':'已通关试算用时')+span(finished.map(r=>r.completionSeconds)):'观察期内均未通关')+'；'+(notes.join('；')||total+'/'+total+'次试算达到周期目标')+'。');
+  }
+  if(g.maxGapSeconds!==null)descriptions.push('最长未推进时间：目标不超过'+gapTime(g.maxGapSeconds)+'，实际'+span(group.map(r=>r.longestGap.seconds))+'；'+(counts.wait?counts.wait+'/'+total+'次试算超过上限':total+'/'+total+'次试算达到等待目标')+'。');
+  if(g.stagesPerVisit!==null){
+   const visits=group.flatMap(r=>r.visits.filter(v=>!v.offline&&v.highestBefore<r.inputGame.world.stageCount).map(v=>({...v,remaining:r.inputGame.world.stageCount-v.highestBefore}))),short=visits.filter(v=>v.newStages<Math.min(g.stagesPerVisit,v.remaining)),values=visits.map(v=>v.newStages),actual=values.length?'实际每次'+Math.min(...values)+(Math.min(...values)===Math.max(...values)?'':'至'+Math.max(...values))+'关':'尚无有效回访记录';
+   descriptions.push('每次回访：目标至少'+g.stagesPerVisit+'关，'+actual+'；'+(counts.visits?short.length+'/'+visits.length+'次有效回访推进不足，涉及'+counts.visits+'/'+total+'次试算':visits.length?'已记录的有效回访均达到目标':'尚无有效回访可核对')+'。'+(visits.some(v=>v.remaining<g.stagesPerVisit)?'剩余关数不足目标时按剩余关数核对。':''));
+  }
+ }
+ return descriptions.join(' ')||'未设置体验目标，本次只显示实际结果。';
+}
 const gapBox=make('section','cgGapSummary');gapBox.className='cg-gap-summary';gapBox.hidden=true;by('cgWhat').after(gapBox);
 const gapDefinition=make('small','cgGapDefinition','按整段未推进时间判断，包含计划离线、在线等待与战斗。');by('cgGoalGap').closest('label').append(gapDefinition);
 function gapParts(p){const keys=['plannedOffline','onlineFunding','combat',...Object.keys(p.totals).filter(k=>!['plannedOffline','onlineFunding','combat'].includes(k)&&num(p.totals[k])>0)];return keys.map(k=>p.labels[k]+' '+gapTime(p.totals[k])).join('；')+'。合计 '+gapTime(p.accounted)+'，分项互不重复。';}
@@ -190,7 +208,7 @@ function renderGapSummary(rows){if(!rows.length){gapBox.hidden=true;return;}cons
 
 function summarizeResults(){const rows=candidateRuns.length?candidateRuns:baseRuns;if(!rows.length){gapBox.hidden=true;return;}const s=ConnectedSearch.stats(rows),budget=rows[0].inputGame.simulation.observationSeconds,stage=rows[0].inputGame.world.stageCount,planned=rows[0].inputGame.simulation.seeds.length;
  by('cgWhat').textContent=(rows.length<planned?'已算出'+rows.length+'/'+planned+'个编号；':'')+(s.completed===rows.length?stage+'关全部完成，最慢'+time(s.time):time(budget)+'内，'+s.completed+'/'+rows.length+'完成；停在第'+(s.lowest+1)+(s.highest!==s.lowest?'–'+(s.highest+1):'')+'关')+'；最长未推进时间'+gapTime(s.gap)+'。';
- const misses=[['completion','完成周期'],['wait','最长未推进时间'],['visits','回访进展']].map(([k,n])=>({n,count:rows.filter(r=>r.goals[k]===false).length})).filter(x=>x.count);by('cgWhy').textContent=misses.length?'未达目标：'+misses.map(x=>x.n+' '+x.count+'/'+rows.length).join('、')+'。':'';renderGapSummary(rows);
+ by('cgWhy').textContent=resultGoalsText(rows);renderGapSummary(rows);
  if(candidateRuns.length){const grade=ConnectedSearch.evaluate(baseRuns,candidateRuns,game),a=grade.before,b=grade.after,changes=diffs(baseGame,game),row=searchRecord?.rows.find(x=>x.verified&&fingerprint(x.game)===fingerprint(game)),cost=designTradeoff(baseGame,game)+onlineChange(baseGame,game);
   by('cgResultTitle').textContent=!grade.paired?'试算不匹配，需重新检查':grade.hasGoals&&!grade.allMet?'有变化，仍有目标未达到':!grade.effective&&!grade.allMet?'这次改动没有明显收益，建议保持':grade.allMet?'这次改动达到所填目标':'发现实际改善，请确认新的节奏';
   by('cgTradeoff').innerHTML=[['改动',row?changeText(row):changes.slice(0,3).join('；')+(changes.length>3?'；其余见完整前后数据':'')||'无'],['收益',benefitText(grade)],['通关周期',paceText(a,b)],['代价',cost||'花费金币 '+pretty(a.spent)+' → '+pretty(b.spent)+'；购买次数 '+f(a.purchases)+' → '+f(b.purchases)],['目标',goalText(game,grade)]].map(([k,v])=>'<p class="cg-comparison-line'+(k==='通关周期'?' cg-pace-change':'')+'"><strong>'+k+'</strong><span>'+escape(v)+'</span></p>').join('');
