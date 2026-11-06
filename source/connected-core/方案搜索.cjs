@@ -1,6 +1,6 @@
 'use strict';
 const C=require('./一体化核心.cjs'),copy=structuredClone,n=C.number;
-const VERSION='connected-search-1.2.1',number=x=>Number(Number(x).toPrecision(12)),text=x=>String(number(x));
+const VERSION='connected-search-1.2.2',number=x=>Number(Number(x).toPrecision(12)),text=x=>String(number(x));
 const sum=(rs,f)=>rs.reduce((s,r)=>s+f(r),0),known=g=>Object.values(g.goals).some(x=>x!==null),met=r=>!Object.values(r.modeledGoals||r.goals).some(x=>x===false);
 function stats(rs){const times=rs.filter(r=>r.completionSeconds!==null).map(r=>n(r.completionSeconds));return {samples:rs.length,completed:rs.filter(r=>r.status==='completed').length,lowest:rs.length?Math.min(...rs.map(r=>r.highest)):0,highest:Math.max(0,...rs.map(r=>r.highest)),gap:Math.max(0,...rs.map(r=>n(r.longestGap.seconds))),time:rs.length&&times.length===rs.length?Math.max(...times):null,timeMin:times.length?Math.min(...times):null,misses:rs.filter(r=>!met(r)).length,spent:rs.length?sum(rs,r=>n(r.spent))/rs.length:0,purchases:rs.length?sum(rs,r=>r.purchases.length)/rs.length:0,deaths:sum(rs,r=>r.battles.filter(b=>b.outcome==='death'||b.outcome==='draw').length),timeouts:sum(rs,r=>r.battles.filter(b=>b.outcome==='timeout').length),failures:sum(rs,r=>r.battles.filter(b=>b.outcome!=='win').length),enemyLeft:Math.max(0,...rs.map(r=>n(r.firstBlock?.enemyHp??'0')))};}
 function goals(g,rs){
@@ -98,7 +98,7 @@ function configuredKnobs(game,runs,options,planned=plan(game,runs)){
 }
 function scopeKey(record,options){
  const common={maxJoint:options.maxJoint??2,templates:options.templates||[]};
- if(record.baseDiscovery.length)return JSON.stringify({...common,knobs:configuredKnobs(record.game,record.baseDiscovery,options).map(k=>({id:k.id,min:k.min,max:k.max,locked:!!k.locked})).sort((a,b)=>a.id.localeCompare(b.id))});
+ if(record.baseDiscovery.length)return JSON.stringify({...common,knobs:configuredKnobs(record.game,[...record.baseDiscovery,...record.baseValidation],options).map(k=>({id:k.id,min:k.min,max:k.max,locked:!!k.locked})).sort((a,b)=>a.id.localeCompare(b.id))});
  const bounds=Object.fromEntries(Object.entries(options.bounds||{}).filter(([,b])=>Object.keys(b).length).sort(([a],[b])=>a.localeCompare(b)).map(([id,b])=>[id,{...(b.min!==undefined?{min:Number(b.min)}:{}),...(b.max!==undefined?{max:Number(b.max)}:{})}]));
  return JSON.stringify({...common,locked:[...new Set(options.locked||[])].sort(),bounds,allowVisits:!!options.allowVisits});
 }
@@ -137,12 +137,13 @@ async function search(source,options={},run=(g,s,limit)=>C.run(g,s,{maxEvents:li
  if(stopped)return end(stopped);if(r.errors.length){r.reason='基准有计算中断';return end('baseline_error');}
  if(known(g)&&[...r.baseDiscovery,...r.baseValidation].every(met)){r.reason='当前方案符合目标，建议保持';return end('already_meets');}
  if(g.goals.minCompletionSeconds!==null&&n(g.goals.minCompletionSeconds)>n(g.simulation.observationSeconds)){r.reason='观察截止早于目标最早完成时间';return end('insufficient_observation');}
- const p=plan(g,r.baseDiscovery);r.issue={cause:p.cause,stage:p.stage,summary:p.summary};
+ const baselineRuns=[...r.baseDiscovery,...r.baseValidation],p=plan(g,baselineRuns);r.issue={cause:p.cause,stage:p.stage,summary:p.summary};
  if(!known(g)&&p.cause==='normal'&&[...r.baseDiscovery,...r.baseValidation].every(x=>x.status==='completed')){r.reason='当前全部通过，未设置其他目标';return end('no_fault');}
- r.knobs=configuredKnobs(g,r.baseDiscovery,opts,p);r.phase='搜索修改量';state();
+ r.knobs=configuredKnobs(g,baselineRuns,opts,p);r.phase='搜索修改量';state();
  const conflict=scheduleConflict(g);if(conflict&&!r.knobs.some(k=>k.id==='visits'&&!k.locked&&k.max>k.current)){r.conflict=conflict;r.reason='回访空档至少'+Math.floor(conflict.gap/60)+'分钟，目标最长'+Math.floor(conflict.allowed/60)+'分钟';return end('conflict');}
  const enabled=r.knobs.filter(k=>!k.locked&&(!k.secondary||opts.maxJoint===3)),queue=[],queued=new Set(),sig=path=>path.map(p=>p.id+':'+p.value).sort().join('|');
- const reserve=Math.min(Math.max(0,Math.floor((opts.maxRuns-(r.runs-initialRuns)-seeds.discovery.length)*.65)),seeds.validation.length*opts.keepCount),searchLimit=Math.max(r.runs,initialRuns+opts.maxRuns-reserve),canSearch=()=>within()&&(r.runs<searchLimit||!r.rows.some(x=>x.grade&&useful(x.grade)));
+ const discoveryMet=known(g)&&r.baseDiscovery.every(met),shouldValidate=row=>row.grade&&(useful(row.grade)||discoveryMet&&row.grade.allMet&&row.discovery.every((run,i)=>run.highest>=r.baseDiscovery[i].highest)&&row.grade.after.completed>=row.grade.before.completed);
+ const reserve=Math.min(Math.max(0,Math.floor((opts.maxRuns-(r.runs-initialRuns)-seeds.discovery.length)*.65)),seeds.validation.length*opts.keepCount),searchLimit=Math.max(r.runs,initialRuns+opts.maxRuns-reserve),canSearch=()=>within()&&(r.runs<searchLimit||!r.rows.some(shouldValidate));
  r.validationReserve=reserve;
  function enqueue(path){
   path=path.map(p=>{const k=r.knobs.find(k=>k.id===p.id);let value=Math.min(k.max,Math.max(k.min,number(p.value)));if(k.integer)value=Math.round(value);return {id:p.id,value};}).filter(p=>Math.abs(p.value-r.knobs.find(k=>k.id===p.id).current)>Math.max(1e-12,Math.abs(p.value)*1e-10));
@@ -171,28 +172,28 @@ async function search(source,options={},run=(g,s,limit)=>C.run(g,s,{maxEvents:li
  }
  if(opts.maxJoint===3&&canSearch())await joint(3);
  for(let round=0;round<r.generationRound&&canSearch();round++)for(const k of enabled.filter(k=>!k.template)){
-  const rows=r.rows.filter(x=>x.path.length===1&&x.path[0].id===k.id&&x.grade&&!x.errors.length),passes=grade=>known(g)?grade.allMet:r.baseDiscovery.some(x=>x.status!=='completed')?grade.after.completed===grade.after.samples:grade.effective,best=rows.filter(x=>passes(x.grade)).sort((a,b)=>a.distance-b.distance)[0],points=[{value:k.current,distance:0,grade:evaluate(r.baseDiscovery,r.baseDiscovery,g)},...rows.map(x=>({value:x.path[0].value,distance:x.distance,grade:x.grade}))];let value;
+  const rows=r.rows.filter(x=>x.path.length===1&&x.path[0].id===k.id&&x.grade&&!x.errors.length),passes=grade=>known(g)?grade.allMet&&(!discoveryMet||grade.effective):r.baseDiscovery.some(x=>x.status!=='completed')?grade.after.completed===grade.after.samples:grade.effective,best=rows.filter(x=>passes(x.grade)).sort((a,b)=>a.distance-b.distance)[0],points=[{value:k.current,distance:0,grade:evaluate(r.baseDiscovery,r.baseDiscovery,g)},...rows.map(x=>({value:x.path[0].value,distance:x.distance,grade:x.grade}))];let value;
   if(best){const failed=points.filter(x=>x.distance<best.distance&&!passes(x.grade)).sort((a,b)=>b.distance-a.distance)[0]||points[0];value=midpoint(best.path[0].value,failed.value);}
   else{const pairs=[];if(known(g))for(const a of points.filter(x=>x.grade.afterGoals.counts.early))for(const b of points.filter(x=>!x.grade.afterGoals.counts.early))pairs.push({a,b,width:Math.abs(Math.log((a.value+1e-9)/(b.value+1e-9)))});const bracket=pairs.sort((a,b)=>a.width-b.width)[0];if(bracket)value=midpoint(bracket.a.value,bracket.b.value);else{const target=Math.max(k.min,Math.min(k.max,k.target)),factor=Math.pow(1.5,round+1);value=k.direction>0?Math.max(target*factor,k.current*factor,target+factor-1):Math.min(target/factor,k.current/factor);}}
   enqueue([{id:k.id,value}]);await drain();
  }
  if(opts.maxJoint===2&&!r.rows.some(x=>x.grade&&(known(g)?x.grade.allMet:x.grade.after.completed===x.grade.after.samples))&&canSearch())await joint(2);
  r.phase='独立编号核对';state();
- const promising=r.rows.filter(x=>x.grade&&useful(x.grade)&&!x.errors.some(e=>!retryable(e))).sort(rank),families=new Map();for(const row of promising){const key=family(row,r.knobs);if(!families.has(key))families.set(key,[]);families.get(key).push(row);}
+ const promising=r.rows.filter(x=>shouldValidate(x)&&!x.errors.some(e=>!retryable(e))).sort(rank),families=new Map();for(const row of promising){const key=family(row,r.knobs);if(!families.has(key))families.set(key,[]);families.get(key).push(row);}
  const attempts=Math.max(0,...[...families.values()].map(x=>x.length));
  for(let attempt=0;attempt<attempts&&within();attempt++)for(const rows of families.values()){
   const row=rows[attempt];if(!row||row.verified)continue;row.state='validating';for(const seed of seeds.validation)if(!await trial(row.game,seed,row.id,'validation'))break;row.state=row.validation.length===seeds.validation.length&&!row.errors.length?'checked':'partial';finish(r,'running');emit({kind:'row',row:{id:row.id,state:row.state,verified:row.verified,grade:row.grade}});state();
  }
- finish(r,stopped||'complete');r.reason=r.recommendations.length?(known(g)?r.recommendations.some(id=>r.rows.find(x=>x.id===id).grade.allMet)?'已找到符合目标的方案':'有改善，仍有目标未达到':'已找到本次卡点的有效改法'):r.rows.some(x=>x.errors.length&&x.validation.length)?'候选核对有计算中断':r.rows.some(x=>x.grade&&useful(x.grade)&&!x.verified)?'发现改善，独立核对未完成':known(g)?'本次范围内没有已核对且符合目标的改法':r.baseDiscovery.every(x=>x.status==='completed')?'本轮没有值得替换的已核对方案，建议保持':'本次范围内未找到有效方案';
+ finish(r,stopped||'complete');r.reason=r.recommendations.length?(known(g)?r.recommendations.some(id=>r.rows.find(x=>x.id===id).grade.allMet)?'已找到符合目标的方案':'有改善，仍有目标未达到':'已找到本次卡点的有效改法'):r.rows.some(x=>x.errors.length&&x.validation.length)?'候选核对有计算中断':r.rows.some(x=>shouldValidate(x)&&!x.verified)?'候选独立核对未完成':known(g)?'本次范围内没有已核对且符合目标的改法':r.baseDiscovery.every(x=>x.status==='completed')?'本轮没有值得替换的已核对方案，建议保持':'本次范围内未找到有效方案';
  return end(stopped||'complete');
 }
 function validateRecord(r){
- if(!r)return;if(r.format!=='idle-connected-search-v1'||!['connected-search-1.0.0','connected-search-1.1.0','connected-search-1.2.0',VERSION].includes(r.version)||!Array.isArray(r.rows)||r.rows.length>1000||new Set(r.rows.map(x=>x.id)).size!==r.rows.length||!Array.isArray(r.knobs)||r.knobs.length>62||!Array.isArray(r.errors)||!r.options)throw Error('搜索记录格式或版本不匹配');C.compile(r.sourceGame);C.compile(r.game);
+ if(!r)return;if(r.format!=='idle-connected-search-v1'||!['connected-search-1.0.0','connected-search-1.1.0','connected-search-1.2.0','connected-search-1.2.1',VERSION].includes(r.version)||!Array.isArray(r.rows)||r.rows.length>1000||new Set(r.rows.map(x=>x.id)).size!==r.rows.length||!Array.isArray(r.knobs)||r.knobs.length>62||!Array.isArray(r.errors)||!r.options)throw Error('搜索记录格式或版本不匹配');C.compile(r.sourceGame);C.compile(r.game);
  if(JSON.stringify(r.game.goals)!==JSON.stringify(r.sourceGame.goals)||JSON.stringify(r.game.behavior)!==JSON.stringify(r.sourceGame.behavior)||n(r.game.simulation.observationSeconds)!==n(r.sourceGame.simulation.observationSeconds))throw Error('搜索记录的目标、行为或观察时长不一致');
  const maxJoint=r.options.maxJoint??2;if(![1,2,3].includes(maxJoint))throw Error('搜索记录的联合项数无效');
  for(const phase of ['discovery','validation'])if(!Array.isArray(r.seeds?.[phase])||!r.seeds[phase].length||r.seeds[phase].some(s=>!Number.isInteger(s)||s<0||s>4294967295))throw Error('搜索记录缺少有效编号');const seeds=[...r.seeds.discovery,...r.seeds.validation];if(seeds.length>8||new Set(seeds).size!==seeds.length||JSON.stringify(seeds)!==JSON.stringify(r.game.simulation.seeds))throw Error('搜索与核对编号不匹配');
  function runs(rs,game,phase){if(!Array.isArray(rs)||rs.length>r.seeds[phase].length||new Set(rs.map(x=>x.seed)).size!==rs.length)throw Error('搜索样本数量或编号不匹配');for(const x of rs)if(x.format!=='idle-connected-result-v1'||x.version!==game.version||!r.seeds[phase].includes(x.seed)||JSON.stringify(x.inputGame)!==JSON.stringify(game)||!C.verifyLedger(x)||!Array.isArray(x.stages)||!Array.isArray(x.events)||!Array.isArray(x.battles)||!C.diagnose(x).exactTimeAccounted)throw Error('搜索样本配置、编号或收支不匹配');rs.sort((a,b)=>r.seeds[phase].indexOf(a.seed)-r.seeds[phase].indexOf(b.seed));}
- runs(r.baseDiscovery,r.game,'discovery');runs(r.baseValidation,r.game,'validation');const available=r.baseDiscovery.length?configuredKnobs(r.game,r.baseDiscovery,r.options):[];
+ runs(r.baseDiscovery,r.game,'discovery');runs(r.baseValidation,r.game,'validation');const available=r.baseDiscovery.length?configuredKnobs(r.game,[...r.baseDiscovery,...r.baseValidation],r.options):[];
  for(const k of r.knobs){const actual=available.find(x=>x.id===k.id),locked=actual&&((r.options.locked||[]).includes(k.id)||(r.options.locked||[]).includes(actual.group)||(actual.defaultLocked&&!r.options.allowVisits));if(!actual||!Number.isFinite(k.min)||!Number.isFinite(k.max)||k.min<actual.min||k.max>actual.max||k.min>k.max||!!k.locked!==!!locked)throw Error('搜索参数与基准不匹配');const {min,max}=k;Object.assign(k,actual,{min,max,locked:!!locked});}
  for(const row of r.rows){if(!Array.isArray(row.path)||!row.path.length||row.path.length>maxJoint||new Set(row.path.map(p=>p.id)).size!==row.path.length||!Array.isArray(row.errors))throw Error('候选修改记录不完整');for(const p of row.path){const k=r.knobs.find(k=>k.id===p.id);if(!k||k.locked||!Number.isFinite(p.value)||p.value<k.min||p.value>k.max||k.integer&&!Number.isInteger(p.value))throw Error('候选修改超出允许范围');}let expected;try{expected=apply(r.game,r.knobs,row.path);}catch(e){if(row.game||!row.errors.length)throw e;}if(row.game){if(JSON.stringify(expected)!==JSON.stringify(row.game))throw Error('候选配置与记录的改动不一致');runs(row.discovery,row.game,'discovery');runs(row.validation,row.game,'validation');}else if(row.discovery?.length||row.validation?.length)throw Error('无配置的候选包含战斗结果');}
  finish(r,r.status);return r;
