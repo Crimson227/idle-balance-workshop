@@ -161,7 +161,12 @@ function updateChrome(){
  by('cgSave').disabled=!game||dirty||busy;by('cgManual').hidden=!baseRuns.length;by('cgComparisonPanel').hidden=by('cgComparison').hidden;by('cgShowBattle').disabled=busy||!selectedRun?.battles.some(b=>b.stage===selectedStage);renderApplicationFeedback();
 }
 const navigateCore=show;show=function(view,{remember=true}={}){if(remember&&workspaceView!==view)scrollPlaces[workspaceView]=window.scrollY;workspaceView=view;navigateCore(view==='solutions'?'none':view);solutionView.hidden=view!=='solutions';updateChrome();if(scrollPlaces[view]!==undefined)window.scrollTo({top:scrollPlaces[view],behavior:'instant'});};
-by('cgDataTab').onclick=()=>{if(!formReady)drawForm(!game);show('data');};by('cgRunTab').onclick=()=>show(currentRuns().length?'results':game?'simulation':'empty');by('cgResultsTab').onclick=()=>{prepareBounds();renderSearch();show('solutions');};
+by('cgDataTab').onclick=()=>{if(!formReady)drawForm(!game);show('data');};by('cgRunTab').onclick=openWholeCheck;by('cgResultsTab').onclick=()=>{prepareBounds();renderSearch();show('solutions');};
+function openWholeCheck(){
+ if(busy)return;
+ if(!game&&formReady){setEntryMode('full');show('data');if(!saveForm())by('cgDataIntro').textContent='整体检查还需要关卡、金币和回访数据。请补齐标出的位置，已填的单场输入会保留。';return;}
+ show(currentRuns().length?'results':game?'simulation':'empty');
+}
 function paceText(a,b){return a.time!==null&&b.time!==null?'最慢通关 '+time(a.time)+' → '+time(b.time):'全部通关 '+a.completed+'/'+a.samples+' → '+b.completed+'/'+b.samples+(b.time!==null?'，最慢'+time(b.time):'，仍有未完成');}
 function benefitText(grade,source=game){
  const a=grade.before,b=grade.after,out=[],goals=source?.goals||{},set=k=>goals[k]!==null&&goals[k]!==undefined,c0=grade.beforeGoals?.counts||{},c1=grade.afterGoals?.counts||{},period0=(c0.early||0)+(c0.late||0)+(c0.unfinished||0),period1=(c1.early||0)+(c1.late||0)+(c1.unfinished||0);

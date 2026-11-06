@@ -73,3 +73,17 @@
 [data-upgrade-preview] small{display:block;margin-top:10px}
 .cg-intake-table input{width:100%;min-width:90px}
 @media(max-width:760px){#cgEntryMode .actions{display:grid;grid-template-columns:1fr}#cgEntryMode button{width:100%}.cg-single-result{padding-left:12px}#cgFieldFix,#cgPendingIntake,#cgIntakeIssues{padding:10px 12px}#cgIntakeActions{flex-wrap:wrap}}
+
+#connected .cg-actors-entry{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;align-items:start}
+#connected #cgFieldGroups .cg-actors-entry>details{margin-top:0;padding-top:8px}
+#connected #cgFieldGroups .cg-actors-entry .fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:12px 0}
+#connected #cgFieldGroups .cg-actors-entry>details>summary{font-size:23px}
+#connected [data-panel="cgMechanisms"]>summary small{display:block;font:400 14px/1.6 'Workshop UI','Microsoft YaHei',sans-serif;color:var(--muted)}
+#connected #cgData.cg-single-mode>h2{font-size:32px;margin:0 0 12px}
+#connected #cgData.cg-single-mode #cgEntryMode{margin:0 0 20px;padding:0 0 16px;border-top:0}
+#connected #cgData.cg-single-mode #cgEntryMode p{font-size:14px;margin:0 0 10px;max-width:none}
+#connected #cgData.cg-single-mode #cgEntryMode .actions{display:flex;flex-wrap:wrap;gap:10px}
+#connected #cgData.cg-single-mode #cgEntryMode button{min-height:44px;padding:8px 14px;width:auto;font-size:14px}
+#connected #cgProjectName{margin-top:20px}
+@media(max-width:1000px){#connected .cg-actors-entry{gap:20px}#connected #cgFieldGroups .cg-actors-entry .fields{grid-template-columns:1fr}}
+@media(max-width:760px){#connected .cg-actors-entry{grid-template-columns:1fr;gap:22px}#connected #cgFieldGroups .cg-actors-entry .fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}#connected #cgFieldGroups .cg-actors-entry>details>summary{font-size:22px}#connected #cgData.cg-single-mode>h2{font-size:25px}#connected #cgData.cg-single-mode #cgEntryMode button{flex:1 1 auto;font-size:12px;padding-inline:8px}}
