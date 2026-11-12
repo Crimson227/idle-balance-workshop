@@ -4,7 +4,8 @@ const roots='format version battleVersion name player types mechanisms world upg
 function issues(g){
  const out=[],add=(name,detail,affects,path=null)=>out.push({name,detail,affects,...(path?{path}:{})}),keys=(o,allowed,path,affects)=>{if(!o||typeof o!=='object'||Array.isArray(o))return;for(const k of Object.keys(o))if(!allowed.includes(k))add('未知规则 '+path+k,'当前计算不使用此字段。请核对拼写，或明确只检查已支持部分；原字段会随配置保留。',affects,path+k);};
  keys(g,roots,'',['combat','growth','recommendation']);
- keys(g.economy,['initialCoins','incomePerSecond','incomeDuringCombat','costScale','rewardScale','payout'],'economy.',['growth','recommendation']);
+ keys(g.economy,['initialCoins','incomePerSecond','incomeDuringCombat','costScale','rewardScale','payout','offlinePayout'],'economy.',['growth','recommendation']);
+ keys(g.economy?.offlinePayout,['mode','ratePerSecond','minimumSeconds','rounding'],'economy.offlinePayout.',['growth','recommendation']);
  keys(g.economy?.payout,['mode','intervalSeconds','firstAtSeconds'],'economy.payout.',['growth','recommendation']);
  keys(g.world,['stageCount','enemy','steps','rewardBase','rewardStep','hpStep','hitStep','elementStep'],'world.',['growth','recommendation']);
  keys(g.rules,['armorK','battleTimeoutSeconds','victoryDelaySeconds','retryDelaySeconds'],'rules.',['combat','growth','recommendation']);
@@ -21,7 +22,7 @@ function issues(g){
    ['critical','mode scope sharedRandom guarantee threshold',['combat','recommendation']],['shield','player enemy',['combat','recommendation']],
    ['recovery','fraction interval leechChannels',['combat','recommendation']],['rounding','mode target at',['combat','recommendation']],
    ['dot','enabled name owner channel amount interval duration critical leech',['combat','recommendation']],
-   ['growth','reward upgrades',['growth','recommendation']],['behavior','autoPurchase strategy offlineIncome offlinePurchase offlineBattle awaitFirstPurchase',['growth','recommendation']],
+   ['growth','reward upgrades',['growth','recommendation']],['behavior','autoPurchase strategy offlineIncome offlinePurchase offlineBattle awaitFirstPurchase skipUnaffordable',['growth','recommendation']],
    ['lifecycle','carryStates carryPity carryShield betweenBattles',['combat','growth','recommendation']]])keys(r[k],allowed.split(' '),'ruleLibrary.'+k+'.',affects);
   for(const [kind,allowed] of [['states','id name enabled effect owner target applyAt source duration interval amount channel maxStacks refresh critical leech'],['triggers','id name enabled owner at condition source threshold every effect value duration cooldown once state'],['reactions','id name enabled states consume effect channel amount duration']])for(const [i,row] of (r[kind]||[]).entries())if(row.enabled!==false)keys(row,allowed.split(' '),'ruleLibrary.'+kind+'.'+i+'.',['combat','recommendation']);
   const growth=(x,path)=>{keys(x,['id','factor','expression','segments','from','base','step'],path,['growth','recommendation']);for(const [i,seg] of (x?.segments||[]).entries())keys(seg,['id','from','base','step','factor'],path+'segments.'+i+'.',['growth','recommendation']);};

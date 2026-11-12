@@ -53,6 +53,7 @@ function validate(g,active=null){if(g.ruleLibrary&&typeof g.ruleLibrary.enabled!
  for(const row of [...r.states,...r.triggers])if(row.enabled!==false&&row.owner!==undefined&&!['player','enemy','both'].includes(row.owner))throw Error('请选择状态/条件效果的作用方');
  if(r.eventBudget!==undefined)integer(r.eventBudget,100,50000,'每场规则事件上限');if(['carryStates','carryPity','carryShield'].some(k=>typeof r.lifecycle[k]!=='boolean'))throw Error('跨战斗保留开关须明确');
  if(!['order','cheapest','damage_first','survival_first'].includes(r.behavior.strategy)||typeof r.behavior.autoPurchase!=='boolean'||['offlineIncome','offlinePurchase','offlineBattle'].some(k=>typeof r.behavior[k]!=='boolean'))throw Error('玩家行为规则不支持');if(!['expire','pause'].includes(r.lifecycle.betweenBattles))throw Error('战斗间状态处理不支持');
+ if(r.behavior.skipUnaffordable!==undefined&&typeof r.behavior.skipUnaffordable!=='boolean')error('买不起时跳过须为明确开关','cgRule-behavior-skipUnaffordable');
  if(!Array.isArray(r.missing)||r.missing.length>20||r.missing.some(m=>typeof m.name!=='string'||!m.name.trim()||m.name.length>120||typeof m.detail!=='string'||m.detail.length>1000||!Array.isArray(m.affects)||!m.affects.length||m.affects.some(a=>!['combat','growth','recommendation'].includes(a))))throw Error('缺失机制须填写名称、说明和受影响检查');
  if(!Array.isArray(r.modules)||r.modules.length>12)throw Error('扩展模块最多12项');for(const m of r.modules)require('./规则模块示例.cjs').validate(m);
  for(const u of g.upgrades){const s=r.growth.upgrades[u.id];if(!s||!u.enabled||active&&!u.fields.every(f=>active.has(f)))continue;const cap=integer(u.maxLevel,0,2000,'升级上限');if(!s.attribute||!s.cost||!s.unlock)throw Error('升级的属性、成本或解锁规则不完整');for(const f of u.fields)formulaAt(s.attribute,unit(f),'cgRule-growth-upgrades-'+u.id+'-attribute-expression');formulaAt(s.cost,COINS,'cgRule-growth-upgrades-'+u.id+'-cost-expression');integer(s.unlock.stage,1,1000,'解锁关卡');if(s.unlock.upgrade)integer(s.unlock.level,0,2000,'前置等级');if(s.unlock.upgrade&&!g.upgrades.some(x=>x.id===s.unlock.upgrade&&x.id!==u.id))throw Error('解锁前置升级不存在或引用自身');for(const f of u.fields)if(!growth(s.attribute,0,g.player[f],u.increment,unit(f)).eq(q(g.player[f])))throw Error('属性增长的0级须等于角色基础值，请调整分段首值或公式');for(let i=0;i<=cap;i++)for(const f of u.fields)growth(s.attribute,i,g.player[f],u.increment,unit(f));for(let i=0;i<cap;i++){const p=growth(s.cost,i,u.costBase,u.costStep,COINS);if(p.cmp(Z)<=0)throw Error('启用升级每次价格须大于0');}}
@@ -75,7 +76,30 @@ function roundPacket(hit,spec,defender){
 function dynamic(g){const r=config(g);return !!r&&(r.attackOrder==='player_first'||r.attackOrder==='enemy_first'||r.damage.id!=='range'||r.damage.segments!==1||r.dot.enabled||(g.mechanisms.critical&&(r.critical.mode!=='probability'||r.critical.guarantee||r.critical.scope!=='segment'))||r.critical.sharedRandom||!q(r.shield.player).eq(Z)||!q(r.shield.enemy).eq(Z)||!q(r.recovery.fraction).eq(Z)||r.recovery.leechChannels.length!==5||r.states.length||r.triggers.length||r.reactions.length||r.modules?.some(m=>m.enabled));}
 function coverage(g){return require('./规则检查.cjs').coverage(g);}
 function actionSchedule(g,slots,budget){const b=config(g)?.behavior;if(!b||g.behavior.mode==='continuous'||!b.offlineBattle&&!b.offlinePurchase)return slots;const rows=[];for(let i=0;i<slots.length;i++){const s=slots[i];rows.push({...s,index:rows.length});const until=slots[i+1]?.start??budget;if(s.end.cmp(until)<0)rows.push({index:rows.length,start:s.end,end:until,earnUntil:s.earnUntil,offline:true});}return rows;}
-function choose(g,upgrades,levels,stage,pointer=0){const br=config(g)?.behavior;if(br&&!br.autoPurchase)return null;const order=g.strategy.order,rows=[];for(let n=0;n<order.length;n++){const pos=(pointer+n)%order.length,id=order[pos],u=upgrades.find(u=>u.id===id);if(u&&levels[id]<u.maxLevel&&unlocked(g,u,levels,stage)&&(!br||u.fields.some(f=>!upgraded(g,u,g.player[f],levels[id]+1,f).eq(upgraded(g,u,g.player[f],levels[id],f)))))rows.push({id,pos,u});}if(br?.strategy==='cheapest')rows.sort((a,b)=>cost(g,a.u,levels[a.id]).cmp(cost(g,b.u,levels[b.id])));else if(br&&br.strategy!=='order'){const fs=br.strategy==='survival_first'?['hp']:['physicalMin','fire','ice','lightning','poison'];rows.sort((a,b)=>Number(b.u.fields.some(f=>fs.includes(f)))-Number(a.u.fields.some(f=>fs.includes(f))));}return rows[0]||null;}
+function choose(g,upgrades,levels,stage,pointer=0,{order=g.strategy.order,funds}={}){
+ const br=config(g)?.behavior;
+ if(br&&!br.autoPurchase)return null;
+ const rows=[];
+ for(let n=0;n<order.length;n++){
+  const pos=(pointer+n)%order.length,id=order[pos],u=upgrades.find(u=>u.id===id);
+  if(u&&levels[id]<u.maxLevel&&unlocked(g,u,levels,stage)&&(!br||u.fields.some(f=>!upgraded(g,u,g.player[f],levels[id]+1,f).eq(upgraded(g,u,g.player[f],levels[id],f)))))rows.push({id,pos,u});
+ }
+ const price=row=>cost(g,row.u,levels[row.id]);
+ if(br?.strategy==='cheapest')rows.sort((a,b)=>price(a).cmp(price(b)));
+ else if(br&&br.strategy!=='order'){
+  const fields=br.strategy==='survival_first'?['hp']:['physicalMin','fire','ice','lightning','poison'];
+  rows.sort((a,b)=>Number(b.u.fields.some(f=>fields.includes(f)))-Number(a.u.fields.some(f=>fields.includes(f))));
+ }
+ if(!br?.skipUnaffordable||funds===undefined||!rows.length)return rows[0]??null;
+ let next=rows[0],lowest=price(next);
+ for(const row of rows){
+  const required=price(row);
+  if(required.cmp(funds)<=0)return row;
+  if(required.cmp(lowest)<0){next=row;lowest=required;}
+ }
+ // With nothing affordable, the cheapest candidate gives the next purchase time.
+ return next;
+}
 function describe(g){const r=config(g);if(!r)return '原五通道规则：'+(g?.mechanisms?.armor===false?'防御已关闭':'物理使用K护甲换算')+'，各类伤害和机制以填写的开关为准';return (g.mechanisms?.armor?DEFENSE[r.defense.id]+'（物理通道）':'防御已关闭')+' · '+({fixed:'固定物理伤害',range:'区间直伤',scaled:'属性倍率伤害',expression:'受限伤害公式'}[r.damage.id])+' · 每次'+r.damage.segments+'段'+' · '+ATTACK_ORDER[r.attackOrder??'simultaneous']+(g.mechanisms?.critical&&g.mechanisms?.armor?' · '+CRITICAL_ORDER[r.criticalOrder??'critical_first']:'')+(r.dot.enabled?' · 周期持续伤害':'')+(r.states.some(s=>s.enabled!==false)?' · '+r.states.filter(s=>s.enabled!==false).length+'种状态':'')+(r.reactions.some(s=>s.enabled!==false)?' · '+r.reactions.filter(s=>s.enabled!==false).length+'种反应':'')+(r.rounding&&r.rounding.mode!=='none'?' · '+({player:'角色',enemy:'敌人',both:'双方'}[r.rounding.target])+'受伤每段'+(r.rounding.at==='channel'?'各类伤害':'合计')+({ceil:'向上取整',floor:'向下取整',nearest:'四舍五入'}[r.rounding.mode]):'');}
 function changes(a,b){
  const x=config(a),y=config(b);if(!x&&!y)return [];if(!x||!y)return [y?'启用可选规则（'+VERSION+'）':'恢复原有规则'];
@@ -95,6 +119,7 @@ function changes(a,b){
  add('dot','周期伤害',s=>s.enabled?'每'+s.interval+'秒扣'+s.amount+'，持续'+s.duration+'秒':'关闭');
  add('growth.reward','奖励',growthText);
  add('behavior','购买与离线',s=>({order:'按填写顺序',cheapest:'先买便宜的',damage_first:'先提高伤害',survival_first:'先提高生命'}[s.strategy])+'；自动购买'+on(s.autoPurchase)+'，离线收入'+on(s.offlineIncome)+' / 购买'+on(s.offlinePurchase)+' / 战斗'+on(s.offlineBattle));
+ if(!!x.behavior.skipUnaffordable!==!!y.behavior.skipUnaffordable)result.push('买不起首选强化时：'+(x.behavior.skipUnaffordable?'继续找可买项':'等待首选')+' → '+(y.behavior.skipUnaffordable?'继续找可买项':'等待首选'));
  add('lifecycle','跨战斗保留',s=>'状态'+on(s.carryStates)+' / 护盾'+on(s.carryShield)+' / 暴击保底'+on(s.carryPity)+'；战斗外状态'+(s.betweenBattles==='pause'?'暂停计时':'继续计时'));
  const upgradeDefault=s=>s||{attribute:{id:'linear'},cost:{id:'linear'},unlock:{stage:1,upgrade:'',level:0}},upgradeText=s=>'属性'+growthText(s.attribute)+'；价格'+growthText(s.cost)+'；第'+s.unlock.stage+'关起解锁'+(s.unlock.upgrade?'，需前置'+s.unlock.upgrade+' '+s.unlock.level+'级':'');
  for(const id of new Set([...Object.keys(x.growth.upgrades),...Object.keys(y.growth.upgrades)])){const before=upgradeDefault(x.growth.upgrades[id]),after=upgradeDefault(y.growth.upgrades[id]);if(!equal(before,after))result.push((b.upgrades.find(u=>u.id===id)?.name||id)+'成长：'+upgradeText(before)+' → '+upgradeText(after));}
@@ -134,7 +159,7 @@ const CATALOG=[
  {id:'reactions',name:'两种状态相遇的反应',phase:'开场或命中施加状态后',channels:['physical','fire','ice','lightning','poison'],parameters:{states:{type:'array',minItems:2,maxItems:2,distinct:true},consume:{type:'array',minItems:1},effect:{enum:['damage','freeze','shield']},amount:{unit:'health',minimum:0,maximum:1e9}},order:'按列表顺序，每时点检查一次；反应不递归触发反应',boundary:'至少消耗一个参与状态的一层；只使用启用状态',example:'wet+heat→扣血30，消耗两个标记'},
  {id:'triggers',name:'条件＋时机＋效果',phase:'开场／攻击前／实际扣血后',channels:['physical','fire','ice','lightning','poison'],parameters:{at:{enum:['battle_start','before_attack','after_hit']},condition:{enum:['always','hp_below','every_n']},effect:{enum:['attack_multiplier','shield','heal','damage','state']},threshold:{unit:'fraction',minimum:0,maximum:1},every:{unit:'count',minimum:1,maximum:100,integer:true},cooldown:{unit:'seconds',minimum:0,maximum:120}},order:'列表顺序；倍率相乘；同一项同刻最多一次',boundary:'不回溯，伤害追加不递归触发；once每场重置',example:'生命不高于30%，攻击前乘1.5，持续2秒，冷却2秒'},
  ...Object.entries(GROWTH).map(([id,name])=>({id:'growth.'+id,name,phase:'属性0级／首笔价格／首关奖励，索引均从0开始',channels:['attribute','cost','reward'],parameters:id==='geometric'?{factor:{unit:'scalar',minimum:0,maximum:100}}:id==='expression'?{expression:{maxLength:512,variables:['base','step','n']}}:id==='piecewise'?{segments:{type:'array',minItems:1,maxItems:12,firstFrom:0}}:{base:{unit:'same_as_target'},step:{unit:'same_as_target'}},order:'属性增长取本项目相对0级的变化；多个项目变化相加；购买使用当前等级价格',boundary:'等级0至2000，关数1至1000；0级属性须等于角色基础属性；每次价格>0；奖励>=0',example:id==='geometric'?'基础10、倍率2，索引0/1/2为10/20/40':'基础10、增量2，线性索引0/1/2为10/12/14'})),
- {id:'behavior',name:'购买、解锁、上线与离线',phase:'每次挑战前及离线行动时点',channels:['time','coins','upgrades'],parameters:{strategy:{enum:['order','cheapest','damage_first','survival_first']},autoPurchase:{type:'boolean'},offlineIncome:{type:'boolean'},offlinePurchase:{type:'boolean'},offlineBattle:{type:'boolean'}},order:'只用已到账金币；未解锁/关闭/封顶/无变化升级跳过',boundary:'离线收入受上限控制；离线购买与战斗各自开关；离线行动不算真实回访',example:'每秒1金币，在线6秒、离线上限360秒，下一次上线前最多366金币'},
+ {id:'behavior',name:'购买、解锁、上线与离线',phase:'每次挑战前及离线行动时点',channels:['time','coins','upgrades'],parameters:{strategy:{enum:['order','cheapest','damage_first','survival_first']},autoPurchase:{type:'boolean'},skipUnaffordable:{type:'boolean'},offlineIncome:{type:'boolean'},offlinePurchase:{type:'boolean'},offlineBattle:{type:'boolean'}},order:'只用已到账金币。未解锁、关闭、封顶或无变化的升级直接跳过。启用购买回退时，继续按优先顺序找买得起的升级。',boundary:'离线收入受上限控制；离线购买与战斗各自开关；离线行动不算真实回访',example:'每秒1金币，在线6秒、离线上限360秒，下一次上线前最多366金币'},
  {id:'lifecycle',name:'跨战斗与离线状态',phase:'下场战斗开始',channels:['states','shield','critical'],parameters:{carryStates:{type:'boolean'},carryPity:{type:'boolean'},carryShield:{type:'boolean'},betweenBattles:{enum:['expire','pause']}},order:'按剩余时间恢复；逾期跳伤不补发，寻找未来下一跳；开场状态仍重新施加',boundary:'生命每场恢复满；默认状态/护盾/保底不保留；年龄模式在战斗外只计到期，不扣血',example:'剩3秒的状态离开战斗5秒：expire删除，pause仍剩3秒'},
  {id:'modules.opening_shield',name:'编译接入的开场护盾模块',phase:'battle_start',channels:['shield'],parameters:{id:{const:'opening_shield'},version:{const:'1.0.0'},enabled:{type:'boolean'},amount:{unit:'health',minimum:0,maximum:1e7}},order:'模块→开场状态→开场条件→反应',boundary:'仅信任随源代码编译的模块；导入配置不能运行代码',example:'开场加护盾5，受到20伤害，生命只少15'}
 ].map(row=>({...row,version:VERSION}));
