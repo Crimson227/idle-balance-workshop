@@ -52,7 +52,8 @@ function validateFormFields(scope='all'){
  if(scope==='combat')return;
  if(by('cgGoalMode').value==='set'&&by('cgGoalMin').value!==''&&by('cgGoalMax').value!==''&&num(ConnectedCore.offset(by('cgGoalMin').value,by('cgGoalMax').value))>0)invalidField('cgGoalMax','最晚完成时间不能早于最早完成时间',['cgGoalMin']);
  const hours=by('cg-hours').value.split(',').map(x=>x.trim());if(!hours.length||hours.length>24||hours.some(x=>x===''||!Number.isFinite(Number(x)))||Number(hours[0])!==0||hours.some((x,i)=>Number(x)<0||Number(x)>=24||i&&Number(x)<=Number(hours[i-1])))invalidField('cg-hours','上线时间请从0开始递增填写，例如0,5,12');
- if(hours.some((h,i)=>Number(by('cg-session').value)>((Number(hours[i+1]??24))-Number(h))*60))invalidField('cg-session','每次在线时长不能超过相邻两次回访的间隔',['cg-hours']);
+ const q=ConnectedCore.rules.q,visitHours=hours.map(hour=>q(String(Number(hour)))),sessionMinutes=q(by('cg-session').value);
+ if(visitHours.some((hour,i)=>sessionMinutes.cmp((visitHours[i+1]??q(24)).sub(hour).mul(q(60)))>0))invalidField('cg-session','每次在线时长不能超过相邻两次回访的间隔',['cg-hours']);
  const seeds=by('cg-seeds').value.split(',').map(x=>x.trim());if(seeds.length>8||seeds.some(x=>x===''||!Number.isInteger(Number(x))||Number(x)<0||Number(x)>4294967295))invalidField('cg-seeds','请填1至8个有效试算编号，用逗号隔开');
 }
 const topBar=make('header','cgTop','<button type="button" id="cgHome" class="cg-wordmark" aria-label="数值工坊，返回首页" title="返回首页">数值工坊</button><div class="cg-top-title"><h1 id="cgGameTitle">选择一份游戏数据</h1><p id="cgWorkspaceState">未载入</p></div><button type="button" id="cgFiles">文件 / 更多</button>');topBar.className='cg-top';by('connected').prepend(topBar);

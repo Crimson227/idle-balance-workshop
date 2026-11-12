@@ -15,7 +15,7 @@ function issues(g){
  keys(g.ruleScope,['mode','unconfirmed'],'ruleScope.',['combat','growth','recommendation']);
  for(const [i,u] of (g.upgrades||[]).entries())keys(u,['id','name','enabled','fields','field','increment','costBase','costStep','maxLevel'],'upgrades.'+i+'.',['growth','recommendation']);
  const r=g.ruleLibrary;if(r?.enabled){
-  keys(r,'version enabled labels defense damage dot critical shield recovery states reactions triggers growth behavior lifecycle modules missing nextRuleId eventBudget rounding'.split(' '),'ruleLibrary.',['combat','growth','recommendation']);
+  keys(r,'version enabled labels defense damage dot critical shield recovery states reactions triggers growth behavior lifecycle modules missing nextRuleId eventBudget rounding attackOrder criticalOrder'.split(' '),'ruleLibrary.',['combat','growth','recommendation']);
   for(const [k,allowed,affects] of [
    ['defense','id unit channels profiles',['combat','recommendation']],['damage','id segments attribute coefficient expression',['combat','recommendation']],
    ['critical','mode scope sharedRandom guarantee threshold',['combat','recommendation']],['shield','player enemy',['combat','recommendation']],

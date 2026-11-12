@@ -1,6 +1,6 @@
 'use strict';
 const B=require('./战斗引擎.cjs'),E=require('./原成长核心.cjs'),N=require('./多属性战斗.cjs'),D=require('./示例.cjs'),R=require('./规则库.cjs'),{Q}=B,q=E.q,enc=E.encode,Z=q(0),O=q(1),DAY=q(86400),VERSION='connected-growth-1.0.0',CURRENT_VERSION='connected-growth-2.0.0';
-const I=require('./收入节拍.cjs'),X=require('./规则检查.cjs'),G=require('./推进归因.cjs'),CALCULATION_REVISION='rule-adaptation-20261104-v1';
+const I=require('./收入节拍.cjs'),X=require('./规则检查.cjs'),G=require('./推进归因.cjs'),CALCULATION_REVISION='rule-adaptation-20261112-v2';
 const clone=x=>structuredClone(x),min=(a,b)=>a.cmp(b)<0?a:b,max=(a,b)=>a.cmp(b)>0?a:b;
 function finite(value,lo,hi,label){const x=q(value);if(x.cmp(q(lo))<0||x.cmp(q(hi))>0)throw Error(label+'超出范围（'+lo+'至'+hi+'）');return x;}
 function int(value,lo,hi,label){const x=finite(value,lo,hi,label);if(x.d!==1n)throw Error(label+'请填整数');return Number(x.n);}
@@ -18,14 +18,25 @@ function compile(game){
  if(!b||!['visits','continuous'].includes(b.mode))throw Error('请选择每天回访或持续在线');
  if(!Array.isArray(b.visitHours)||b.visitHours.length<1||b.visitHours.length>24||b.visitHours[0]!==0||b.visitHours.some((x,i)=>!Number.isFinite(x)||x<0||x>=24||(i&&x<=b.visitHours[i-1])))throw Error('上线时间请从0小时开始递增填写，例如0,5,12');
  const session=finite(b.sessionMinutes,'0.1',120,'每次在线分钟').mul(q(60)),cap=finite(b.offlineCapHours,0,72,'离线收入上限小时').mul(q(3600));
- if(b.visitHours.some((x,i)=>session.cmp(q(((b.visitHours[i+1]??24)-x)*3600))>0))throw Error('上线时段不能重叠');
+ const visitHours=b.visitHours.map(hour=>q(String(hour)));
+ if(visitHours.some((hour,i)=>session.cmp((visitHours[i+1]??q(24)).sub(hour).mul(q(3600)))>0))throw Error('上线时段不能重叠');
  for(const[k,lo,hi]of [['minCompletionSeconds',0,7776000],['maxCompletionSeconds',0,7776000],['maxGapSeconds',0,7776000],['stagesPerVisit',1,1000]])if(game.goals[k]!==null){if(k==='stagesPerVisit')int(game.goals[k],lo,hi,'每次回访目标');else finite(game.goals[k],lo,hi,'目标');}
  if(game.goals.minCompletionSeconds!==null&&game.goals.maxCompletionSeconds!==null&&q(game.goals.minCompletionSeconds).cmp(q(game.goals.maxCompletionSeconds))>0)throw Error('目标最早完成时间不能晚于最晚时间');
  return {c,v,behavior:{...b,session,cap},game:clone(game)};
 }
 function schedule(b,budget){
  if(b.mode==='continuous')return [{index:0,start:Z,end:budget,earnUntil:budget,highestBefore:0}];
- const rows=[];for(let day=0;day<91;day++)for(const hour of b.visitHours){const start=q(day*86400+hour*3600);if(start.cmp(budget)>=0)continue;const end=min(start.add(b.session),budget);rows.push({index:rows.length,start,end,earnUntil:end.add(b.cap),highestBefore:0});}return rows;
+ const offsets=b.visitHours.map(hour=>q(String(hour)).mul(q(3600)));
+ const rows=[];
+ for(let day=Z;day.cmp(DAY.mul(q(91)))<0;day=day.add(DAY)){
+  for(const offset of offsets){
+   const start=day.add(offset);
+   if(start.cmp(budget)>=0)return rows;
+   const end=min(start.add(b.session),budget);
+   rows.push({index:rows.length,start,end,earnUntil:end.add(b.cap),highestBefore:0});
+  }
+ }
+ return rows;
 }
 function compileMulti(game){const dummy=D.ruins();for(const k of ['name','economy','rules','behavior','goals','simulation'])dummy[k]=clone(game[k]);if(!game.mechanisms.armor||R.config(game)&&R.defense(game)!=='armor_k')dummy.rules.armorK='1';dummy.world.stageCount=game.world.stageCount;dummy.world.rewardBase=R.config(game)?'0':game.world.rewardBase;dummy.world.rewardStep=R.config(game)?'0':game.world.rewardStep;const common=compile(dummy),v=common.v,{p,e}=N.validateGame(game),active=new Set(N.enabledFields(game).map(f=>f[0]));for(const k of N.TYPES)if(game.types[k]&&game.mechanisms.resistance)active.add(k+'Reduction');try{R.validate(game,active);}catch(e){if(!e.fieldId)e.fieldId='cgRuleEnabled';throw e;}
  v.player=p;v.multi=clone(game);v.stages=v.stages.map((s,i)=>{const enemy={...e};for(const[k,raw]of Object.entries(game.world.steps||{})){if(!N.FIELDS.some(f=>f[0]===k)&&!N.TYPES.some(t=>k===t+'Reduction'))throw Error('不支持的关卡成长字段：'+k);if(active.has(k))enemy[k]=enemy[k].add(finite(raw,0,1e6,'每关增加'+k).mul(q(i)));}return {enemy:N.actor(enemy,game,'第'+(i+1)+'关敌人'),winReward:R.config(game)?R.reward(game,i):s.winReward};});
@@ -70,7 +81,7 @@ function run(game,seedOverride,controls={}){
  const gaps=stageRows.filter(x=>x.arrival!==null),worst=gaps.reduce((a,r)=>r.noProgressSeconds.cmp(a.noProgressSeconds)>0?r:a,gaps[0]),goals={};
  const completeSeconds=status==='completed'?t:null;goals.completion=game.goals.minCompletionSeconds===null&&game.goals.maxCompletionSeconds===null?null:completeSeconds!==null&&(game.goals.minCompletionSeconds===null||t.cmp(q(game.goals.minCompletionSeconds))>=0)&&(game.goals.maxCompletionSeconds===null||t.cmp(q(game.goals.maxCompletionSeconds))<=0);goals.wait=game.goals.maxGapSeconds===null?null:worst.noProgressSeconds.cmp(q(game.goals.maxGapSeconds))<=0;goals.visits=game.goals.stagesPerVisit===null?null:visits.filter(x=>!x.offline).every(x=>x.newStages>=Math.min(Number(game.goals.stagesPerVisit),v.stages.length-x.highestBefore));
  const result={format:'idle-connected-result-v1',version:game.version,battleVersion:v.multi?N.VERSION:B.VERSION,seed,inputGame:clone(game),status,stopReason,time:t,completionSeconds:completeSeconds,highest:stage-1,balance:coins,initialCoins:v.economy.initialCoins,passiveEarned:earned,rewardsEarned:rewards,spent,levels,events,battles,purchases,waits,visits,stages:stageRows,firstBlock,longestGap:{stage:worst.stage,seconds:worst.noProgressSeconds,from:worst.arrival,to:worst.passedAt??t,censored:worst.passedAt===null},goals,ledger:{exactConserved:v.economy.initialCoins.add(earned).add(rewards).sub(spent).eq(coins)}};
- if(R.config(game)){result.coverage=R.coverage(game);result.ruleVersion=R.VERSION;result.battleVersion=R.VERSION;}if(R.config(game)?.rounding&&R.config(game).rounding.mode!=='none'||I.config(game).mode==='interval'||R.config(game)?.behavior.awaitFirstPurchase||game.ruleScope)result.calculationRevision=CALCULATION_REVISION;const coverage=R.coverage(game);if(!coverage.complete){result.coverage=coverage;result.modeledGoals={...goals};result.goals=Object.fromEntries(Object.keys(goals).map(k=>[k,null]));result.overallAssessment=null;}return enc(result);
+ if(R.config(game)){result.coverage=R.coverage(game);result.ruleVersion=R.VERSION;result.battleVersion=R.VERSION;}if(R.config(game)?.attackOrder||R.config(game)?.criticalOrder||R.config(game)?.rounding&&R.config(game).rounding.mode!=='none'||I.config(game).mode==='interval'||R.config(game)?.behavior.awaitFirstPurchase||game.ruleScope)result.calculationRevision=CALCULATION_REVISION;const coverage=R.coverage(game);if(!coverage.complete){result.coverage=coverage;result.modeledGoals={...goals};result.goals=Object.fromEntries(Object.keys(goals).map(k=>[k,null]));result.overallAssessment=null;}return enc(result);
 }
 function replay(result,stage,attempt){if(![VERSION,CURRENT_VERSION].includes(result?.version))throw Error('结果版本不匹配');const {v}=compile(result.inputGame),entry=result.battles.find(x=>x.stage===stage&&x.attempt===attempt);if(!entry)throw Error('这场战斗没有实际记录');const seed=E.battleSeed(result.seed,stage,attempt);if(seed!==entry.seed)throw Error('战斗编号与结果不一致');const input=battleConfig(v,entry.levels,stage,seed);if(R.dynamic(result.inputGame)){input.ruleState=entry.ruleStateBefore??null;input.elapsedSinceBattle=entry.elapsedSinceBattle||'0';}const full=v.multi?N.run(input):B.run(input),view=v.multi?{interrupted:entry.outcome==='interrupted_budget',data:entry.outcome==='interrupted_budget'?N.run(input,q(entry.seconds)).exact:full.exact}:E.battleView(full,q(entry.seconds));return {stage,attempt,levels:entry.levels,input,cutoffSeconds:view.interrupted?entry.seconds:null,executed:view.data};}
 function number(x){if(x===null)return null;return q(x).toNumber();}
