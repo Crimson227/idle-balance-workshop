@@ -2,6 +2,9 @@
 
 const assert = require('node:assert/strict');
 const test = require('node:test');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
 const Core = require('../source/connected-core/一体化核心.cjs');
 const Meridian = require('../source/connected-core/子午线.cjs');
 const {ruins} = require('../source/connected-core/示例.cjs');
@@ -9,6 +12,7 @@ const ice = require('../source/connected-core/冰霜手算案例.json');
 const q = Core.rules.q;
 const halfSeconds = ticks => q(ticks).div(q(2));
 const credits = quarters => q(quarters).div(q(4));
+const source = name => fs.readFileSync(path.join(__dirname,'../source',name),'utf8');
 
 function incomeReference({slots, budget, cap, minimum, enabled, mode, period, first, round}) {
   const steps = Array.from({length:budget+1}, () => ({base:0, returning:0}));
@@ -163,4 +167,66 @@ test('章末门槛、固定奖章补给与浮点校正对照原版路线', () =>
   const damaged=Meridian.audit(wrong);
   assert.ok(damaged.discrepancies.some(row=>row.label.endsWith(' damage')));
   assert.ok(damaged.discrepancies.some(row=>row.label.endsWith('价格')));
+});
+
+test('5,000 项能复用字段对应，宽 JSON 在展开前检查大小', async () => {
+  const intake=vm.runInNewContext(source('connected-intake.js')+'\nConnectedIntake',{ConnectedCore:Core,structuredClone,TextDecoder,Blob});
+  const rows=[['对象','属性','数值'],...Array.from({length:5000},(_,i)=>['角色','项目'+i,'7'])];
+  const items=intake.entries([{name:'新表',rows}]);
+  const saved=Object.fromEntries(items.map((item,i)=>['旧表|'+item.owner+'|'+item.name,{target:i===2?'player.hp':'',unit:'number'}]));
+  const targets=intake.targets(ice),mappings=intake.suggestAll(items,targets,saved);
+  assert.equal(mappings.filter(x=>x.reused).length,5000);
+  assert.equal(intake.apply(ice,targets,mappings,items).game.player.hp,'7');
+  assert.throws(()=>intake.entries([{name:'超过上限',rows:[...rows,rows[1]]}]),/5000项/);
+  const sparse=Array.from({length:300},(_,i)=>({['列'+i]:i}));
+  assert.throws(()=>intake.fromJSON(sparse),/50000个单元格/);
+  assert.equal(intake.entries(intake.fromJSON([{对象:'角色',属性:'生命',数值:80}]))[0].value,80);
+  let read=false;
+  const oversize={name:'大文件.json',size:256*1024*1024+1,text(){read=true;return '{}';}};
+  await assert.rejects(()=>intake.readFile(oversize),/超过256MB/);
+  assert.equal(read,false);
+  const data={text:'x'.repeat(1024*1024+20)};
+  const exported=intake.exportJSON(data);
+  assert.equal(exported.size,JSON.stringify(data).length);
+  const roundTrip=await intake.readFile(Object.assign(exported,{name:'结果.json'}));
+  assert.equal(roundTrip.data.text,data.text);
+
+});
+
+test('大图形限制绘制点，查询和记录分页保留精确明细', () => {
+  const elements=new Map();
+  const by=id=>{
+    if(!elements.has(id))elements.set(id,{clientWidth:700,setAttribute(){},querySelector:selector=>by(id+selector)});
+    return elements.get(id);
+  };
+  const charts=vm.runInNewContext(source('connected-charts.js')+'\nConnectedCharts',{ConnectedCore:Core,document:{getElementById:by}});
+  const points=Array.from({length:10001},(_,i)=>({time:String(i),value:String(i===5432?99999:i%300),label:'记录'+i,kind:'purchase'}));
+  charts.render('chart',[{name:'测试',points}],{title:'钱包',yLabel:'金币'});
+  assert.ok((by('chart').innerHTML.match(/<circle /g)||[]).length<=2001);
+  assert.match(by('chart').innerHTML,/记录5432/);
+  assert.match(by('chart').innerHTML,/max="10000"/);
+  charts.select('chart',9999);
+  assert.match(by('chart-value').textContent,/记录9999/);
+  const app=source('connected-app.js');
+  const render=vm.runInNewContext(app.slice(app.indexOf(' function renderRecordPage('),app.indexOf(' function renderRecords('))+'\nrenderRecordPage',{by});
+  render(points.slice(0,201),'rows','pager',(row,index)=>'<p>'+index+'</p>');
+  assert.match(by('rows').innerHTML,/<p>99<\/p>$/);
+  const next={target:{closest:()=>({dataset:{recordPage:'1'}})}};
+  by('pager').onclick(next);
+  by('pager').onclick(next);
+  assert.equal(by('rows').innerHTML,'<p>200</p>');
+  assert.equal(by('pager').querySelector('[data-record-page="1"]').disabled,true);
+});
+
+test('重复消耗同一状态时在计算前提示规则错误', () => {
+  const game=structuredClone(ice),rules=game.ruleLibrary=Core.rules.initial(game);
+  const state={effect:'marker',owner:'player',target:'target',applyAt:'start',duration:'2',maxStacks:1,refresh:'refresh'};
+  rules.states=[{...state,id:'wet'},{...state,id:'cold'}];
+  rules.reactions=[{id:'freeze',effect:'freeze',duration:'1',states:['wet','cold'],consume:['wet','wet']}];
+  const invalid=Core.preflight(game);
+  assert.equal(invalid.ready,false);
+  assert.match(invalid.issues[0].detail,/不重复的消耗状态/);
+  rules.reactions[0].consume=['wet'];
+  assert.equal(Core.preflight(game).ready,true);
+  Core.assertResultTrace(Core.run(game));
 });
