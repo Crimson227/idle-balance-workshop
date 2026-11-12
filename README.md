@@ -123,6 +123,8 @@
 
 构建需要 Python 3.10或更高版本、Node.js 22或更高版本，无须安装额外依赖。
 
+构建会先检查离线收益、购买顺序、账本和子午线原版路线，全部通过后才生成发布文件。也可单独运行 `node --test tests/workshop.test.cjs`。
+
 ```sh
 python build.py
 ```

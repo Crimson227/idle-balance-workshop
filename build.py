@@ -14,6 +14,7 @@ def build(output):
         raise SystemExit("构建需要 Node.js 22或更高版本，请先安装并加入 PATH。")
     if output == repo or output == source or source in output.parents:
         raise SystemExit("输出目录不能覆盖仓库根目录或源码目录。")
+    subprocess.run(["node", "--test", str(repo / "tests/workshop.test.cjs")], cwd=repo, check=True)
     scratch_root = (repo / "outputs").resolve()
     scratch_root.mkdir(exist_ok=True)
     stage = Path(tempfile.mkdtemp(prefix="build-", dir=scratch_root)).resolve()
